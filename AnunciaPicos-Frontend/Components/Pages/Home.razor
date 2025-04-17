@@ -2,7 +2,6 @@
 
 <NavBar />
 
-
 <!-- Banner do carrossel -->
 <div class="banner-carousel">
     <div class="carousel-inner-slide" id="carouselSlide">
@@ -14,11 +13,16 @@
 </div>
 
 <div class="conteudo-container">
-    <button id="toggleFiltro" class="menu-filtro-btn">☰ Filtros</button>
+    <button id="toggleFiltro" class="menu-filtro-btn">
+        <span class="hamburguer-icon">☰</span>
+        <span class="fechar-icon" style="display:none;">✕</span>
+        Filtros
+    </button>
     <div class="backdrop" id="fundoFiltro"></div>
 
     <aside class="filtro-lateral oculto-mobile" id="filtroLateral">
-        <button id="fecharFiltro" style="background:none; border:none; font-size:22px; color:#555; float:right; cursor:pointer;">✕</button>
+        <button id="fecharFiltro"
+            style="background:none; border:none; font-size:22px; color:#555; float:right; cursor:pointer;">✕</button>
         <h3>CATEGORIAS</h3>
         <form id="formCategorias">
             <label><input type="radio" name="categoria" value="" checked> Todas as categorias</label>
@@ -43,18 +47,20 @@
                 <input type="number" id="maxPrice" min="0" step="0.01" placeholder="R$ Max">
             </div>
         </div>
-        
-        <button id="aplicarFiltros" style="margin-top: 20px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+
+        <button id="aplicarFiltros"
+            style="margin-top: 20px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
             Aplicar Filtros
         </button>
     </aside>
 
     <main class="conteudo-principal" id="conteudo">
         <div id="areaAnunciar" style="text-align: right; margin-bottom: 10px; display: none;">
-    <button id="btnAdicionarAnuncio" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
-        + Anunciar Produto
-    </button>
-</div>
+            <button id="btnAdicionarAnuncio"
+                style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                + Anunciar Produto
+            </button>
+        </div>
 
         <div id="barraDeBusca">
             <input type="text" id="inputBusca" placeholder="Buscar produtos..." />
@@ -71,225 +77,239 @@
 <Footer />
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const welcomeEl = document.getElementById("welcomeMessage");
-    const token = localStorage.getItem("authToken");
+    document.addEventListener("DOMContentLoaded", function () {
+        const welcomeEl = document.getElementById("welcomeMessage");
+        const token = localStorage.getItem("authToken");
 
-    if (!token) {
-        welcomeEl.textContent = "Você está navegando como visitante.";
-    } else {
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const agora = Math.floor(Date.now() / 1000);
-            if (payload.exp && payload.exp < agora) {
-                welcomeEl.textContent = "Sessão expirada. Você está como visitante.";
+        if (!token) {
+            welcomeEl.textContent = "Você está navegando como visitante.";
+        } else {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const agora = Math.floor(Date.now() / 1000);
+                if (payload.exp && payload.exp < agora) {
+                    welcomeEl.textContent = "Sessão expirada. Você está como visitante.";
+                    localStorage.removeItem("authToken");
+                } else {
+                    const nome = payload.sub || "Usuário";
+                    welcomeEl.textContent = `Olá, ${nome}! Seja bem vindo ao Anuncia Picos.`;
+                }
+            } catch (error) {
+                welcomeEl.textContent = "Erro ao verificar login. Acesso limitado como visitante.";
                 localStorage.removeItem("authToken");
-            } else {
-                const nome = payload.sub || "Usuário";
-                welcomeEl.textContent = `Olá, ${nome}! Seja bem vindo ao Anuncia Picos.`;
             }
-        } catch (error) {
-            welcomeEl.textContent = "Erro ao verificar login. Acesso limitado como visitante.";
-            localStorage.removeItem("authToken");
         }
-    }
 
-    const slideContainer = document.getElementById("carouselSlide");
-    const slides = document.querySelectorAll(".banner-slide");
-    let currentIndex = 0;
+        const slideContainer = document.getElementById("carouselSlide");
+        const slides = document.querySelectorAll(".banner-slide");
+        let currentIndex = 0;
 
-    function goToSlide(index) {
-        const slideWidth = slides[0].clientWidth;
-        slideContainer.style.transition = "transform 0.8s ease-in-out";
-        slideContainer.style.transform = `translateX(-${index * slideWidth}px)`;
-    }
-
-    function nextSlide() {
-        currentIndex++;
-        goToSlide(currentIndex);
-        if (currentIndex === slides.length - 1) {
-            setTimeout(() => {
-                slideContainer.style.transition = "none";
-                currentIndex = 0;
-                slideContainer.style.transform = `translateX(0px)`;
-            }, 800);
+        function goToSlide(index) {
+            const slideWidth = slides[0].clientWidth;
+            slideContainer.style.transition = "transform 0.8s ease-in-out";
+            slideContainer.style.transform = `translateX(-${index * slideWidth}px)`;
         }
-    }
 
-    setInterval(nextSlide, 5000);
+        function nextSlide() {
+            currentIndex++;
+            goToSlide(currentIndex);
+            if (currentIndex === slides.length - 1) {
+                setTimeout(() => {
+                    slideContainer.style.transition = "none";
+                    currentIndex = 0;
+                    slideContainer.style.transform = `translateX(0px)`;
+                }, 800);
+            }
+        }
 
-    const toggleFiltro = document.getElementById("toggleFiltro");
-    const fecharFiltro = document.getElementById("fecharFiltro");
-    const filtroLateral = document.getElementById("filtroLateral");
-    const backdrop = document.getElementById("fundoFiltro");
+        setInterval(nextSlide, 5000);
 
-    [toggleFiltro, fecharFiltro, backdrop].forEach(el => {
-        if (el) el.addEventListener("click", () => {
+        const toggleFiltro = document.getElementById("toggleFiltro");
+        const fecharFiltro = document.getElementById("fecharFiltro");
+        const filtroLateral = document.getElementById("filtroLateral");
+        const backdrop = document.getElementById("fundoFiltro");
+
+        // Alteração do evento de clique para o toggleFiltro
+        toggleFiltro.addEventListener("click", () => {
+            toggleFiltro.classList.toggle("ativo");
             filtroLateral.classList.toggle("ativo");
             backdrop.classList.toggle("ativo");
         });
-    });
 
-    let todosProdutos = [];
-    let produtosBusca = [];
-    let paginaAtual = 1;
-    const produtosPorPagina = 12;
-    let buscandoProdutos = false;
+        // Alteração do evento de clique para o fecharFiltro
+        fecharFiltro.addEventListener("click", () => {
+            toggleFiltro.classList.remove("ativo");
+            filtroLateral.classList.remove("ativo");
+            backdrop.classList.remove("ativo");
+        });
 
-    function exibirPagina(pagina, lista) {
-        const inicio = (pagina - 1) * produtosPorPagina;
-        const fim = inicio + produtosPorPagina;
-        const produtosPagina = lista.slice(inicio, fim);
+        // Alteração do evento de clique para o backdrop
+        backdrop.addEventListener("click", () => {
+            toggleFiltro.classList.remove("ativo");
+            filtroLateral.classList.remove("ativo");
+            backdrop.classList.remove("ativo");
+        });
 
-        const container = document.getElementById("produtosContainer");
-        container.innerHTML = "";
+        let todosProdutos = [];
+        let produtosBusca = [];
+        let paginaAtual = 1;
+        const produtosPorPagina = 12;
+        let buscandoProdutos = false;
 
-        if (produtosPagina.length === 0) {
-            container.innerHTML = ` 
+        function exibirPagina(pagina, lista) {
+            const inicio = (pagina - 1) * produtosPorPagina;
+            const fim = inicio + produtosPorPagina;
+            const produtosPagina = lista.slice(inicio, fim);
+
+            const container = document.getElementById("produtosContainer");
+            container.innerHTML = "";
+
+            if (produtosPagina.length === 0) {
+                container.innerHTML = ` 
                 <div style="text-align: center; width: 100%; padding: 20px;">
                     <p>Nenhum produto encontrado.</p>
                 </div>
             `;
-            return;
-        }
+                return;
+            }
 
-        produtosPagina.forEach(prod => {
-            const nome = prod.name || "Produto sem nome";
-            const preco = typeof prod.price === "number"
-                ? parseFloat(prod.price).toFixed(2).replace(".", ",")
-                : "0,00";
-            const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string")
-                ? prod.imageUrl[0]
-                : "images/sem-imagem.png";
+            produtosPagina.forEach(prod => {
+                const nome = prod.name || "Produto sem nome";
+                const preco = typeof prod.price === "number"
+                    ? parseFloat(prod.price).toFixed(2).replace(".", ",")
+                    : "0,00";
+                const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string")
+                    ? prod.imageUrl[0]
+                    : "images/sem-imagem.png";
 
-            const div = document.createElement("div");
-            div.classList.add("produto");
-            div.innerHTML = ` 
+                const div = document.createElement("div");
+                div.classList.add("produto");
+                div.innerHTML = ` 
                 <img src="${imagem}" alt="${nome}" onerror="this.src='images/sem-imagem.png'">
                 <p class="titulo">${nome}</p>
                 <p class="preco">R$ ${preco}</p>
                 <button class="botao-produto" data-id="${prod.id}">Saiba Mais</button>
             `;
-            container.appendChild(div);
-        });
-
-        atualizarPaginacao(lista);
-    }
-
-    function atualizarPaginacao(lista) {
-        const totalPaginas = Math.ceil(lista.length / produtosPorPagina);
-        const paginacaoBusca = document.getElementById("paginacaoBusca");
-        const paginacaoNormal = document.getElementById("paginacao");
-
-        paginacaoBusca.innerHTML = "";
-        paginacaoNormal.innerHTML = "";
-
-        for (let i = 1; i <= totalPaginas; i++) {
-            const btn = document.createElement("button");
-            btn.textContent = i;
-            btn.classList.add("pagina-btn");
-            if (i === paginaAtual) btn.classList.add("ativa");
-
-            btn.addEventListener("click", () => {
-                paginaAtual = i;
-                exibirPagina(paginaAtual, buscandoProdutos ? produtosBusca : todosProdutos);
+                container.appendChild(div);
             });
 
-            if (buscandoProdutos) {
-                paginacaoBusca.appendChild(btn);
-            } else {
-                paginacaoNormal.appendChild(btn);
+            atualizarPaginacao(lista);
+        }
+
+        function atualizarPaginacao(lista) {
+            const totalPaginas = Math.ceil(lista.length / produtosPorPagina);
+            const paginacaoBusca = document.getElementById("paginacaoBusca");
+            const paginacaoNormal = document.getElementById("paginacao");
+
+            paginacaoBusca.innerHTML = "";
+            paginacaoNormal.innerHTML = "";
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                const btn = document.createElement("button");
+                btn.textContent = i;
+                btn.classList.add("pagina-btn");
+                if (i === paginaAtual) btn.classList.add("ativa");
+
+                btn.addEventListener("click", () => {
+                    paginaAtual = i;
+                    exibirPagina(paginaAtual, buscandoProdutos ? produtosBusca : todosProdutos);
+                });
+
+                if (buscandoProdutos) {
+                    paginacaoBusca.appendChild(btn);
+                } else {
+                    paginacaoNormal.appendChild(btn);
+                }
             }
         }
-    }
 
-    async function carregarProdutos() {
-        try {
-            document.getElementById("produtosContainer").innerHTML = ` 
+        async function carregarProdutos() {
+            try {
+                document.getElementById("produtosContainer").innerHTML = ` 
                 <div style="text-align: center; width: 100%; padding: 20px;">
                     <div class="loader"></div>
                     <p>Carregando produtos...</p>
                 </div>
             `;
 
-            const resposta = await fetch("https://api.anunciapicos.shop/product/exibicao-produtos");
-            const dados = await resposta.json();
-            todosProdutos = Array.isArray(dados) ? dados : dados.items || [];
-            paginaAtual = 1;
-            buscandoProdutos = false;
-            exibirPagina(paginaAtual, todosProdutos);
-        } catch (erro) {
-            console.error("Erro ao carregar produtos:", erro);
-            document.getElementById("produtosContainer").innerHTML = ` 
-                <div style="text-align: center; width: 100%; padding: 20px;">
-                    <p>Erro ao carregar produtos. Tente novamente mais tarde.</p>
-                    <button onclick="carregarProdutos()">Tentar Novamente</button>
-                </div>
-            `;
-        }
-    }
-
-    const btnBuscar = document.getElementById("btnBuscar");
-    const inputBusca = document.getElementById("inputBusca");
-    const aplicarFiltros = document.getElementById("aplicarFiltros");
-
-    async function realizarBusca() {
-        const termo = inputBusca.value.trim();
-
-        const categoriaSelecionada = document.querySelector('input[name="categoria"]:checked')?.value;
-        const minPrice = document.getElementById('minPrice').value;
-        const maxPrice = document.getElementById('maxPrice').value;
-
-        const params = new URLSearchParams();
-
-        if (termo) params.append('Name', termo);
-        if (categoriaSelecionada && categoriaSelecionada !== "") params.append('CategoryId', categoriaSelecionada);
-        if (minPrice) params.append('MinPrice', minPrice);
-        if (maxPrice) params.append('MaxPrice', maxPrice);
-
-        const temBusca = params.toString() !== "";
-
-        buscandoProdutos = temBusca;
-
-        if (!temBusca) {
-            await carregarProdutos();
-            return;
+                const resposta = await fetch("https://api.anunciapicos.shop/product/exibicao-produtos");
+                const dados = await resposta.json();
+                todosProdutos = Array.isArray(dados) ? dados : dados.items || [];
+                paginaAtual = 1;
+                buscandoProdutos = false;
+                exibirPagina(paginaAtual, todosProdutos);
+            } catch (erro) {
+                console.error("Erro ao carregar produtos:", erro);
+                document.getElementById("produtosContainer").innerHTML = `
+                <div class="erro-carregamento">
+                <p>Erro ao carregar produtos. Tente novamente mais tarde.</p>
+                <button onclick="carregarProdutos()">Tentar Novamente</button>
+                </div>`;
+            }
         }
 
-        const textoOriginal = btnBuscar.innerHTML;
-        btnBuscar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        btnBuscar.disabled = true;
+        const btnBuscar = document.getElementById("btnBuscar");
+        const inputBusca = document.getElementById("inputBusca");
+        const aplicarFiltros = document.getElementById("aplicarFiltros");
 
-        try {
-            const url = `https://api.anunciapicos.shop/product/busca/produtos/?${params.toString()}`;
-            const resposta = await fetch(url, { method: "GET", headers: { "Content-Type": "application/json" } });
-            const dados = await resposta.json();
-            produtosBusca = Array.isArray(dados) ? dados : dados.items || [];
+        async function realizarBusca() {
+            const termo = inputBusca.value.trim();
 
-            paginaAtual = 1;
-            exibirPagina(paginaAtual, produtosBusca);
-        } catch (erro) {
-            console.error("Erro ao buscar produtos:", erro);
-            produtosBusca = [];
-            exibirPagina(1, []);
-        } finally {
-            btnBuscar.innerHTML = textoOriginal;
-            btnBuscar.disabled = false;
+            const categoriaSelecionada = document.querySelector('input[name="categoria"]:checked')?.value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            const params = new URLSearchParams();
+
+            if (termo) params.append('Name', termo);
+            if (categoriaSelecionada && categoriaSelecionada !== "") params.append('CategoryId', categoriaSelecionada);
+            if (minPrice) params.append('MinPrice', minPrice);
+            if (maxPrice) params.append('MaxPrice', maxPrice);
+
+            const temBusca = params.toString() !== "";
+
+            buscandoProdutos = temBusca;
+
+            if (!temBusca) {
+                await carregarProdutos();
+                return;
+            }
+
+            const textoOriginal = btnBuscar.innerHTML;
+            btnBuscar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btnBuscar.disabled = true;
+
+            try {
+                const url = `https://api.anunciapicos.shop/product/busca/produtos/?${params.toString()}`;
+                const resposta = await fetch(url, { method: "GET", headers: { "Content-Type": "application/json" } });
+                const dados = await resposta.json();
+                produtosBusca = Array.isArray(dados) ? dados : dados.items || [];
+
+                paginaAtual = 1;
+                exibirPagina(paginaAtual, produtosBusca);
+            } catch (erro) {
+                console.error("Erro ao buscar produtos:", erro);
+                produtosBusca = [];
+                exibirPagina(1, []);
+            } finally {
+                btnBuscar.innerHTML = textoOriginal;
+                btnBuscar.disabled = false;
+            }
         }
-    }
 
-    btnBuscar.addEventListener("click", realizarBusca);
+        btnBuscar.addEventListener("click", realizarBusca);
 
-    aplicarFiltros.addEventListener("click", async () => {
-        await realizarBusca();
+        aplicarFiltros.addEventListener("click", async () => {
+            await realizarBusca();
 
-        // Fecha o menu de filtro se for mobile
-        if (window.innerWidth <= 768) {
-            filtroLateral.classList.remove("ativo");
-            backdrop.classList.remove("ativo");
-        }
+            // Fecha o menu de filtro se for mobile
+            if (window.innerWidth <= 768) {
+                toggleFiltro.classList.remove("ativo");
+                filtroLateral.classList.remove("ativo");
+                backdrop.classList.remove("ativo");
+            }
+        });
+
+        carregarProdutos();
     });
-
-    carregarProdutos();
-});
 </script>

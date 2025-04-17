@@ -514,3 +514,20 @@
         padding: 12px 14px;
     }
 }
+
+.avaliacao {
+    display: flex;
+    align-items: center; /* Alinha as estrelas verticalmente ao centro */
+    justify-content: flex-start; /* Alinha as estrelas à esquerda */
+    padding: 4px 0;
+    width: 100%; /* Garante que ocupe toda a largura disponível */
+}
+
+.estrelas {
+    display: flex;
+    gap: 2px; /* Espaço entre as estrelas */
+    justify-content: start;
+    color: gold;
+    width: 100%; /* Faz as estrelas ocuparem toda a largura do container */
+    max-width: 120px; /* Limita a largura das estrelas para que fiquem consistentes */
+}
