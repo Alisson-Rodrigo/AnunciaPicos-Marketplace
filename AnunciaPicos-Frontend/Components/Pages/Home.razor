@@ -2,7 +2,6 @@
 
 <NavBar />
 
-<p id="welcomeMessage" style="padding: 10px 20px; font-weight: 500; color: #333;"></p>
 
 <!-- Banner do carrossel -->
 <div class="banner-carousel">
@@ -51,6 +50,12 @@
     </aside>
 
     <main class="conteudo-principal" id="conteudo">
+        <div id="areaAnunciar" style="text-align: right; margin-bottom: 10px; display: none;">
+    <button id="btnAdicionarAnuncio" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        + Anunciar Produto
+    </button>
+</div>
+
         <div id="barraDeBusca">
             <input type="text" id="inputBusca" placeholder="Buscar produtos..." />
             <button id="btnBuscar">Buscar</button>
@@ -81,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 localStorage.removeItem("authToken");
             } else {
                 const nome = payload.sub || "Usuário";
-                welcomeEl.textContent = `Olá, ${nome}! Você está logado.`;
+                welcomeEl.textContent = `Olá, ${nome}! Seja bem vindo ao Anuncia Picos.`;
             }
         } catch (error) {
             welcomeEl.textContent = "Erro ao verificar login. Acesso limitado como visitante.";
@@ -128,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let todosProdutos = [];
     let produtosBusca = [];
     let paginaAtual = 1;
-    const produtosPorPagina = 10;
+    const produtosPorPagina = 12;
     let buscandoProdutos = false;
 
     function exibirPagina(pagina, lista) {
