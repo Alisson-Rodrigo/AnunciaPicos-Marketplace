@@ -9,7 +9,7 @@
   </div>
 
   <div class="icons" id="menuIcons">
-    <a href="#" class="icon" onclick="verificarAuthENavegar('/cadastrarProduto')">
+    <a href="#" class="icon" onclick="verificarAuthENavegar('')">
       <i class="fas fa-shopping-cart"></i>
       <span class="cart-count">2</span>
     </a>
@@ -25,7 +25,14 @@
 <div class="sub-navbar">
   <div class="sub-navbar-container">
     <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">Escolha um Plano</button>
+
+    <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')"class="plan-button">
+    + Anunciar Produto
+</button>
+
   </div>
+
+  
 </div>
 
 
@@ -65,7 +72,6 @@
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.nome) {
-          document.getElementById("welcomeMessage").innerText = `Olá, ${payload.nome}, bem-vindo ao Anuncia Picos!`;
         }
       } catch (e) {
         console.error("Erro ao processar token:", e);
