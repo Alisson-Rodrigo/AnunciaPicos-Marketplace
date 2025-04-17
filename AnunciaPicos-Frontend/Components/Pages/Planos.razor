@@ -1,0 +1,201 @@
+@page "/Planos"
+
+
+<div class="planos-container">
+    <h1>Escolha seu plano</h1>
+    <div id="error-message" class="error-container" style="display: none;"></div>
+    <div class="planos-cards">
+        <div class="card selecionado">
+            <h2>Free</h2>
+            <p class="preco">R$0<span>/mês</span></p>
+            <ul>
+                <li>✔ Consumo de recursos</li>
+                <li>✔ Postagem ilimitada</li>
+                <li>✔ Chat de negociação</li>
+            </ul>
+            <button disabled>Plano atual</button>
+        </div>
+        <div class="card">
+            <h2>Premium</h2>
+            <p class="preco">R$30<span>/mês</span></p>
+            <ul>
+                <li>✔ Consumo de recursos</li>
+                <li>✔ Postagem ilimitada</li>
+                <li>✔ Chat de negociação</li>
+                <li>✔ 10 anúncios por mês</li>
+            </ul>
+            <button onclick="escolherPlano(2)">Quero esse!</button>
+        </div>
+        <div class="card">
+            <h2>Business</h2>
+            <p class="preco">R$60<span>/mês</span></p>
+            <ul>
+                <li>✔ Consumo de recursos</li>
+                <li>✔ Postagem ilimitada</li>
+                <li>✔ Chat de negociação</li>
+                <li>✔ 30 anúncios por mês</li>
+            </ul>
+            <button onclick="escolherPlano(3)">Quero esse!</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function escolherPlano(idPlano) {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            window.location.href = "/Login";
+            return;
+        }
+
+        hideError();
+
+        const buttons = document.querySelectorAll(".card button:not([disabled])");
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.dataset.originalText = btn.textContent;
+            btn.textContent = "Processando...";
+        });
+
+        try {
+            const resposta = await fetch(`https://api.anunciapicos.shop/api/PlanPayments/checkout/${idPlano}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            const contentType = resposta.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                const data = await resposta.json();
+                console.log("Resposta JSON:", data);  // Debug: mostrar a resposta
+                console.log("Tipo de 'data':", typeof data);  // Verificando tipo de dado
+
+                if (!resposta.ok) {
+                    if (data.errors && data.errors.length > 0) {
+                        showError(data.errors.join("<br>"));
+                    } else {
+                        showError("Erro ao tentar assinar o plano. Tente novamente.");
+                    }
+                } else {
+                    if (data?.paymentUrl) {
+                        window.location.href = data.paymentUrl;
+                    } else {
+                        console.warn("paymentUrl ausente no JSON:", data);
+                        showError("Erro: resposta da API não contém o link de pagamento.");
+                    }
+                }
+            } else {
+                const texto = await resposta.text();
+                showError("Erro ao processar resposta do servidor");
+                console.error("Resposta não-JSON:", texto);
+            }
+        } catch (erro) {
+            console.error("Erro na requisição:", erro);
+            showError("Erro de conexão. Tente novamente mais tarde.");
+        } finally {
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                if (btn.dataset.originalText) {
+                    btn.textContent = btn.dataset.originalText;
+                }
+            });
+        }
+    }
+
+    function showError(message) {
+        const errorContainer = document.getElementById("error-message");
+        errorContainer.innerHTML = message;
+        errorContainer.style.display = "block";
+    }
+
+    function hideError() {
+        const errorContainer = document.getElementById("error-message");
+        errorContainer.style.display = "none";
+    }
+</script>
+
+<style>
+    .error-container {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        border-left: 4px solid #c62828;
+    }
+
+    .selecionado {
+        border: 2px solid #28a745;
+        background-color: #e6ffe6;
+    }
+
+    .selecionado button {
+        background-color: #28a745;
+        color: white;
+        cursor: not-allowed;
+    }
+
+    .card button {
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .card button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .planos-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .planos-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        width: 280px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+        text-align: center;
+        margin-top: 0;
+    }
+
+    .preco {
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .preco span {
+        font-size: 16px;
+        font-weight: normal;
+    }
+
+    .card button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: white;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    .card button:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+</style>

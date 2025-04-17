@@ -1,0 +1,236 @@
+/* Configuração do layout para ocupar toda a altura da tela */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+
+}
+
+.zen-kaku-gothic-antique-regular {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Container principal do formulário */
+.register-container {
+  display: flex;
+  width: 100%;
+  height: 100vh; /* A altura da tela será totalmente utilizada */
+  margin: 0;
+}
+
+/* Lado esquerdo */
+.left-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Centraliza verticalmente */
+  gap: 3rem;
+  color: white;
+  width: 50%;
+  background-image: url('images/background.png');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.left-side img {
+  width: 40%;
+  height: auto;
+  max-width: 300px;
+}
+
+.right-side {
+  font-family: Zen Kaku Gothic Antique, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Alinha os itens no topo */
+  align-items: center;
+  gap: 10px; /* Reduz o espaçamento entre os campos */
+  width: 50%;
+  background-color: #fff;
+  box-sizing: border-box;
+  padding: 20px;
+  height: 100vh; /* Garante que a área direita ocupe toda a altura da tela */
+ 
+}
+
+/* Título principal */
+h1, h2, h3, p {
+  margin: 0;
+  padding: 0 20px;
+  text-align: center;
+}
+
+/* Tamanho específico para o h3 */
+h3 {
+  font-size: 28px;  /* Ajuste o tamanho conforme necessário */
+  margin-bottom: 20px; /* Adiciona espaçamento abaixo do h3 */
+}
+
+/* Ajustes do formulário */
+form {
+  width: 100%;
+  max-width: 400px; /* Define o tamanho máximo do formulário */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Reduz o espaço entre os campos */
+  justify-content: flex-start;
+}
+
+/* Estilos para os campos de entrada do formulário */
+.input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Estilo dos labels dentro do formulário */
+.input-container label {
+  font-size: 12px; /* Reduz o tamanho da fonte dos labels */
+  color: #555;
+  font-weight: 500;
+}
+
+/* Estilo dos inputs dentro do formulário */
+input {
+  width: 100%;
+  padding: 20px; /* Reduz o padding dos campos */
+  margin: 0;
+  border: none;
+  border-bottom: 2px solid #ddd; /* Borda apenas embaixo */
+  background-color: transparent;
+  font-size: 13px; /* Reduz o tamanho da fonte */
+  color: #333;
+}
+
+input:focus {
+  border-bottom-color: #4285F4; /* Cor da borda ao focar */
+  outline: none;
+  
+}
+
+/* Estilo para o botão de recuperação de senha */
+.register-btn {
+  display: inline-block;
+  padding: 8px 15px; /* Reduz o tamanho do botão */
+  font-size: 13px; /* Reduz o tamanho da fonte do botão */
+  font-weight: bold;
+  background-color: #7B76F1;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px; /* Ajusta a distância entre o botão e o formulário */
+}
+
+.register-btn:hover {
+  background-color: #5a51c0;
+  text-decoration: none;
+}
+
+/* Estilo do link "Esqueci minha senha" */
+.reclink {
+  display: inline-block;
+  padding: 8px 25px; /* Reduz o padding do link */
+  font-size: 13px;
+  font-weight: bold;
+  background-color: #7B76F1;
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  text-align: center;
+  width: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.reclink:hover {
+  background-color: #5a51c0;
+}
+
+/* Centraliza o link "Já tem uma conta?" */
+.cadlink {
+  color: #7B76F1;
+  text-decoration: none;
+  font-size: 13px; /* Tamanho da fonte do link */
+  font-weight: bold;
+  text-align: center; /* Garante que o texto do link fique centralizado */
+  margin-top: 20px; /* Ajusta o espaçamento entre o link e o botão */
+  display: block; /* Faz o link ocupar toda a largura disponível */
+  width: 100%; /* Garante que ocupe toda a largura */
+}
+
+.cadlink:hover {
+  text-decoration: underline;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 1050px) {
+  .register-container {
+      flex-direction: column; /* Alinha os elementos em coluna */
+  }
+
+  .left-side,
+  .right-side {
+      width: 100%;
+      height: auto;
+  }
+
+  .register-btn {
+      width: 100%;
+  }
+
+  /* Ajuste dos campos de input para telas menores */
+  .input-container label,
+  .input-container input {
+      width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  h3 {
+      font-size: 24px; /* Ajuste para tamanhos de tela menores */
+  }
+  h1 {
+    margin-top: 21px; /* Adiciona espaçamento acima do título */
+    margin-bottom: 20px; /* Ajuste para o espaço abaixo do título */
+  }
+  p{
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .reclink {
+      width: 100%;
+  }
+
+  .cadlink {
+      font-size: 12px; /* Ajuste o tamanho da fonte para telas menores */
+  }
+}
+@media screen and (min-width: 1918px) {
+  .input-container label {
+    font-size: 13px;  /* Aumenta o tamanho da fonte dos labels */
+  }
+
+  input {
+    padding: 14px;  /* Aumenta o padding para os campos de entrada */
+    font-size: 14px; /* Aumenta o tamanho da fonte para os campos de entrada */
+  }
+
+  .register-btn {
+    font-size: 13px; /* Aumenta o tamanho da fonte do botão */
+    padding: 13px 30px; /* Aumenta o tamanho do botão */
+  }
+
+  .reclink, .cadlink {
+    font-size: 14px; /* Aumenta o tamanho da fonte dos links */
+    padding: 12px 30px; /* Aumenta o padding dos links */
+  }
+}

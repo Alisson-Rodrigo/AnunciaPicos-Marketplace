@@ -1,0 +1,516 @@
+/* Banner do carrossel */
+.banner-carousel {
+    width: 95%; /* Largura ajustada para 95% */
+    height: 250px;
+    margin: 0 auto; /* Centraliza o banner */
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    box-sizing: border-box;
+}
+
+.carousel-inner-slide {
+    display: flex;
+    height: 100%;
+    transition: transform 0.8s ease-in-out;
+    width: max-content;
+}
+
+.banner-slide {
+    width: 100vw;
+    height: 100%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Botão para mostrar o menu lateral */
+.menu-filtro-btn {
+    display: none;
+    background-color: #7E6EEA;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+
+/* Container flex principal */
+.conteudo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Filtro lateral */
+.filtro-lateral {
+    width: 300px;
+    padding: 25px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    position: relative;
+}
+
+.filtro-lateral h3 {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+}
+
+.filtro-lateral form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 25px;
+}
+
+.filtro-lateral label {
+    font-size: 15px;
+    color: #444;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.filtro-lateral input[type="radio"] {
+    margin-right: 8px;
+}
+
+.filtro-lateral input[type="range"] {
+    width: 100%;
+    margin: 12px 0;
+}
+
+.filtro-lateral .precos {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Botão fechar (mobile) */
+#fecharFiltro {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #555;
+    float: right;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+/* Backdrop para menu mobile */
+.backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+}
+
+/* Conteúdo principal */
+.conteudo-principal {
+    padding: 1rem;
+    padding-top: 3rem;
+    background-color: #f8f8f8;
+    min-height: 100vh;
+    flex: 1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1200px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Grade de produtos */
+.grid-produtos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+/* Card do produto */
+.produto {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza elementos no eixo horizontal */
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* Animação ao passar o mouse */
+.produto:hover {
+    transform: translateY(-5px);
+}
+
+/* Imagem do produto - Centralizada */
+.produto img {
+    width: 90%;
+    max-height: 160px;
+    object-fit: contain;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Título - Alinhado à esquerda */
+.produto .titulo {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #333;
+    text-align: left;
+    width: 100%;
+}
+
+/* Descrição - Alinhada à esquerda */
+.produto .descricao {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 8px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    width: 100%;
+}
+
+/* Preço - Alinhado à esquerda */
+.produto .preco {
+    font-size: 1.1rem;
+    color: #7E6EEA;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
+}
+
+/* Categoria - Alinhada à esquerda */
+.produto .categoria {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 10px;
+    text-align: left;
+    width: 100%;
+}
+
+/* Selos */
+.selo {
+    background-color: #ff5050;
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+}
+
+.selo.oferta {
+    background-color: #1a8d1a;
+}
+
+/* Botão dos produtos - Centralizado */
+.botao-produto {
+    margin-top: auto;
+    background-color: #7E6EEA;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 80%; /* Reduzido de 100% para 80% para centralizar */
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.botao-produto:hover {
+    transform: translateY(-2px);
+}
+
+.botao-produto:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+/* Responsivo */
+@media screen and (max-width: 768px) {
+    .conteudo-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .menu-filtro-btn {
+        display: block;
+    }
+
+    #fecharFiltro {
+        display: block;
+    }
+
+    .filtro-lateral {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        height: 100vh;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+        overflow-y: auto;
+        transition: left 0.3s ease;
+        z-index: 1001;
+        border-radius: 0;
+    }
+
+    .filtro-lateral.ativo {
+        left: 0;
+    }
+
+    .backdrop.ativo {
+        display: block;
+    }
+
+    .grid-produtos {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .conteudo-principal {
+        padding: 0.8rem;
+        width: 98%;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .grid-produtos {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 0 5px;
+        gap: 0.8rem;
+    }
+
+    .produto {
+        padding: 0.8rem;
+    }
+
+    .produto .titulo {
+        font-size: 0.85rem;
+    }
+
+    .produto .descricao {
+        font-size: 0.75rem;
+    }
+
+    .produto .preco {
+        font-size: 0.95rem;
+    }
+
+    .produto .categoria {
+        font-size: 0.7rem;
+    }
+
+    .botao-produto {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+}
+#paginacao {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px auto 10px auto;
+    flex-wrap: wrap;
+}
+
+.pagina-btn {
+    padding: 10px;
+    border: 2px solid #7E6EEA;
+    border-radius: 50%;
+    background-color: white;
+    color: #7E6EEA;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 42px;
+    height: 42px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagina-btn:hover {
+    background-color: #7E6EEA;
+    color: white;
+}
+
+/* Página atual */
+.pagina-btn.ativa {
+    background-color: #7E6EEA;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 6px rgba(126, 110, 234, 0.6);
+}
+#barraDeBusca {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto;
+    max-width: 900px; /* Aumenta o espaço total da barra */
+    padding: 20px;
+    border-radius: 12px;
+ 
+}
+
+#barraDeBusca input[type="text"] {
+    width: 600px; /* Aumenta a largura do input */
+    padding: 14px 18px;
+    font-size: 18px;
+    border: 1.5px solid #000;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#barraDeBusca input[type="text"]:focus {
+    border-color: #6B5ED9;
+}
+
+#btnBuscar {
+    background-color: #6B5ED9;
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#btnBuscar:hover {
+    background-color: #5848c2;
+    transform: translateY(-1px);
+}
+
+#btnBuscar:active {
+    transform: translateY(1px);
+}
+
+  
+  .precos {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.precos label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.precos input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+/* Botão "Aplicar Filtros" */
+#aplicarFiltros {
+    margin-top: 20px !important;
+    padding: 10px 20px !important;
+    background-color: #6B5ED9 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 20px !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+    transition: background-color 0.3s ease !important;
+}
+
+
+#aplicarFiltros:hover {
+    background-color: #5848c2;
+}
+
+@media screen and (max-width: 768px) {
+    #barraDeBusca {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    #barraDeBusca input[type="text"] {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    #btnBuscar {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #barraDeBusca {
+        padding: 12px;
+    }
+
+    #barraDeBusca input[type="text"] {
+        font-size: 15px;
+        padding: 12px 14px;
+    }
+
+    #btnBuscar {
+        font-size: 15px;
+        padding: 12px 14px;
+    }
+}

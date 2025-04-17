@@ -1,0 +1,94 @@
+@page "/Login"  
+
+<div class="login-container">     
+    <div class="left-side">         
+        <h1>Anuncia Picos!</h1>         
+        <img src="images/logo.png" alt="Logo Anuncia Picos">         
+        <h2>Encontre as melhores oportunidades perto de você no Anuncia Picos</h2>         
+        <p>"Descubra ofertas incríveis e negocie com facilidade no Anuncia Picos!"</p>     
+    </div>      
+    
+    <div class="right-side">         
+        <h3>Bem-vindo ao Anuncia Picos! Estamos felizes em tê-lo conosco.</h3>          
+        
+        <div class="logins">             
+            <button class="google-btn"><i class="fab fa-google"></i> Entrar com o Google</button>             
+            <button class="facebook-btn"><i class="fab fa-facebook-f"></i> Entrar com o Facebook</button>         
+        </div>          
+        
+        <form id="loginForm">             
+            <div class="input-container">                 
+                <label for="Email">Email ou Usuário:</label>                 
+                <input type="email" id="Email" placeholder="Email" required>             
+            </div>              
+            
+            <div class="input-container">                 
+                <label for="Password">Digite sua senha:</label>                 
+                <div class="password-container">                     
+                    <input type="password" id="Password" placeholder="Senha" required>                     
+                    <span id="togglePassword" class="eye-icon">&#128065;</span>                 
+                </div>             
+            </div>              
+            
+            <button type="submit" class="login-btn">LOGIN</button>              
+            
+            <button type="button" class="reclink" onclick="window.location.href='/RecSenhaEmail'">                 
+                ESQUECI MINHA SENHA!             
+            </button>         
+        </form>          
+        
+        <div class="links">             
+            <button type="button" class="cadlink" onclick="window.location.href='/Cadastro'">                 
+                Não tem uma conta ainda? CADASTRE-SE             
+            </button>         
+        </div>     
+    </div> 
+</div>  
+
+<script>     
+    document.addEventListener("DOMContentLoaded", function () {         
+        const loginForm = document.getElementById("loginForm");          
+        
+        loginForm.addEventListener("submit", async function (e) {             
+            e.preventDefault();              
+            
+            const email = document.getElementById("Email").value.trim();             
+            const password = document.getElementById("Password").value;                          
+            
+            try {                 
+                const response = await fetch("https://api.anunciapicos.shop/auth/login", {                     
+                    method: "POST",                     
+                    headers: {                         
+                        "Content-Type": "application/json"                     
+                    },                     
+                    body: JSON.stringify({ email, password })                 
+                });                  
+                
+                if (response.ok) {                     
+                    const result = await response.json();                      
+                    
+                    // Armazenar token e nome no localStorage                     
+                    const token = result.token;                     
+                    const nome = result.nome;                      
+                    
+                    localStorage.setItem("authToken", token);                     
+                    localStorage.setItem("nome", nome);                      
+                    
+                    // Redirecionar para a home SEM passar o token na URL                     
+                    window.location.href = "/Home";                 
+                } else {                     
+                    alert("Email ou senha incorretos!");                 
+                }             
+            } catch (error) {                 
+                console.error("Erro ao conectar com a API:", error);                 
+                alert("Erro de conexão. Tente novamente mais tarde.");             
+            }         
+        });          
+        
+        document.getElementById("togglePassword").addEventListener("click", function () {             
+            const passwordInput = document.getElementById("Password");             
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";             
+            passwordInput.setAttribute("type", type);         
+        });     
+    }); 
+</script>

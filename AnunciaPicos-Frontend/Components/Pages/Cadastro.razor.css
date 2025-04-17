@@ -1,0 +1,378 @@
+/* Configuração do layout para ocupar toda a altura da tela */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.zen-kaku-gothic-antique-regular {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Container principal do formulário */
+.register-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Lado esquerdo */
+.left-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  color: white;
+  width: 50%;
+  background-image: url('images/background.png');
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  text-align: center;
+}
+
+.left-side img {
+  width: 40%;
+  height: auto;
+  max-width: 300px;
+}
+
+.right-side {
+  font-family: Zen Kaku Gothic Antique, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  width: 50%;
+  background-color: #fff;
+  box-sizing: border-box;
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto; /* Permite rolagem vertical se necessário */
+}
+
+/* Título principal */
+h1, h2, h3, p {
+  margin: 0;
+  padding: 0 20px;
+  text-align: center;
+  max-width: 100%; /* Garante que texto não ultrapasse o contêiner */
+  word-wrap: break-word; /* Quebra palavras longas */
+}
+
+/* Adicionando o tamanho específico para o h3 */
+h3 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+/* Ajustes do formulário */
+form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: flex-start;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Estilos para os campos de entrada do formulário */
+.input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box; /* Garante que padding não afete a largura */
+}
+
+/* Estilo dos labels dentro do formulário */
+.input-container label {
+  font-size: 12px;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Estilo dos inputs dentro do formulário */
+input {
+  width: 100%;
+  padding: 3px;
+  height: 28px;
+  margin: 0;
+  border: none;
+  border-bottom: 2px solid #ddd;
+  background-color: transparent;
+  font-size: 10px;
+  color: #333;
+  box-sizing: border-box; /* Importante: inclui padding/border na largura total */
+}
+
+input:focus {
+  border-bottom-color: #7B76F1;
+  outline: none;
+}
+
+.register-btn {
+  display: block;
+  padding: 0.8em 1.5em;
+  font-size: clamp(12px, 1.5vw, 16px); /* responsivo entre 12px e 16px */
+  font-weight: bold;
+  background-color: #7B76F1;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  width: 100%;
+  max-width: 400px; /* limite opcional em telas grandes */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 15px auto 0; /* centraliza automaticamente */
+  box-sizing: border-box;
+  text-align: center;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.register-btn:hover {
+  background-color: #5a51c0;
+  text-decoration: none;
+}
+
+/* Estilo do link "Esqueci minha senha" - Melhorias para responsividade */
+.reclink {
+  display: block;
+  padding: 8px 25px;
+  font-size: 13px;
+  font-weight: bold;
+  background-color: #7B76F1;
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  text-align: center;
+  width: 100%;
+  max-width: 100%; /* Limita a largura máxima */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-sizing: border-box;
+  white-space: normal; /* Permite quebra de texto se necessário */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona reticências se o texto for muito longo */
+}
+
+.reclink:hover {
+  background-color: #5a51c0;
+}
+
+/* Centraliza o link "Já tem uma conta?" */
+.cadlink {
+  color: #7B76F1;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  display: block;
+  width: 100%;
+  max-width: 100%; /* Evita que o texto ultrapasse o contêiner */
+  box-sizing: border-box;
+  white-space: normal; /* Permite quebra de texto se necessário */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona reticências se o texto for muito longo */
+}
+
+.cadlink:hover {
+  text-decoration: underline;
+}
+
+/* Responsividade para telas menores (max-width: 768px) */
+@media screen and (max-width: 1050px) {
+  body, html {
+    overflow-y: auto; /* Permite rolagem vertical em telas menores */
+  }
+  
+  h1 {
+    margin-top: 21px;
+    margin-bottom: 20px;
+    font-size: 24px; /* Ajusta tamanho da fonte para telas menores */
+  }
+  
+  p {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 14px; /* Ajusta tamanho da fonte para telas menores */
+  }
+  
+  .register-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh; /* Mantém altura mínima */
+  }
+
+  .left-side, .right-side {
+    width: 100%;
+    min-height: 50vh; /* Altura mínima para cada lado */
+    height: auto;
+    padding: 15px; /* Reduz padding em telas menores */
+  }
+
+  .left-side img {
+    width: 60%;
+    max-width: 200px; /* Limita tamanho máximo */
+  }
+
+  form {
+    max-width: 90%; /* Aumenta largura proporcional */
+  }
+
+  /* Ajusta o tamanho dos campos e botões */
+  .input-container label {
+    font-size: 14px;
+  }
+
+  input {
+    padding: 8px;
+    font-size: 14px;
+    height: auto;
+  }
+
+  /* Ajustes para botões em telas menores */
+  .register-btn {
+    font-size: 15px;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .reclink {
+    font-size: 15px;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .cadlink {
+    font-size: 15px;
+    margin-top: 15px;
+    max-width: 100%;
+  }
+}
+
+/* Responsividade para telas muito pequenas */
+@media screen and (max-width: 380px) {
+  .register-btn, .reclink {
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  form {
+    max-width: 95%;
+    padding: 0 5px;
+  }
+  
+  .input-container {
+    gap: 10px;
+  }
+  
+  h1 {
+    font-size: 20px;
+  }
+  
+  h3 {
+    font-size: 16px;
+  }
+}
+
+/* Responsividade para telas médias */
+@media screen and (min-width: 768px) and (max-width: 1200px) {
+  .right-side, .left-side {
+    padding: 15px;
+  }
+  
+  form {
+    max-width: 90%;
+  }
+  
+  .input-container {
+    gap: 15px;
+  }
+  
+  input {
+    padding: 8px;
+    height: 30px;
+    font-size: 16px;
+  }
+  
+  /* Ajustes para botões em telas médias */
+  .register-btn, .reclink {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Responsividade para telas com largura igual ou superior a 1918px */
+@media screen and (min-width: 1918px) {
+  .right-side {
+    padding: 30px;
+  }
+  
+  form {
+    max-width: 500px; /* Aumenta para telas grandes */
+  }
+  
+  .input-container {
+    gap: 25px;
+  }
+  
+  .input-container label {
+    font-size: 16px;
+  }
+
+  input {
+    padding: 8px;
+    height: 30px;
+    font-size: 16px;
+  }
+
+  /* Ajustes para botões em telas grandes */
+  .register-btn {
+    font-size: 13px;
+    padding: 12px 20px;
+    margin-top: 25px;
+    max-width: 100%;
+  }
+
+  .reclink {
+    font-size: 16px;
+    padding: 15px 30px;
+    max-width: 100%;
+  }
+  
+  .cadlink {
+    font-size: 16px;
+    margin-top: 25px;
+  }
+  
+  h3 {
+    font-size: 24px;
+  }
+}
+
+#statusMessage {
+  font-size: 12px !important;
+  margin-top: 5px;
+  color: #ff3333;
+  max-width: 100%;
+  text-align: center;
+}

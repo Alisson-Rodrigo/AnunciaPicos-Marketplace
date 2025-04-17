@@ -1,0 +1,80 @@
+.planos-container {
+    text-align: center;
+    padding: 2rem;
+    font-family: 'Segoe UI', sans-serif;
+    color: #6b6bff;
+}
+
+.planos-container h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.planos-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+.card {
+    background-color: #8f80f8;
+    border-radius: 20px;
+    padding: 2rem;
+    width: 250px;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 420px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adicionado aqui */
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Um leve realce adicional opcional */
+}
+.card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.preco {
+    font-size: 1.8rem;
+    margin: 0.5rem 0;
+}
+
+.preco span {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.card ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin: 1rem 0;
+    flex-grow: 1;
+}
+
+.card ul li {
+    margin: 0.5rem 0;
+}
+
+.card button {
+    background-color: white;
+    color: #6b6bff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: auto; /* Empurra o botão pro final */
+}
+
+.card button:hover {
+    background-color: #e4e4ff;
+}
