@@ -1,0 +1,14 @@
+﻿namespace AnunciaPicos.Shared.Communication.Response.Profile
+{
+    public class ResponseGetProfileCommunication
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Email { get; set; } = string.Empty;
+
+        public string CPF { get; set; } = string.Empty;
+
+        public string Phone { get; set; } = string.Empty;
+
+    }
+}
