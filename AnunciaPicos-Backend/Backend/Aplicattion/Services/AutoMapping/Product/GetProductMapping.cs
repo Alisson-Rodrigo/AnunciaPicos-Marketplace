@@ -9,6 +9,8 @@ namespace AnunciaPicos.Backend.Aplicattion.Services.AutoMapping.Product
         public GetProductMapping()
         {
             CreateMap<ProductModel, ResponseProductGetCommunication>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
