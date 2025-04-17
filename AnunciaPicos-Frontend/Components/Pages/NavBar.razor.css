@@ -79,6 +79,7 @@
   gap: 24px;
   position: absolute;
   right: 20px; /* Cola à direita */
+  transition: all 0.3s ease-in-out;
 }
 
 .icon {
@@ -177,6 +178,13 @@
   z-index: 1;
   left: 50%;
   transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dropdown-content.show {
+  display: block;
+  opacity: 1;
 }
 
 .dropdown-content a {
@@ -191,8 +199,25 @@
   background-color: #f3f3ff;
 }
 
-.show {
-  display: block;
+/* Hamburger icon animation */
+.hamburger {
+  display: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  transition: all 0.3s ease-in-out;
+  z-index: 100;
+}
+
+.hamburger i {
+  transition: transform 0.3s ease-in-out;
+}
+
+.hamburger i.fa-times {
+  transform: rotate(180deg);
 }
 
 /* Responsividade */
@@ -277,17 +302,7 @@
   }
 }
 
-.hamburger {
-  display: none;
-  font-size: 24px;
-  color: white;
-  cursor: pointer;
-  position: absolute;
-  right: 15px;
-  top: 15px;
-}
-
-/* CORRIGIDO: Ícones lado a lado no mobile */
+/* CORRIGIDO: Ícones lado a lado no mobile com animação */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
@@ -324,20 +339,31 @@
   }
 
   .icons {
-    display: none;
+    display: flex;
     flex-direction: row;
     justify-content: center;
     gap: 20px;
     background-color: #7e6eea;
-    padding: 10px;
+    padding: 0;
     border-radius: 10px;
     width: 100%;
     margin-top: 10px;
     position: relative;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px);
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .icons.show-menu {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    max-height: 200px;
+    padding: 15px 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
 
   .hamburger {

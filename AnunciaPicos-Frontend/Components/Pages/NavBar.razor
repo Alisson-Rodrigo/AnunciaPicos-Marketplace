@@ -5,7 +5,7 @@
   </div>
 
   <div class="hamburger" onclick="toggleMenu()">
-    <i class="fas fa-bars"></i>
+    <i class="fas fa-bars" id="menuIcon"></i>
   </div>
 
   <div class="icons" id="menuIcons">
@@ -25,27 +25,22 @@
 <div class="sub-navbar">
   <div class="sub-navbar-container">
     <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">Escolha um Plano</button>
-
-    <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')"class="plan-button">
-    + Anunciar Produto
-</button>
-
+    <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')" class="plan-button">
+      + Anunciar Produto
+    </button>
   </div>
-
-  
 </div>
-
 
 <script>
   function verificarAuthENavegar(destino) {
     const token = localStorage.getItem("authToken");
-
+    
     if (!token) {
       alert("Você precisa estar logado para acessar essa funcionalidade.");
       window.location.href = "/Login";
       return;
     }
-
+    
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const agora = Math.floor(Date.now() / 1000);
@@ -55,7 +50,7 @@
         window.location.href = "/Login";
         return;
       }
-
+      
       // Token válido, redireciona
       window.location.href = destino;
     } catch (e) {
@@ -72,6 +67,7 @@
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.nome) {
+          // Aqui você pode adicionar código para exibir o nome do usuário
         }
       } catch (e) {
         console.error("Erro ao processar token:", e);
@@ -80,6 +76,18 @@
   });
 
   function toggleMenu() {
-    document.getElementById("menuIcons").classList.toggle("show-menu");
+    const menuIcons = document.getElementById("menuIcons");
+    const menuIcon = document.getElementById("menuIcon");
+    
+    menuIcons.classList.toggle("show-menu");
+    
+    // Troca o ícone entre barras e X
+    if (menuIcon.classList.contains("fa-bars")) {
+      menuIcon.classList.remove("fa-bars");
+      menuIcon.classList.add("fa-times"); // fa-times é o ícone X do Font Awesome
+    } else {
+      menuIcon.classList.remove("fa-times");
+      menuIcon.classList.add("fa-bars");
+    }
   }
 </script>
