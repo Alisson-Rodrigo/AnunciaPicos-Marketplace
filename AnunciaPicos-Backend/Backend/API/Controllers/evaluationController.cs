@@ -14,7 +14,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> PustEvaluation([FromBody] RequestEvaluationCommunication request, [FromServices] IPostEvaluationUseCase pushEvaluationUseCase)
+        public async Task<IActionResult> PostEvaluation([FromBody] RequestEvaluationCommunication request, [FromServices] IPostEvaluationUseCase pushEvaluationUseCase)
         {
             await pushEvaluationUseCase.Execute(request);
             return Created("EvaluationController", null);
@@ -28,6 +28,15 @@ namespace AnunciaPicos.Backend.API.Controllers
             var evaluations = await getEvaluationUseCase.Execute(id);
             return Ok(evaluations);
         }
+
+        [HttpGet("average/{id}")]
+        [ProducesResponseType(typeof(double), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAverageEvalution([FromRoute] int id, IGetEvaluationUseCase getEvaluationUseCase)
+        {
+            double evaluations = await getEvaluationUseCase.ExecuteAverage(id);
+            return Ok(evaluations);
+        }
+
 
     }
 }

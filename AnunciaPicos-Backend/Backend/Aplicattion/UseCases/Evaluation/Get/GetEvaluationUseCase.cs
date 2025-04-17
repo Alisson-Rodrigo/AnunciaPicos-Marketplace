@@ -6,6 +6,7 @@ using AnunciaPicos.Shared.Communication.Response.Evaluation;
 using AnunciaPicos.Shared.Exceptions;
 using AutoMapper;
 using Azure;
+using Google.Protobuf.WellKnownTypes;
 using Mysqlx.Prepare;
 
 namespace AnunciaPicos.Backend.Aplicattion.UseCases.Evaluation.Get
@@ -42,6 +43,20 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Evaluation.Get
             var evaluationMap = _mapper.Map<List<ResponseGetEvaluationCommunicattion>>(evaluation);
 
             return evaluationMap;
+        }
+
+        public async Task<double> ExecuteAverage (int id)
+        {
+            var verifyUserEvaluationExists = await _userRepository.GetUserById(id);
+
+            if (verifyUserEvaluationExists == null)
+            {
+                throw new AnunciaPicosExceptions(ResourceMessagesException.USER_NOT_FOUND);
+            }
+
+            double average = await _evaluationRepository.GetAverageNoteById(id);
+            return average;
+
         }
     }
 }

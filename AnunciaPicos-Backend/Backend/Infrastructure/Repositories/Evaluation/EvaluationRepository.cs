@@ -34,6 +34,20 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Evaluation
             return exists;
         }
 
+        public async Task<double> GetAverageNoteById(int id)
+        {
+            var media = await _context.Evaluation
+                .Where(e => e.UserIdEvaluated == id)
+                .Select(e => (double?)e.Note)
+                .AverageAsync();
+
+            return media.GetValueOrDefault(); // Se media for null, retorna 0
+        }
+
+
+
+
+
 
     }
 }

@@ -9,6 +9,8 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Evaluation
         public Task<List<EvaluationModel>> GetEvaluationSeller(int id);
 
         public Task<bool> VerifyUserCommentSeller(int userId, int userIdEvaluated);
+        public Task<double> GetAverageNoteById(int id);
+
 
     }
 }

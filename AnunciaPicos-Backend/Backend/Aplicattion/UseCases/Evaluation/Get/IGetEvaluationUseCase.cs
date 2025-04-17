@@ -5,6 +5,8 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Evaluation.Get
     public interface IGetEvaluationUseCase
     {
         public Task<List<ResponseGetEvaluationCommunicattion>> Execute(int id);
+        public Task<double> ExecuteAverage(int id);
+
 
     }
 }
