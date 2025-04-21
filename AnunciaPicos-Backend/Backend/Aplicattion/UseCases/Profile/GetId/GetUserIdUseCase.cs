@@ -23,7 +23,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.GetId
             var user = await _userRepository.GetUserById(id);
             if (user == null)
             {
-                throw new AnunciaPicosExceptions(ResourceMessagesException.NOT_FOUND_PRODUCTS);
+                throw new AnunciaPicosExceptions(ResourceMessagesException.USER_NOT_FOUND);
             }
             
             ResponseGetProfileIdCommunication response = _mapper.Map<ResponseGetProfileIdCommunication>(user);

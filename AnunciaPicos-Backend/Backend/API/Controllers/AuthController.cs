@@ -31,6 +31,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         }
 
         [HttpPost("esqueceu-senha")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdatePassword([FromServices] IUpdatePasswordUseCase updatePassUseCase, [FromBody] RequestUpdatePasswordCommunication updatePasswordModel)
         {
             await updatePassUseCase.Execute(updatePasswordModel);
@@ -38,6 +39,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         }
 
         [HttpPost("validar-recuperacao")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ValidateRecovery([FromServices] IResetUseCase resetUseCase, RequestResetPasswordCommunication resetRequest)
         {
             await resetUseCase.Execute(resetRequest);

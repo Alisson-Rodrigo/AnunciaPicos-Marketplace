@@ -1,9 +1,6 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using AnunciaPicos.Backend.Infrastructure.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AnunciaPicos.Backend.Aplicattion.Services.TokenUpdatePassword
