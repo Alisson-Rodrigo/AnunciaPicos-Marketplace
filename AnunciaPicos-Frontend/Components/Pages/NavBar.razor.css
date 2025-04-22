@@ -224,90 +224,8 @@
 @media (max-width: 992px) {
   .navbar {
     flex-direction: column;
-    align-items: flex-start;
-    padding: 20px 20px;
-    height: auto;
-  }
-
-  .logo-area {
-    width: 100%;
-    margin-bottom: 60px; /* Espaço para acomodar os elementos posicionados absolutamente */
-    min-height: 50px;
-  }
-
-  .search-container {
-    margin: 10px 0;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .icons {
-    position: relative;
-    justify-content: center;
-    width: 100%;
-    margin-top: 30px;
-    right: auto;
-  }
-
-  .sub-navbar-container {
-    flex-direction: column;
     align-items: center;
-    gap: 16px;
-    padding: 20px;
-  }
-
-  .plan-button,
-  .categories-dropdown {
-    padding: 10px 18px;
-    font-size: 15px;
-    width: 90%;
-    max-width: 300px;
-    text-align: center;
-  }
-
-  .dropdown-content {
-    left: 0;
-    transform: none;
-    width: 100%;
-  }
-}
-
-@media (max-width: 576px) {
-  .navbar {
-    padding: 15px;
-  }
-
-  .logo {
-    font-size: 22px;
-  }
-
-  .welcome-message {
-    font-size: 14px;
-    padding: 8px 12px;
-  }
-
-  .search-box {
-    padding: 10px 12px;
-    font-size: 14px;
-  }
-
-  .plan-button,
-  .categories-dropdown {
-    padding: 10px 16px;
-    font-size: 14px;
-  }
-
-  .icons {
-    gap: 16px;
-  }
-}
-
-/* CORRIGIDO: Ícones lado a lado no mobile com animação */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: center;
-    padding-top: 20px;
+    padding: 15px 20px;
     height: auto;
   }
 
@@ -319,29 +237,43 @@
     gap: 10px;
     position: relative;
     margin-bottom: 10px;
+    min-height: 50px;
   }
 
   .logo {
     position: static;
     transform: none;
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .welcome-message {
     position: static;
     margin: 0;
-    font-size: 15px;
+    font-size: 14px;
     background-color: #6f5eea;
-    padding: 8px 14px;
+    padding: 8px 12px;
     border-radius: 6px;
     white-space: normal;
     text-align: center;
+  }
+
+  .search-container {
+    margin: 10px 0;
+    width: 100%;
+    max-width: 100%;
+    display: none;
+  }
+
+  .search-box {
+    padding: 10px 12px;
+    font-size: 14px;
   }
 
   .icons {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
     gap: 20px;
     background-color: #7e6eea;
     padding: 0;
@@ -363,17 +295,52 @@
     transform: translateY(0);
     max-height: 200px;
     padding: 15px 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  /* Ensure each icon/button is properly centered */
+  .icons > * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Style for icon links and buttons */
+  .icons a, .icons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .hamburger {
     display: block;
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    z-index: 100;
   }
 
-  .search-container {
-    display: none;
+  .sub-navbar-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .plan-button,
+  .categories-dropdown {
+    padding: 10px 16px;
+    font-size: 14px;
+    width: 90%;
+    max-width: 300px;
+    text-align: center;
+  }
+
+  .dropdown-content {
+    left: 0;
+    transform: none;
+    width: 100%;
   }
 }

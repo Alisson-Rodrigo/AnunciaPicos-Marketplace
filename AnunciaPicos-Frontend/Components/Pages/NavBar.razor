@@ -19,6 +19,11 @@
     <a href="#" class="icon" onclick="verificarAuthENavegar('/Perfil')">
       <i class="far fa-user"></i>
     </a>
+    <div id="areaLogout" >
+    <button id="btnLogout">
+        Sair
+    </button>
+</div>
   </div>
 </div>
 
@@ -90,4 +95,34 @@
       menuIcon.classList.add("fa-bars");
     }
   }
+  window.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem("authToken");
+  const logoutBtn = document.getElementById("btnLogout");
+
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.nome) {
+        // document.getElementById("welcomeMessage").textContent = `Olá, ${payload.nome}`;
+      }
+
+      // Mostra o botão de logout
+      logoutBtn.style.display = "inline-block";
+
+      // Adiciona ação de logout + redirecionamento
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("authToken");
+        window.location.href = "/Login";
+      });
+
+    } catch (e) {
+      console.error("Erro ao processar token:", e);
+      logoutBtn.style.display = "none";
+    }
+
+  } else {
+    logoutBtn.style.display = "none";
+  }
+});
+
 </script>
