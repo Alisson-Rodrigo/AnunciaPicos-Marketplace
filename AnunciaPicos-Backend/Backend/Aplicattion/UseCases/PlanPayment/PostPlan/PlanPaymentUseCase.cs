@@ -19,13 +19,11 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.PlanPayment.PostPlan
 
         public PlanPaymentUseCase(
             ILogged logged,
-            IPaymentRepository subscriptionRepository,
             IStripeService stripeService,
             IUnitOfWork unitOfWork,
             IPaymentRepository paymentRepository)
         {
             _logged = logged;
-            _paymentRepository = subscriptionRepository;
             _stripeService = stripeService;
             _unitOfWork = unitOfWork;
             _paymentRepository = paymentRepository;
@@ -42,10 +40,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.PlanPayment.PostPlan
             var user = await _logged.UserLogged();
             var planType = (PlanTypeEnum)planId;
 
-            // Verifica se já tem um plano ativo
             var activePlan = await _paymentRepository.GetActivePlan(user.Id);
-
-            // Se não tem plano ativo, verifica se tem plano pendente
 
             if (activePlan != null)
             {
@@ -55,7 +50,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.PlanPayment.PostPlan
             var pendingSubscription = await _paymentRepository.GetAllPlanUser(user.Id);
             if (pendingSubscription != null)
             {
-                var timeElapsed = DateTime.Now - pendingSubscription.PurchaseDate;
+                var timeElapsed = DateTime.UtcNow - pendingSubscription.PurchaseDate;
                 if (timeElapsed.TotalMinutes > 10)
                 {
                     _paymentRepository.RemovePayment(pendingSubscription);
@@ -69,6 +64,12 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.PlanPayment.PostPlan
 
             // Cria o pagamento no Stripe para novo plano
             var stripeResponse = await _stripeService.CreateOneTimePayment(user, planType);
+
+            if (string.IsNullOrEmpty(stripeResponse.PaymentIntentId))
+            {
+                // Gerar um novo PaymentIntentId ou lançar uma exceção
+                stripeResponse.PaymentIntentId = Guid.NewGuid().ToString();
+            }
 
             // Registra o pagamento no sistema
             var paymentRecord = new PaymentModel
