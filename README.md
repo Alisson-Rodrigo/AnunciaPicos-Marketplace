@@ -2,6 +2,8 @@
 
 **Anuncia Picos** é uma aplicação web desenvolvida com .NET 8 e Blazor, projetada para ser um marketplace local, permitindo que os usuários anunciem produtos, conversem entre si e escolham planos para impulsionar seus anúncios, aumentando sua visibilidade na plataforma.
 
+Este projeto foi desenvolvido para a disciplina de **PROJETO E DESENVOLVIMENTO DE SISTEMAS DE INFORMAÇÃO I**.
+
 ## Funcionalidades ✨
 
 - **Marketplace Local**: Os usuários podem criar anúncios para vender produtos. 🛍️
