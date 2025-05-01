@@ -1,0 +1,130 @@
+@page "/visualizarproduto"
+
+<NavBar />
+<div class="container">
+    <div class="product-view">
+        <div class="product-image-container">
+            <img src="images/macbook-main.jpg" class="product-main-image" alt="MacBook Pro" />
+            
+            <div class="product-thumbnails">
+                <div class="arrow left">&lt;</div>
+                <div class="thumbnail-container">
+                    <img src="images/macbook-thumb1.jpg" class="thumbnail active" alt="MacBook thumbnail 1" />
+                    <img src="images/macbook-thumb2.jpg" class="thumbnail" alt="MacBook thumbnail 2" />
+                    <img src="images/macbook-thumb3.jpg" class="thumbnail" alt="MacBook thumbnail 3" />
+                    <img src="images/macbook-thumb4.jpg" class="thumbnail" alt="MacBook thumbnail 4" />
+                    <img src="images/macbook-thumb5.jpg" class="thumbnail" alt="MacBook thumbnail 5" />
+                </div>
+                <div class="arrow right">&gt;</div>
+            </div>
+        </div>
+        
+        <div class="product-info">
+            <div class="rating">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                <span class="rating-value">4.7</span>
+            </div>
+            
+            <h1 class="product-title">2020 Apple MacBook-Space Gray</h1>
+            
+            <div class="availability">
+                Availability: <span class="in-stock">In Stock</span>
+            </div>
+            
+            <div class="brand-category">
+                <div class="brand">Brand: Apple</div>
+                <div class="category">Categoria: Computador e laptop</div>
+            </div>
+            
+            <div class="price-container">
+                <span class="current-price">R$10.999</span>
+                <span class="original-price">R$13.999,00</span>
+                <span class="discount">21% OFF</span>
+            </div>
+            
+            <div class="product-options">
+                <div class="option">
+                    <label>Cor</label>
+                    <div class="color-options">
+                        <div class="color-option active" style="background-color: #B8B8B8;"></div>
+                        <div class="color-option" style="background-color: #E5E5E5;"></div>
+                    </div>
+                </div>
+                
+                <div class="option">
+                    <label>Tamanho</label>
+                    <div class="select-wrapper">
+                        <select class="form-select">
+                            <option>14-inch Liquid Retina XDR display</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option">
+                    <label>Memory</label>
+                    <div class="select-wrapper">
+                        <select class="form-select">
+                            <option>16GB memory RAM</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quantity-container">
+                <div class="quantity-control">
+                    <button class="quantity-btn">−</button>
+                    <input type="text" value="01" class="quantity-input" readonly />
+                    <button class="quantity-btn">+</button>
+                </div>
+                
+                <button class="add-to-cart">
+                    <span>ADD AO CARRINHO</span>
+                    <i class="cart-icon">🛒</i>
+                </button>
+                
+                <button class="favorite-btn">❤️</button>
+            </div>
+            
+            <div class="talk-with-seller">
+                <button class="talk-seller-btn">FALAR COM VENDEDOR</button>
+            </div>
+            
+            <div class="security-info">
+                <div class="secure">100% Seguro</div>
+                <div class="payment-methods">
+                    <img src="images/visa.png" alt="Visa" />
+                    <img src="images/mastercard.png" alt="Mastercard" />
+                    <img src="images/paypal.png" alt="PayPal" />
+                    <img src="images/amex.png" alt="American Express" />
+                    <img src="images/discover.png" alt="Discover" />
+                    <img src="images/other-card.png" alt="Other Card" />
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="product-tabs">
+        <div class="tabs-header">
+            <div class="tab active">DESCRIÇÃO</div>
+            <div class="tab">INFORMAÇÃO ADICIONAL</div>
+            <div class="tab">ESPECIFICAÇÃO</div>
+            <div class="tab">REVIEW</div>
+        </div>
+        
+        <div class="tab-content">
+            <h3>Descrição</h3>
+            <p>
+                O MacBook Pro mais potente de todos os tempos chegou. Com o chip M1 Pro ou M1 Max 
+                ultrarrápido — o primeiro chip da Apple projetado para profissionais — você obtém 
+                desempenho incrível e uma duração de bateria incrível. Adicione a isso uma 
+                impressionante tela Liquid Retina XDR, a melhor câmera e áudio já vistos em um 
+                notebook Mac e todas as portas que você precisa. O primeiro notebook desse tipo, este 
+                MacBook Pro é um monstro. O M1 Pro leva o desempenho excepcional da arquitetura M1 
+                a um patamar totalmente novo para usuários profissionais.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<Footer />

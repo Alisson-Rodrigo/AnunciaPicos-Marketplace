@@ -1,17 +1,31 @@
 @page "/Home"
-
 <NavBar />
 
 
-<!-- Banner do carrossel -->
 <div class="banner-carousel">
     <div class="carousel-inner-slide" id="carouselSlide">
-        <img src="images/banner1.jpeg" class="banner-slide" alt="Banner 1">
-        <img src="images/banner2.jpeg" class="banner-slide" alt="Banner 2">
-        <img src="images/banner3.jpeg" class="banner-slide" alt="Banner 3">
-        <img src="images/banner1.jpeg" class="banner-slide" alt="Banner 1 Duplicado">
+        <!-- Primeira imagem com crédito -->
+        <div class="banner-slide-container">
+            <img src="images/feche-o-retrato-jovem-linda-e-atraente-ruiva-com-chocante-com-algo-e-apontando.jpg" class="banner-slide" alt="Mulher ruiva surpresa apontando">
+            <p class="image-credit">
+                Imagem de <a href="https://br.freepik.com/fotos-gratis/feche-o-retrato-jovem-linda-e-atraente-ruiva-com-chocante-com-algo-e-apontando_33526363.htm" target="_blank" rel="noopener noreferrer">benzoix no Freepik</a>
+            </p>
+        </div>
+
+        <!-- Segunda imagem com crédito -->
+        <div class="banner-slide-container">
+            <img src="images/mulher-de-espanto-animada-olhando-para-o-lado-jovem-feliz-surpresa-olhando-de-soslaio-em-excitacao.jpg" class="banner-slide" alt="Mulher surpresa olhando para o lado">
+            <p class="image-credit">
+                Imagem de <a href="https://br.freepik.com/fotos-gratis/mulher-de-espanto-animada-olhando-para-o-lado-jovem-feliz-surpresa-olhando-de-soslaio-em-excitacao_32391608.htm" target="_blank" rel="noopener noreferrer">benzoix no Freepik</a>
+            </p>
+        </div>
+
+        <!-- Demais imagens sem crédito necessário -->
+        <img src="images/feche-o-retrato-jovem-linda-e-atraente-ruiva-com-chocante-com-algo-e-apontando.jpg" class="banner-slide" alt="Banner 1 Duplicado">
     </div>
 </div>
+
+
 
 <div class="conteudo-container">
     <button id="toggleFiltro" class="menu-filtro-btn">
@@ -173,25 +187,31 @@
                 return;
             }
 
-            produtosPagina.forEach(prod => {
-                const nome = prod.name || "Produto sem nome";
-                const preco = typeof prod.price === "number"
-                    ? parseFloat(prod.price).toFixed(2).replace(".", ",")
-                    : "0,00";
-                const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string")
-                    ? prod.imageUrl[0]
-                    : "images/sem-imagem.png";
+         produtosPagina.forEach(prod => {
+    const nome = prod.name || "Produto sem nome";
+    const preco = typeof prod.price === "number"
+        ? parseFloat(prod.price).toFixed(2).replace(".", ",")
+        : "0,00";
+    const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string")
+        ? prod.imageUrl[0]
+        : "images/sem-imagem.png";
 
-                const div = document.createElement("div");
-                div.classList.add("produto");
-                div.innerHTML = ` 
-                <img src="${imagem}" alt="${nome}" onerror="this.src='images/sem-imagem.png'">
-                <p class="titulo">${nome}</p>
-                <p class="preco">R$ ${preco}</p>
-                <button class="botao-produto" data-id="${prod.id}">Saiba Mais</button>
-            `;
-                container.appendChild(div);
-            });
+    const div = document.createElement("div");
+    div.classList.add("produto");
+    div.innerHTML = ` 
+        <img src="${imagem}" alt="${nome}" onerror="this.src='images/sem-imagem.png'">
+        <p class="titulo">${nome}</p>
+        <p class="preco">R$ ${preco}</p>
+        <button class="botao-produto" data-id="${prod.id}">Saiba Mais</button>
+    `;
+    container.appendChild(div);
+
+    // Adiciona o redirecionamento
+    div.querySelector(".botao-produto").addEventListener("click", () => {
+        const id = prod.id;
+        window.location.href = `/visualizarproduto`;
+    });
+});
 
             atualizarPaginacao(lista);
         }
