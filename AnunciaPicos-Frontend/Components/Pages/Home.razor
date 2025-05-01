@@ -206,12 +206,13 @@
     `;
     container.appendChild(div);
 
-    // Adiciona o redirecionamento
+    // Redireciona para a página de visualização do produto com o ID do produto
     div.querySelector(".botao-produto").addEventListener("click", () => {
         const id = prod.id;
-        window.location.href = `/visualizarproduto`;
+        window.location.href = `/visualizarproduto?id=${id}`;
     });
 });
+
 
             atualizarPaginacao(lista);
         }
