@@ -336,7 +336,15 @@ body {
     display: flex;
     transition: transform 0.3s ease-in-out;
 }
-
+/* Container principal do carrossel */
+#product-carousel {
+    width: 100%;
+    max-width: 400px; /* ou o tamanho que preferir */
+    height: 400px; /* altura ajustada */
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+}
 .carousel-item {
     min-width: 100%;
     max-width: 100%;
