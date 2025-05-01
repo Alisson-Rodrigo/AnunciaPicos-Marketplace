@@ -1,7 +1,7 @@
 /* Banner do carrossel */
 .banner-carousel {
     width: 95%; /* Largura ajustada para 95% */
-    height: 250px;
+    height: 500px;
     margin: 0 auto; /* Centraliza o banner */
     margin-bottom: 20px;
     overflow: hidden;

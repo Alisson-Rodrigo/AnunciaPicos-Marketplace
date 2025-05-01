@@ -1,0 +1,131 @@
+@page "/visualizarproduto"
+
+<NavBar />
+<div class="container">
+    <div class="product-view">
+        <div class="product-image-container">
+            <!-- Carrossel de Imagens -->
+            <div id="product-carousel" class="carousel">
+                <div class="carousel-inner">
+                    <!-- Imagens serão carregadas dinamicamente aqui -->
+                </div>
+                <button class="carousel-prev" onclick="prevImage()">❮</button>
+                <button class="carousel-next" onclick="nextImage()">❯</button>
+            </div>
+        </div>
+        
+        <div class="product-info">
+            <div class="rating">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                <span class="rating-value">4.7</span>
+            </div>
+            
+            <h1 class="product-title">Nome do Produto</h1>
+
+            <div class="category">Categoria: Computador e laptop</div>
+            
+            <div class="price-container">
+                <span class="current-price">R$10.999</span>
+            </div>
+
+            <!-- Botões de ação -->
+            <div class="action-buttons">
+                <button class="favorite-btn">Adicionar aos Favoritos</button>
+                <button class="chat-btn">Conversar com o Vendedor</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-tabs">
+        <div class="tabs-header">
+            <div class="tab active">DESCRIÇÃO</div>
+        </div>
+        
+        <div class="tab-content">
+            <h3>Descrição</h3>
+            <p class="description">A descrição do produto será carregada aqui.</p>
+        </div>
+    </div>
+</div>
+
+<Footer />
+
+<Footer />
+
+<script>
+    let currentImageIndex = 0;
+
+    window.addEventListener("DOMContentLoaded", async () => {
+        // Pega o ID do produto da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get("id"); // Pega o parâmetro id
+
+        if (!productId) {
+            alert("Produto não encontrado!");
+            return;
+        }
+
+        try {
+            // Faz a requisição para a API para buscar o produto pelo ID
+            const response = await fetch(`https://api.anunciapicos.shop/product/exibicao-produtos/${productId}`);
+            const product = await response.json();
+
+            if (response.ok) {
+                // Exibe os dados do produto
+                document.querySelector(".product-title").textContent = product.name || "Produto sem nome";
+                document.querySelector(".current-price").textContent = `R$ ${parseFloat(product.price).toFixed(2).replace(".", ",")}`;
+                document.querySelector(".rating-value").textContent = product.rating || "Sem avaliações";
+                document.querySelector(".category").textContent = `Categoria: ${product.category || "Desconhecida"}`;
+                document.querySelector(".description").textContent = product.description || "Descrição não disponível";
+
+                // Carrega o carrossel de imagens
+                if (product.imageUrl && product.imageUrl.length > 0) {
+                    const carouselInner = document.querySelector(".carousel-inner");
+                    product.imageUrl.forEach((url, index) => {
+                        const imgElement = document.createElement("img");
+                        imgElement.src = url;
+                        imgElement.alt = `${product.name} - Imagem ${index + 1}`;
+                        imgElement.classList.add("carousel-item");
+                        if (index === 0) imgElement.classList.add("active"); // Define a primeira imagem como ativa
+                        carouselInner.appendChild(imgElement);
+                    });
+                }
+            } else {
+                alert("Produto não encontrado!");
+            }
+        } catch (error) {
+            console.error("Erro ao carregar o produto:", error);
+            alert("Erro ao carregar os dados do produto.");
+        }
+    });
+
+    function prevImage() {
+        const images = document.querySelectorAll(".carousel-item");
+        if (currentImageIndex > 0) {
+            currentImageIndex--;
+        } else {
+            currentImageIndex = images.length - 1;
+        }
+        updateCarousel(images);
+    }
+
+    function nextImage() {
+        const images = document.querySelectorAll(".carousel-item");
+        if (currentImageIndex < images.length - 1) {
+            currentImageIndex++;
+        } else {
+            currentImageIndex = 0;
+        }
+        updateCarousel(images);
+    }
+
+    function updateCarousel(images) {
+        images.forEach((img, index) => {
+            img.classList.remove("active");
+            if (index === currentImageIndex) {
+                img.classList.add("active");
+            }
+        });
+    }
+</script>
+
