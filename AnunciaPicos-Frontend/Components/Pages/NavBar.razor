@@ -15,11 +15,9 @@
     <a href="#" class="icon" onclick="verificarAuthENavegar('/Perfil')">
       <i class="far fa-user"></i>
     </a>
-    <div id="areaLogout" >
-    <button id="btnLogout">
-        Sair
-    </button>
-</div>
+    <div id="areaLogout">
+      <button id="btnLogout">Sair</button>
+    </div>
   </div>
 </div>
 
@@ -35,13 +33,12 @@
 <script>
   function verificarAuthENavegar(destino) {
     const token = localStorage.getItem("authToken");
-    
     if (!token) {
       alert("Você precisa estar logado para acessar essa funcionalidade.");
       window.location.href = "/Login";
       return;
     }
-    
+
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const agora = Math.floor(Date.now() / 1000);
@@ -51,8 +48,6 @@
         window.location.href = "/Login";
         return;
       }
-      
-      // Token válido, redireciona
       window.location.href = destino;
     } catch (e) {
       console.error("Erro no token:", e);
@@ -61,64 +56,50 @@
     }
   }
 
-  // Exibir nome na mensagem
-  window.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        if (payload.nome) {
-          // Aqui você pode adicionar código para exibir o nome do usuário
-        }
-      } catch (e) {
-        console.error("Erro ao processar token:", e);
-      }
-    }
-  });
-
   function toggleMenu() {
     const menuIcons = document.getElementById("menuIcons");
     const menuIcon = document.getElementById("menuIcon");
-    
+
     menuIcons.classList.toggle("show-menu");
-    
-    // Troca o ícone entre barras e X
+
     if (menuIcon.classList.contains("fa-bars")) {
       menuIcon.classList.remove("fa-bars");
-      menuIcon.classList.add("fa-times"); // fa-times é o ícone X do Font Awesome
+      menuIcon.classList.add("fa-times");
     } else {
       menuIcon.classList.remove("fa-times");
       menuIcon.classList.add("fa-bars");
     }
   }
-  window.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem("authToken");
-  const logoutBtn = document.getElementById("btnLogout");
 
-  if (token) {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.nome) {
-        // document.getElementById("welcomeMessage").textContent = `Olá, ${payload.nome}`;
+  function exibirMensagemUsuario() {
+    const token = localStorage.getItem("authToken");
+    const welcomeEl = document.getElementById("welcomeMessage");
+    const logoutBtn = document.getElementById("btnLogout");
+
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.nome && welcomeEl) {
+          welcomeEl.textContent = `Olá, ${payload.nome}`;
+        }
+
+        if (logoutBtn) {
+          logoutBtn.style.display = "inline-block";
+          logoutBtn.onclick = () => {
+            localStorage.removeItem("authToken");
+            window.location.href = "/Login";
+          };
+        }
+      } catch (e) {
+        console.error("Erro ao processar token:", e);
+        if (welcomeEl) welcomeEl.textContent = "Visitante";
+        if (logoutBtn) logoutBtn.style.display = "none";
       }
-
-      // Mostra o botão de logout
-      logoutBtn.style.display = "inline-block";
-
-      // Adiciona ação de logout + redirecionamento
-      logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("authToken");
-        window.location.href = "/";
-      });
-
-    } catch (e) {
-      console.error("Erro ao processar token:", e);
-      logoutBtn.style.display = "none";
+    } else {
+      if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
+      if (logoutBtn) logoutBtn.style.display = "none";
     }
-
-  } else {
-    logoutBtn.style.display = "none";
   }
-});
 
+  exibirMensagemUsuario();
 </script>

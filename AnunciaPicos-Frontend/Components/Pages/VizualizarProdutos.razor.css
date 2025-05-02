@@ -339,8 +339,8 @@ body {
 /* Container principal do carrossel */
 #product-carousel {
     width: 100%;
-    max-width: 400px; /* ou o tamanho que preferir */
-    height: 400px; /* altura ajustada */
+    max-width: 600px; /* ou o tamanho que preferir */
+    height: 600px; /* altura ajustada */
     position: relative;
     overflow: hidden;
     margin: 0 auto;
@@ -425,3 +425,27 @@ body {
 .carousel-item:not(.active) {
     opacity: 0;
 }
+.preview-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    justify-content: center;
+  }
+  
+  .preview-container .preview-box {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .preview-container .preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  

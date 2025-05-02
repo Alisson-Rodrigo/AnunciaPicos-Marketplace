@@ -1,28 +1,23 @@
 @page "/cadastrarProduto"
-
+<NavBar />
 <div class="container">
-    <h2>Cadastrar Produto</h2>
+    <h2>Informações do Produto</h2>
 
     <form id="productForm">
         <div class="form-group">
-            <label for="productName">Nome do Produto:</label>
+            <label for="productPrice">Preço do produto:</label>
+            <input type="number" step="0.01" id="productPrice" placeholder="R$200..." required />
+        </div>
+
+        <div class="form-group">
+            <label for="productName">Nome do produto:</label>
             <input type="text" id="productName" placeholder="Digite o nome do produto" required />
-        </div>
-
-        <div class="form-group">
-            <label for="productDescription">Descrição:</label>
-            <textarea id="productDescription" placeholder="Descreva detalhes importantes sobre o produto" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="productPrice">Preço (R$):</label>
-            <input type="number" step="0.01" id="productPrice" placeholder="0.00" required />
         </div>
 
         <div class="form-group">
             <label for="productCategory">Categoria:</label>
             <select id="productCategory" required>
-                <option value="" disabled selected>Selecione uma categoria</option>
+                <option value="" disabled selected>Select...</option>
                 <option value="0">Outros</option>
                 <option value="1">Eletrônicos</option>
                 <option value="2">Móveis</option>
@@ -38,15 +33,31 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="productImages">Imagens do Produto:</label>
-            <input type="file" id="productImages" multiple accept="image/*" />
-            <div id="imagePreview" class="preview-container"></div>
+        <div class="form-group full-width">
+            <div class="image-upload-container">
+                <div class="image-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </div>
+                <p>Faça o upload das imagens do seu produto</p>
+                <label for="productImages" class="file-upload-button">Escolha o arquivo</label>
+                <input type="file" id="productImages" multiple accept="image/*" />
+                <div id="imagePreview" class="preview-container"></div>
+            </div>
         </div>
 
-        <button type="submit" class="submit-btn">Cadastrar Produto</button>
+        <div class="form-group full-width additional-info">
+            <h3>Informações adicionais:</h3>
+            <textarea id="productDescription" placeholder="Digite informações específicas sobre seu produto."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Save</button>
     </form>
 </div>
+<Footer />
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -56,7 +67,6 @@
         const imageInput = document.getElementById("productImages");
         const imagePreview = document.getElementById("imagePreview");
 
-        // Código para preview de imagens
         imageInput.addEventListener("change", function () {
             imagePreview.innerHTML = "";
             if (this.files) {
@@ -88,7 +98,6 @@
             const token = localStorage.getItem("authToken");
             const formData = new FormData();
 
-            // Adicionando dados básicos do produto
             formData.append("Name", document.getElementById("productName").value);
             formData.append("Description", document.getElementById("productDescription").value);
             formData.append("Price", document.getElementById("productPrice").value);
@@ -100,28 +109,15 @@
                 return;
             }
 
-            // Adicionando imagens diretamente como arquivos
             for (let i = 0; i < images.length; i++) {
                 formData.append("Imagens", images[i]);
             }
-
-            // Exibir todos os dados antes de enviar (para depuração)
-            console.log("==== Dados Enviados ====");
-            for (let pair of formData.entries()) {
-                if (pair[1] instanceof File) {
-                    console.log(pair[0] + ": [Arquivo] " + pair[1].name + " (" + pair[1].type + ", " + pair[1].size + " bytes)");
-                } else {
-                    console.log(pair[0] + ": " + pair[1]);
-                }
-            }
-            console.log("========================");
 
             try {
                 const response = await fetch("https://api.anunciapicos.shop/product/cadastro", {
                     method: "POST",
                     headers: {
                         Authorization: `Bearer ${token}`
-                        // Não definir Content-Type, deixar o navegador configurar automaticamente
                     },
                     body: formData
                 });
@@ -130,14 +126,10 @@
                     alert("Produto cadastrado com sucesso!");
                     window.location.href = "/Home";
                 } else {
-                    // Tratamento de erros detalhado
                     let errorData;
-                    
                     try {
-                        // Tenta obter JSON primeiro
                         errorData = await response.json();
                     } catch {
-                        // Se não for JSON, tenta texto
                         const text = await response.text();
                         try {
                             errorData = JSON.parse(text);
@@ -145,10 +137,6 @@
                             errorData = { message: text || "Erro desconhecido", statusCode: response.status };
                         }
                     }
-
-                    console.error("Erro na requisição:");
-                    console.error("Status:", response.status);
-                    console.error("Detalhes:", errorData);
 
                     let errorMessage = `Erro ${response.status} ao cadastrar produto:`;
                     if (errorData.errors && errorData.errors.length > 0) {
@@ -165,10 +153,8 @@
             }
         });
 
-        // Função para verificar autenticação
         function verificarAutenticacao() {
             const token = localStorage.getItem("authToken");
-
             if (!token) {
                 alert("Você precisa estar logado para cadastrar um produto.");
                 window.location.href = "/Login";
@@ -178,17 +164,14 @@
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 const agora = Math.floor(Date.now() / 1000);
-
                 if (payload.exp && payload.exp < agora) {
                     alert("Sua sessão expirou. Por favor, faça login novamente.");
                     localStorage.removeItem("authToken");
                     window.location.href = "/Login";
                     return false;
                 }
-
                 return true;
             } catch (e) {
-                console.error("Erro ao verificar token:", e);
                 alert("Erro na autenticação. Por favor, faça login novamente.");
                 localStorage.removeItem("authToken");
                 window.location.href = "/Login";
