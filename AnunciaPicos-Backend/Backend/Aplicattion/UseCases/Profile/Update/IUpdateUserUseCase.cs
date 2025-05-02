@@ -7,7 +7,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update
     {
         public Task Execute(RequestUpdateProfileCommunication request);
 
-        public void ValidateUser(RequestUpdateProfileCommunication request, UserModel user);
+        public Task ValidateUser(RequestUpdateProfileCommunication request, UserModel user);
 
     }
 }

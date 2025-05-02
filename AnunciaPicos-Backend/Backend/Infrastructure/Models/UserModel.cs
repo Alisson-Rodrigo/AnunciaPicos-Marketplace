@@ -8,18 +8,14 @@ public class UserModel : InfoBaseModel
     public string Password { get; set; } = string.Empty;
     public string CPF { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
+    public string? ImageProfile {  get; set; } = string.Empty;
     public Guid UserIdentifier { get; set; }
-
-    // Relacionamento 1:N com produtos (um usuário pode ter vários produtos)
     public List<ProductModel>? Products { get; set; }
 
-    // Relacionamento com conversas
     public ICollection<ConversationModel>? Conversation { get; set; }
 
-    // NOVO: Relacionamento 1:N com pagamentos (um usuário pode ter vários pagamentos/planos ao longo do tempo)
-    public virtual ICollection<PaymentModel>? Payments { get; set; } // Correção: manter como ICollection
+    public virtual ICollection<PaymentModel>? Payments { get; set; }
 
-    // Propriedade auxiliar para obter o plano ativo atual
     public PaymentModel? ActivePayment => Payments?
         .Where(p => p.Status == PaymentStatus.Completed &&
                    p.ExpirationDate > DateTime.UtcNow)
