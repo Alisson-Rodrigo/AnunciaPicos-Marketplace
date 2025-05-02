@@ -60,7 +60,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         }
 
         [HttpGet("busca/produtos")]
-        [ProducesResponseType(typeof(List<ResponseProductGetCommunication>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseProductSearchCommunication>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Search([FromQuery] RequestProductSearchCommunication request, [FromServices] ISearchAndFiltersUseCase searchAndFiltersUseCase)
         {
             var response = await searchAndFiltersUseCase.ExecuteSearch(request);

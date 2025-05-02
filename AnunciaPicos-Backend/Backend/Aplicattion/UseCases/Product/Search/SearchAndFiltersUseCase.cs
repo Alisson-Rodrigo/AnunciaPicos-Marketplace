@@ -5,6 +5,7 @@ using AnunciaPicos.Shared.Communication.Request.Product;
 using AnunciaPicos.Shared.Communication.Response.Product;
 using AnunciaPicos.Shared.Exceptions;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Mysqlx.Prepare;
 
 namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Search
@@ -20,18 +21,24 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Search
 
         }
 
-        public async Task<List<ResponseProductGetCommunication>> ExecuteSearch(RequestProductSearchCommunication request)
+        public async Task<ResponseProductSearchCommunication> ExecuteSearch(RequestProductSearchCommunication request)
         {
-            var response = await _productRepository.SearchProductsAsync(request);
-            if (response == null || !response.Any())
+            var items = await _productRepository.SearchProductsAsync(request);
+            if (items == null || !items.Any())
             {
                 throw new AnunciaPicosExceptions(ResourceMessagesException.NOT_FOUND_PRODUCTS);
             }
 
-            var products = _mapper.Map<List<ResponseProductGetCommunication>>(response);
+            var totalItems = await _productRepository.GetTotalCountAsync(request);
 
             // Nesse ponto, `products` já vai conter a lista de imagens de cada produto
-            return products;
+            return new ResponseProductSearchCommunication
+            {
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalItems = totalItems,
+                Items = items
+            };
         }
 
         public async Task<List<string>> ExecuteAutoComplete(string term)
