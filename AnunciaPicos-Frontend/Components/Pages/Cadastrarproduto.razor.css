@@ -1,107 +1,116 @@
+/* Estilo geral da página */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f2f5;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
     margin: 0;
     padding: 0;
 }
 
 .container {
     max-width: 800px;
-    margin: 30px auto;
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-    color: #333;
+/* Título do formulário */
+.container h2 {
     text-align: center;
+    color: #333;
     margin-bottom: 30px;
-    font-size: 28px;
-    font-weight: 600;
+    font-size: 24px;
 }
 
+/* Estilo do formulário */
+#productForm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+
+/* Para campos que devem ocupar linha inteira */
+#productForm .form-group.full-width {
+    grid-column: 1 / span 2;
+}
+
+/* Estilo para cada grupo de formulário */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #444;
-    font-size: 16px;
+    color: #333;
+    font-size: 14px;
 }
 
-#productName, #productPrice, #productCategory, #productDescription, #productImages {
+/* Estilo para inputs e selects */
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group select,
+.form-group textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    border-radius: 4px;
     box-sizing: border-box;
+    font-size: 14px;
 }
 
-#productName:focus, #productPrice:focus, #productCategory:focus, #productDescription:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-    outline: none;
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
 }
 
-#productDescription {
-    min-height: 100px;
-    resize: vertical;
-}
-
-#productCategory {
-    cursor: pointer;
-    background-color: white;
-}
-
-.submit-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
+/* Estilo para área de upload de imagens */
+.image-upload-container {
+    border: 1px dashed #ddd;
     border-radius: 8px;
-    padding: 14px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    width: 100%;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
+    padding: 15px;
+    text-align: center;
+    margin-top: 15px;
+    background-color: #f9f9f9;
 }
 
-.submit-btn:hover {
-    background-color: #0056b3;
+.image-upload-container p {
+    color: #666;
+    margin-bottom: 15px;
+    font-style: italic;
+    font-size: 14px;
 }
 
-/* Estilo para o input de arquivo */
-#productImages {
-    padding: 10px;
-    border: 2px dashed #007bff;
-    background-color: #f8f9fa;
-    cursor: pointer;
-}
-
-#productImages::-webkit-file-upload-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 16px;
+/* Botão de escolher arquivo personalizado */
+.file-upload-button {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #fff;
+    color: #02C887;
+    border: 1px solid #02C887;
     border-radius: 4px;
     cursor: pointer;
-    margin-right: 10px;
-    transition: background-color 0.3s;
+    font-size: 14px;
+    transition: all 0.3s;
 }
 
-#productImages::-webkit-file-upload-button:hover {
-    background-color: #0056b3;
+.file-upload-button:hover {
+    background-color: #f0fff9;
 }
 
-/* Estilo para a visualização prévia de imagens */
+/* Esconder o input file original */
+input[type="file"] {
+    display: none;
+}
+
+/* Estilo para o preview de imagens */
 .preview-container {
     display: flex;
     flex-wrap: wrap;
@@ -110,21 +119,69 @@ h2 {
 }
 
 .preview-container img {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border: 1px solid #ddd;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    .container {
-        padding: 20px;
-        margin: 20px 10px;
-    }
-    
-    h2 {
-        font-size: 24px;
-    }
+/* Botão de salvar */
+.submit-btn {
+    grid-column: 1 / span 2;
+    background-color: #7E6EEA;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: auto;
+    margin: 20px auto 0;
+    display: block;
+}
+
+.submit-btn:hover {
+    background-color: #6a59d4;
+}
+
+/* Estilo para informações adicionais */
+.additional-info {
+    margin-top: 30px;
+    grid-column: 1 / span 2;
+}
+
+.additional-info h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.additional-info textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+/* Ícone de placeholder para imagem */
+.image-placeholder {
+    width: 100px;
+    height: 100px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.image-placeholder svg {
+    width: 40px;
+    height: 40px;
+    color: #aaa;
 }
