@@ -34,11 +34,12 @@ namespace AnunciaPicos.Backend.API.Controllers
 
         [Authorize]
         [HttpPut("atualizar-perfil")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> UpdateProfile([FromServices] IUpdateUserUseCase updateUserUseCase, [FromBody] RequestUpdateProfileCommunication request)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [RequestSizeLimit(10_000_000)] // Limita para 10MB por request (ajustável)
+        public async Task<IActionResult> UpdateProfile([FromServices] IUpdateUserUseCase updateUserUseCase, [FromForm] RequestUpdateProfileCommunication request)
         {
             await updateUserUseCase.Execute(request);
-            return Ok();
+            return NoContent();
 
         }
 
