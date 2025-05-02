@@ -5,7 +5,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Search
 {
     public interface ISearchAndFiltersUseCase
     {
-        public Task<List<ResponseProductGetCommunication>> ExecuteSearch(RequestProductSearchCommunication request);
+        public Task<ResponseProductSearchCommunication> ExecuteSearch(RequestProductSearchCommunication request);
         public Task<List<string>> ExecuteAutoComplete(string term);
 
     }
