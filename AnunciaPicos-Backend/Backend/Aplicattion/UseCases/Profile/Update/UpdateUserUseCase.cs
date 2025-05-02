@@ -29,14 +29,14 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update
             if (request.ImageProfile != null)
             {
                 var nomeArquivo = $"{Guid.NewGuid()}_{request.ImageProfile.FileName}";
-                var caminho = Path.Combine("wwwroot/products/images", nomeArquivo);
+                var caminho = Path.Combine("wwwroot/profile/images", nomeArquivo);
 
                 using (var stream = new FileStream(caminho, FileMode.Create))
                 {
                     await request.ImageProfile.CopyToAsync(stream);
                 }
 
-                var url = $"https://api.anunciapicos.shop/products/images/{nomeArquivo}";
+                var url = $"https://api.anunciapicos.shop/profile/images/{nomeArquivo}";
                 imagensUrl = url;
             }
 
