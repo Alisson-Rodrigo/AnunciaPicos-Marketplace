@@ -56,7 +56,6 @@
         return;
       }
       
-      // Token válido, redireciona
       window.location.href = destino;
     } catch (e) {
       console.error("Erro no token:", e);
@@ -65,14 +64,12 @@
     }
   }
 
-  // Exibir nome na mensagem
   window.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem("authToken");
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.nome) {
-          // Aqui você pode adicionar código para exibir o nome do usuário
         }
       } catch (e) {
         console.error("Erro ao processar token:", e);
@@ -86,10 +83,9 @@
     
     menuIcons.classList.toggle("show-menu");
     
-    // Troca o ícone entre barras e X
     if (menuIcon.classList.contains("fa-bars")) {
       menuIcon.classList.remove("fa-bars");
-      menuIcon.classList.add("fa-times"); // fa-times é o ícone X do Font Awesome
+      menuIcon.classList.add("fa-times"); 
     } else {
       menuIcon.classList.remove("fa-times");
       menuIcon.classList.add("fa-bars");
@@ -106,10 +102,8 @@
         // document.getElementById("welcomeMessage").textContent = `Olá, ${payload.nome}`;
       }
 
-      // Mostra o botão de logout
       logoutBtn.style.display = "inline-block";
 
-      // Adiciona ação de logout + redirecionamento
       logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("authToken");
         window.location.href = "/";
