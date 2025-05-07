@@ -12,5 +12,7 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
         public void DeleteProduct(ProductModel product);
         public Task<List<ProductModel>> SearchProductsAsync(RequestProductSearchCommunication request);
         public Task<List<string>> GetProductSuggestionsAsync(string term, int maxResults = 5);
+        public Task<int> GetTotalCountAsync(RequestProductSearchCommunication request);
+
     }
 }

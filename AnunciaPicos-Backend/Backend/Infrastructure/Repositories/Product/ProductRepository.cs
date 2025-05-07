@@ -54,9 +54,8 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
                 var loweredName = request.Name.ToLower();
                 query = query.Where(p => p.Name.ToLower().Contains(loweredName));
             }
-
             if (request.CategoryId.HasValue)
-                query = query.Where(p => p.Category== request.CategoryId);
+                query = query.Where(p => p.Category == request.CategoryId);
 
             if (request.MinPrice.HasValue)
                 query = query.Where(p => p.Price >= request.MinPrice.Value);
@@ -64,8 +63,38 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
             if (request.MaxPrice.HasValue)
                 query = query.Where(p => p.Price <= request.MaxPrice.Value);
 
-            return await query.ToListAsync();
+            query = request.OrderBy?.ToLower() switch
+            {
+                "name" => request.Ascending ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name),
+                "price" => request.Ascending ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price),
+                _ => query.OrderBy(p => p.Name)
+            };
+
+            return await query
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
         }
+
+        public async Task<int> GetTotalCountAsync(RequestProductSearchCommunication request)
+        {
+            var query = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(request.Name))
+                query = query.Where(p => p.Name.Contains(request.Name));
+
+            if (request.MinPrice.HasValue)
+                query = query.Where(p => p.Price >= request.MinPrice.Value);
+
+            if (request.MaxPrice.HasValue)
+                query = query.Where(p => p.Price <= request.MaxPrice.Value);
+
+            if (request.CategoryId.HasValue)
+                query = query.Where(p => p.Category == request.CategoryId.Value);
+
+            return await query.CountAsync();
+        }
+
         public async Task<List<string>> GetProductSuggestionsAsync(string term, int maxResults = 5)
         {
             return await _context.Products
