@@ -1,0 +1,50 @@
+@page "/perfil"
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Olá, <span id="user-name">Jorgin canalha</span></h1>
+                <div class="notification-only">
+                </div>
+            </div>
+        </header>
+
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-image-container">
+                    <img id="profile-image" src="https://via.placeholder.com/150" alt="Imagem do perfil" />
+                    <div class="edit-image-overlay">
+                        <button class="edit-image-btn">Editar</button>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h2 id="display-name">Jorgin canalha</h2>
+                    <p id="display-email">jorgincanalhas@gmail.com</p>
+                    <button class="edit-btn">Editar</button>
+                </div>
+            </div>
+
+            <div class="profile-form">
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="nome-completo">Nome completo</label>
+                        <input type="text" id="nome-completo" placeholder="Seu nome completo" />
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Endereço de e-mail:</h3>
+                    <div class="email-item">
+                        <div class="email-radio">
+                            <input type="radio" name="email-principal" id="email-1" checked />
+                            <label for="email-1" class="email-label">
+                                <span class="email-text">jorgincanalhas@gmail.com</span>
+                                <span class="email-date">1 month ago</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
