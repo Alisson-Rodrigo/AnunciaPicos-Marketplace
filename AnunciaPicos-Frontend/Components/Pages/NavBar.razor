@@ -48,7 +48,6 @@
         window.location.href = "/Login";
         return;
       }
-      
       window.location.href = destino;
     } catch (e) {
       console.error("Erro no token:", e);
@@ -57,28 +56,15 @@
     }
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        if (payload.nome) {
-        }
-      } catch (e) {
-        console.error("Erro ao processar token:", e);
-      }
-    }
-  });
-
   function toggleMenu() {
     const menuIcons = document.getElementById("menuIcons");
     const menuIcon = document.getElementById("menuIcon");
 
     menuIcons.classList.toggle("show-menu");
-    
+
     if (menuIcon.classList.contains("fa-bars")) {
       menuIcon.classList.remove("fa-bars");
-      menuIcon.classList.add("fa-times"); 
+      menuIcon.classList.add("fa-times");
     } else {
       menuIcon.classList.remove("fa-times");
       menuIcon.classList.add("fa-bars");
@@ -109,17 +95,9 @@
         if (welcomeEl) welcomeEl.textContent = "Visitante";
         if (logoutBtn) logoutBtn.style.display = "none";
       }
-
-      logoutBtn.style.display = "inline-block";
-
-      logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("authToken");
-        window.location.href = "/";
-      });
-
-    } catch (e) {
-      console.error("Erro ao processar token:", e);
-      logoutBtn.style.display = "none";
+    } else {
+      if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
+      if (logoutBtn) logoutBtn.style.display = "none";
     }
   }
 
