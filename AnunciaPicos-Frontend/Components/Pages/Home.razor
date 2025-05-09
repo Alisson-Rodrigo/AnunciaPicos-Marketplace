@@ -77,8 +77,8 @@
 
         <div class="grid-produtos" id="produtosContainer"></div>
 
-        <div id="paginacaoBusca" style="margin-bottom: 10px;"></div>
-        <div id="paginacao" style="margin-bottom: 10px;"></div>
+        <div id="paginacaoBusca"></div>
+        <div id="paginacao"></div>
     </main>
 </div>
 
@@ -89,25 +89,33 @@
         const welcomeEl = document.getElementById("welcomeMessage");
         const token = localStorage.getItem("authToken");
 
-        if (!token) {
-           
-        } else {
+        function verificarLogin() {
+            if (!token) return null;
+
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 const agora = Math.floor(Date.now() / 1000);
                 if (payload.exp && payload.exp < agora) {
-                    welcomeEl.textContent = "Sessão expirada. Você está como visitante.";
                     localStorage.removeItem("authToken");
-                } else {
-                    const nome = payload.sub || "Usuário";
-                    welcomeEl.textContent = `Olá, ${nome}! Seja bem vindo ao Anuncia Picos.`;
+                    return null;
                 }
-            } catch (error) {
-                welcomeEl.textContent = "Erro ao verificar login. Acesso limitado como visitante.";
+                return payload;
+            } catch {
                 localStorage.removeItem("authToken");
+                return null;
             }
         }
 
+        const usuario = verificarLogin();
+
+        if (usuario) {
+            const nome = usuario.sub || "Usuário";
+            welcomeEl.textContent = `Olá, ${nome}! Seja bem vindo ao Anuncia Picos.`;
+        } else {
+            welcomeEl.textContent = "Você está acessando como visitante.";
+        }
+
+        // Slides
         const slideContainer = document.getElementById("carouselSlide");
         const slides = document.querySelectorAll(".banner-slide");
         let currentIndex = 0;
@@ -132,119 +140,100 @@
 
         setInterval(nextSlide, 5000);
 
+        // Filtro
         const toggleFiltro = document.getElementById("toggleFiltro");
         const fecharFiltro = document.getElementById("fecharFiltro");
         const filtroLateral = document.getElementById("filtroLateral");
         const backdrop = document.getElementById("fundoFiltro");
 
-        // Alteração do evento de clique para o toggleFiltro
-        toggleFiltro.addEventListener("click", () => {
-            toggleFiltro.classList.toggle("ativo");
-            filtroLateral.classList.toggle("ativo");
-            backdrop.classList.toggle("ativo");
+        [toggleFiltro, fecharFiltro, backdrop].forEach(el => {
+            el.addEventListener("click", () => {
+                toggleFiltro.classList.toggle("ativo");
+                filtroLateral.classList.toggle("ativo");
+                backdrop.classList.toggle("ativo");
+            });
         });
 
-        fecharFiltro.addEventListener("click", () => {
-            toggleFiltro.classList.remove("ativo");
-            filtroLateral.classList.remove("ativo");
-            backdrop.classList.remove("ativo");
-        });
-
-        // Alteração do evento de clique para o backdrop
-        backdrop.addEventListener("click", () => {
-            toggleFiltro.classList.remove("ativo");
-            filtroLateral.classList.remove("ativo");
-            backdrop.classList.remove("ativo");
-        });
-
-        let todosProdutos = [];
-        let produtosBusca = [];
+        // Produtos
+        let todosProdutos = [], produtosBusca = [];
         let paginaAtual = 1;
-        const produtosPorPagina = 12;
+        const produtosPorPagina = 1;
         let buscandoProdutos = false;
 
         function exibirPagina(pagina, lista) {
             const inicio = (pagina - 1) * produtosPorPagina;
             const fim = inicio + produtosPorPagina;
             const produtosPagina = lista.slice(inicio, fim);
-
             const container = document.getElementById("produtosContainer");
             container.innerHTML = "";
 
             if (produtosPagina.length === 0) {
-                container.innerHTML = ` 
-                <div style="text-align: center; width: 100%; padding: 20px;">
-                    <p>Nenhum produto encontrado.</p>
-                </div>
-            `;
+                container.innerHTML = `<div style="text-align: center; width: 100%; padding: 20px;"><p>Nenhum produto encontrado.</p></div>`;
                 return;
             }
 
-         produtosPagina.forEach(prod => {
-    const nome = prod.name || "Produto sem nome";
-    const preco = typeof prod.price === "number"
-        ? parseFloat(prod.price).toFixed(2).replace(".", ",")
-        : "0,00";
-    const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string")
-        ? prod.imageUrl[0]
-        : "images/sem-imagem.png";
+            produtosPagina.forEach(prod => {
+                const nome = prod.name || "Produto sem nome";
+                const preco = typeof prod.price === "number" ? parseFloat(prod.price).toFixed(2).replace(".", ",") : "0,00";
+                const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string") ? prod.imageUrl[0] : "images/sem-imagem.png";
 
-    const div = document.createElement("div");
-    div.classList.add("produto");
-    div.innerHTML = ` 
-        <img src="${imagem}" alt="${nome}" onerror="this.src='images/sem-imagem.png'">
-        <p class="titulo">${nome}</p>
-        <p class="preco">R$ ${preco}</p>
-        <button class="botao-produto" data-id="${prod.id}">Saiba Mais</button>
-    `;
-    container.appendChild(div);
+                const div = document.createElement("div");
+                div.classList.add("produto");
+                div.innerHTML = `
+                    <img src="${imagem}" alt="${nome}" onerror="this.src='images/sem-imagem.png'">
+                    <p class="titulo">${nome}</p>
+                    <p class="preco">R$ ${preco}</p>
+                    <button class="botao-produto" data-id="${prod.id}">Saiba Mais</button>
+                `;
+                container.appendChild(div);
 
-    // Redireciona para a página de visualização do produto com o ID do produto
-    div.querySelector(".botao-produto").addEventListener("click", () => {
-        const id = prod.id;
-        window.location.href = `/visualizarproduto?id=${id}`;
-    });
-});
-
+                // Verificação de login no botão "Saiba Mais"
+                div.querySelector(".botao-produto").addEventListener("click", () => {
+                    if (!verificarLogin()) {
+                        alert("Você precisa estar logado para visualizar o produto.");
+                        return;
+                    }
+                    window.location.href = `/visualizarproduto?id=${prod.id}`;
+                });
+            });
 
             atualizarPaginacao(lista);
         }
 
-        function atualizarPaginacao(lista) {
-            const totalPaginas = Math.ceil(lista.length / produtosPorPagina);
-            const paginacaoBusca = document.getElementById("paginacaoBusca");
-            const paginacaoNormal = document.getElementById("paginacao");
+function atualizarPaginacao(lista) {
+    const totalPaginas = Math.ceil(lista.length / produtosPorPagina);
+    const paginacaoBusca = document.getElementById("paginacaoBusca");
+    const paginacaoNormal = document.getElementById("paginacao");
+    paginacaoBusca.innerHTML = "";
+    paginacaoNormal.innerHTML = "";
 
-            paginacaoBusca.innerHTML = "";
-            paginacaoNormal.innerHTML = "";
+    if (totalPaginas <= 1) return;
 
-            for (let i = 1; i <= totalPaginas; i++) {
-                const btn = document.createElement("button");
-                btn.textContent = i;
-                btn.classList.add("pagina-btn");
-                if (i === paginaAtual) btn.classList.add("ativa");
+    const paginacao = buscandoProdutos ? paginacaoBusca : paginacaoNormal;
 
-                btn.addEventListener("click", () => {
-                    paginaAtual = i;
-                    exibirPagina(paginaAtual, buscandoProdutos ? produtosBusca : todosProdutos);
-                });
+    for (let i = 1; i <= totalPaginas; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.classList.add("pagina-btn");
+        if (i === paginaAtual) btn.classList.add("ativa");
 
-                if (buscandoProdutos) {
-                    paginacaoBusca.appendChild(btn);
-                } else {
-                    paginacaoNormal.appendChild(btn);
-                }
-            }
-        }
+        btn.addEventListener("click", () => {
+            paginaAtual = i;
+            exibirPagina(paginaAtual, buscandoProdutos ? produtosBusca : todosProdutos);
+        });
+
+        paginacao.appendChild(btn);
+    }
+}
+
 
         async function carregarProdutos() {
             try {
-                document.getElementById("produtosContainer").innerHTML = ` 
-                <div style="text-align: center; width: 100%; padding: 20px;">
-                    <div class="loader"></div>
-                    <p>Carregando produtos...</p>
-                </div>
-            `;
+                document.getElementById("produtosContainer").innerHTML = `
+                    <div style="text-align: center; width: 100%; padding: 20px;">
+                        <div class="loader"></div>
+                        <p>Carregando produtos...</p>
+                    </div>`;
 
                 const resposta = await fetch("https://api.anunciapicos.shop/product/exibicao-produtos");
                 const dados = await resposta.json();
@@ -255,10 +244,10 @@
             } catch (erro) {
                 console.error("Erro ao carregar produtos:", erro);
                 document.getElementById("produtosContainer").innerHTML = `
-                <div class="erro-carregamento">
-                <p>Erro ao carregar produtos. Tente novamente mais tarde.</p>
-                <button onclick="carregarProdutos()">Tentar Novamente</button>
-                </div>`;
+                    <div class="erro-carregamento">
+                        <p>Erro ao carregar produtos. Tente novamente mais tarde.</p>
+                        <button onclick="carregarProdutos()">Tentar Novamente</button>
+                    </div>`;
             }
         }
 
@@ -268,23 +257,19 @@
 
         async function realizarBusca() {
             const termo = inputBusca.value.trim();
-
             const categoriaSelecionada = document.querySelector('input[name="categoria"]:checked')?.value;
             const minPrice = document.getElementById('minPrice').value;
             const maxPrice = document.getElementById('maxPrice').value;
 
             const params = new URLSearchParams();
-
             if (termo) params.append('Name', termo);
-            if (categoriaSelecionada && categoriaSelecionada !== "") params.append('CategoryId', categoriaSelecionada);
+            if (categoriaSelecionada) params.append('CategoryId', categoriaSelecionada);
             if (minPrice) params.append('MinPrice', minPrice);
             if (maxPrice) params.append('MaxPrice', maxPrice);
 
-            const temBusca = params.toString() !== "";
+            buscandoProdutos = params.toString() !== "";
 
-            buscandoProdutos = temBusca;
-
-            if (!temBusca) {
+            if (!buscandoProdutos) {
                 await carregarProdutos();
                 return;
             }
@@ -294,11 +279,9 @@
             btnBuscar.disabled = true;
 
             try {
-                const url = `https://api.anunciapicos.shop/product/busca/produtos/?${params.toString()}`;
-                const resposta = await fetch(url, { method: "GET", headers: { "Content-Type": "application/json" } });
+                const resposta = await fetch(`https://api.anunciapicos.shop/product/busca/produtos/?${params.toString()}`);
                 const dados = await resposta.json();
                 produtosBusca = Array.isArray(dados) ? dados : dados.items || [];
-
                 paginaAtual = 1;
                 exibirPagina(paginaAtual, produtosBusca);
             } catch (erro) {
@@ -315,8 +298,6 @@
 
         aplicarFiltros.addEventListener("click", async () => {
             await realizarBusca();
-
-            // Fecha o menu de filtro se for mobile
             if (window.innerWidth <= 768) {
                 toggleFiltro.classList.remove("ativo");
                 filtroLateral.classList.remove("ativo");
@@ -326,6 +307,4 @@
 
         carregarProdutos();
     });
-  
-
 </script>
