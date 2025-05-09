@@ -31,8 +31,10 @@
 </div>
 
 <script>
+  // Função para verificar se o usuário está autenticado
   function verificarAuthENavegar(destino) {
     const token = localStorage.getItem("authToken");
+
     if (!token) {
       alert("Você precisa estar logado para acessar essa funcionalidade.");
       window.location.href = "/Login";
@@ -42,13 +44,20 @@
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const agora = Math.floor(Date.now() / 1000);
+
       if (payload.exp && payload.exp < agora) {
         alert("Sessão expirada. Faça login novamente.");
         localStorage.removeItem("authToken");
         window.location.href = "/Login";
         return;
       }
-      window.location.href = destino;
+
+      // Redireciona para a página de perfil passando o token na URL
+      if (destino === "/perfil") {
+        window.location.href = `${destino}?token=${token}`;
+      } else {
+        window.location.href = destino;
+      }
     } catch (e) {
       console.error("Erro no token:", e);
       localStorage.removeItem("authToken");
@@ -56,6 +65,7 @@
     }
   }
 
+  // Função para alternar o menu hamburguer
   function toggleMenu() {
     const menuIcons = document.getElementById("menuIcons");
     const menuIcon = document.getElementById("menuIcon");
@@ -71,6 +81,7 @@
     }
   }
 
+  // Função para exibir a mensagem de boas-vindas ao usuário
   function exibirMensagemUsuario() {
     const token = localStorage.getItem("authToken");
     const welcomeEl = document.getElementById("welcomeMessage");
@@ -101,5 +112,6 @@
     }
   }
 
+  // Chama a função para exibir a mensagem de boas-vindas ao usuário
   exibirMensagemUsuario();
 </script>
