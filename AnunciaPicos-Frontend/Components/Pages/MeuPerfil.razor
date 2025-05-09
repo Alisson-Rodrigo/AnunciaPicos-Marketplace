@@ -1,4 +1,5 @@
 @page "/perfil"
+<NavBar />
 <body>
     <div class="container">
         <header class="header">
@@ -11,7 +12,7 @@
         <div class="profile-container">
             <div class="profile-header">
                 <div class="profile-image-container">
-                    <img id="profile-image" src="https://via.placeholder.com/150" alt="Imagem do perfil" />
+                    
                     <div class="edit-image-overlay">
                         <button class="edit-image-btn">Editar</button>
                     </div>
@@ -69,78 +70,98 @@
             </div>
         </div>
     </div>
-
+<Footer /> 
     <script>
-        let produtosVisiveis = false;
 
-        async function carregarPerfil() {
-            try {
-                const response = await fetch("https://api.anunciapicos.shop/profile/perfil");
-                const data = await response.json();
+    let produtosVisiveis = false;
 
-                // Preenche informações do perfil
-                document.getElementById("user-name").textContent = data.name || "Usuário";
-                document.getElementById("display-name").textContent = data.name || "Nome do Usuário";
-                document.getElementById("display-email").textContent = data.email || "Email";
-                document.getElementById("email-text").textContent = data.email || "Email";
+    async function carregarPerfil() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get("token"); // Agora pega o token da URL
 
-                document.getElementById("nome-completo").value = data.name || "";
-                document.getElementById("cpf").value = data.cpf || "";
-                document.getElementById("phone").value = data.phone || "";
+        if (!token) {
+            console.error("Token não encontrado na URL. Usuário não autenticado.");
+            return;
+        }
 
-                if (data.imageProfile) {
-                    document.getElementById("profile-image").src = data.imageProfile;
+        try {
+            const response = await fetch("https://api.anunciapicos.shop/profile/perfil", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
                 }
+            });
 
-                // Salva os produtos na memória para exibição futura
-                window.produtosDoUsuario = data.products || [];
-
-            } catch (error) {
-                console.error("Erro ao carregar perfil:", error);
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
             }
+
+            const data = await response.json();
+
+            // Preenche informações do perfil
+            document.getElementById("user-name").textContent = data.name || "Usuário";
+            document.getElementById("display-name").textContent = data.name || "Nome do Usuário";
+            document.getElementById("display-email").textContent = data.email || "Email";
+            document.getElementById("email-text").textContent = data.email || "Email";
+
+            document.getElementById("nome-completo").value = data.name || "";
+            document.getElementById("cpf").value = data.cpf || "";
+            document.getElementById("phone").value = data.phone || "";
+
+            if (data.imageProfile) {
+                document.getElementById("profile-image").src = data.imageProfile;
+            }
+
+            // Salva os produtos na memória para exibição futura
+            window.produtosDoUsuario = data.products || [];
+
+        } catch (error) {
+            console.error("Erro ao carregar perfil:", error);
         }
+    }
 
-        function habilitarEdicao() {
-            document.getElementById("nome-completo").disabled = false;
-            document.getElementById("cpf").disabled = false;
-            document.getElementById("phone").disabled = false;
-        }
+    function habilitarEdicao() {
+        document.getElementById("nome-completo").disabled = false;
+        document.getElementById("cpf").disabled = false;
+        document.getElementById("phone").disabled = false;
+    }
 
-        function mostrarProdutos() {
-            const container = document.getElementById("produtos-container");
-            const lista = document.getElementById("lista-produtos");
+    function mostrarProdutos() {
+        const container = document.getElementById("produtos-container");
+        const lista = document.getElementById("lista-produtos");
 
-            if (!produtosVisiveis) {
-                // Mostra os produtos
-                lista.innerHTML = "";
+        if (!produtosVisiveis) {
+            lista.innerHTML = "";
 
-                if (window.produtosDoUsuario.length === 0) {
-                    lista.innerHTML = "<p>Você ainda não tem produtos cadastrados.</p>";
-                } else {
-                    window.produtosDoUsuario.forEach(produto => {
-                        const imagem = produto.imageUrl?.[0] || "https://via.placeholder.com/150";
-
-                        const card = `
-                            <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-                                <img src="${imagem}" alt="${produto.name}" style="width: 100px; height: 100px; object-fit: cover;" />
-                                <h4>${produto.name}</h4>
-                                <p>${produto.description}</p>
-                                <strong>R$ ${produto.price.toFixed(2)}</strong>
-                            </div>
-                        `;
-                        lista.innerHTML += card;
-                    });
-                }
-
-                container.style.display = "block";
-                produtosVisiveis = true;
+            if (!window.produtosDoUsuario || window.produtosDoUsuario.length === 0) {
+                lista.innerHTML = "<p>Você ainda não tem produtos cadastrados.</p>";
             } else {
-                // Oculta a seção de produtos
-                container.style.display = "none";
-                produtosVisiveis = false;
-            }
-        }
+                window.produtosDoUsuario.forEach(produto => {
+                    const imagem = produto.imageUrl?.[0] || "";
 
-        window.onload = carregarPerfil;
-    </script>
+                    const card = `
+                        <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                            ${imagem ? `<img src="${imagem}" alt="${produto.name}" style="width: 100px; height: 100px; object-fit: cover;" />` : ""}
+                            <h4>${produto.name}</h4>
+                            <p>${produto.description}</p>
+                            <strong>R$ ${produto.price.toFixed(2)}</strong>
+                        </div>
+                    `;
+                    lista.innerHTML += card;
+                });
+            }
+
+            container.style.display = "block";
+            produtosVisiveis = true;
+        } else {
+            container.style.display = "none";
+            produtosVisiveis = false;
+        }
+    }
+
+    // Carrega o perfil automaticamente ao carregar a página
+    window.onload = carregarPerfil;
+</script>
+
 </body>
