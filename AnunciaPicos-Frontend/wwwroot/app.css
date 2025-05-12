@@ -575,3 +575,44 @@
         padding: 12px 14px;
     }
 }
+#btn-salvar {
+    padding: 10px 20px;
+    background-color: #7E6EEA; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+#btn-salvar:hover {
+    background-color: #705ee6;
+}
+.home-button-container {
+    margin: 10px;
+    text-align: center;
+}
+
+.home-button {
+    background-color: #705ee6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.home-button i {
+    margin-right: 8px;
+}
+
+.home-button:hover {
+    background-color: #6B5ED9;
+}
+
+.plan-button i {
+    margin-right: 8px;
+}

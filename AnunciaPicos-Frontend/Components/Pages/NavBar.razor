@@ -1,125 +1,136 @@
-    <div class="navbar">
-        <div class="logo-area">
-            <div class="logo">Anuncia Picos!</div>
-            <div class="welcome-message" id="welcomeMessage"></div>
-        </div>
-
-        <div class="hamburger" onclick="toggleMenu()">
-            <i class="fas fa-bars" id="menuIcon"></i>
-        </div>
-
-        <div class="icons" id="menuIcons">
-            <a href="#" class="icon" onclick="verificarAuthENavegar('/Favoritos')">
-                <i class="far fa-heart"></i>
-            </a>
-            <a href="#" class="icon" onclick="verificarAuthENavegar('/perfil')">
-                <i class="far fa-user"></i>
-            </a>
-            <div id="areaLogout">
-                <button id="btnLogout">Sair</button>
-            </div>
-        </div>
+<div class="navbar">
+    <div class="logo-area">
+        <div class="logo">Anuncia Picos!</div>
+    
     </div>
 
-    <div class="sub-navbar">
-        <div class="sub-navbar-container">
-            <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">Escolha um Plano</button>
-            <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')" class="plan-button">
-                + Anunciar Produto
+    <div class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars" id="menuIcon"></i>
+    </div>
+
+    <div class="icons" id="menuIcons">
+        <a href="#" class="icon" onclick="verificarAuthENavegar('/Favoritos')">
+            <i class="far fa-heart"></i>
+        </a>
+        <a href="#" class="icon" onclick="verificarAuthENavegar('/perfil')">
+            <i class="far fa-user"></i>
+        </a>
+        <div id="areaLogout">
+            <button id="btnLogout">
+                <i class="fas fa-sign-out-alt"></i> Sair
             </button>
         </div>
     </div>
+</div>
 
-    <script>
-        // Função para verificar se o usuário está autenticado e navegar
-        function verificarAuthENavegar(destino) {
-            const token = localStorage.getItem("authToken");
+<!-- Botão para voltar para a Home com ícone -->
+<div class="home-button-container">
+    <button class="home-button" onclick="window.location.href = '/'">
+        <i class="fas fa-home"></i> Voltar para a Home
+    </button>
+</div>
 
-            if (!token) {
-                alert("Você precisa estar logado para acessar essa funcionalidade.");
+<div class="sub-navbar">
+    <div class="sub-navbar-container">
+        <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">
+            <i class="fas fa-cogs"></i> Escolha um Plano
+        </button>
+        <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')" class="plan-button">
+            <i class="fas fa-plus"></i>  Anunciar Produto
+        </button>
+    </div>
+</div>
+
+<script>
+    // Função para verificar se o usuário está autenticado e navegar
+    function verificarAuthENavegar(destino) {
+        const token = localStorage.getItem("authToken");
+
+        if (!token) {
+            alert("Você precisa estar logado para acessar essa funcionalidade.");
+            window.location.href = "/Login";
+            return;
+        }
+
+        try {
+            // Decodifica o token para verificar expiração
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const agora = Math.floor(Date.now() / 1000);
+
+            if (payload.exp && payload.exp < agora) {
+                alert("Sessão expirada. Faça login novamente.");
+                localStorage.removeItem("authToken");
                 window.location.href = "/Login";
                 return;
             }
 
-            try {
-                // Decodifica o token para verificar expiração
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const agora = Math.floor(Date.now() / 1000);
+            // Se o destino for a página de perfil, passa o token na URL
+            if (destino === "/perfil") {
+                // Usando encodeURIComponent para garantir que o token seja transmitido corretamente
+                window.location.href = `${destino}?token=${encodeURIComponent(token)}`;
+            } else {
+                // Para outras páginas, apenas navega normalmente
+                window.location.href = destino;
+            }
+        } catch (e) {
+            console.error("Erro ao processar token:", e);
+            alert("Ocorreu um erro com sua autenticação. Por favor, faça login novamente.");
+            localStorage.removeItem("authToken");
+            window.location.href = "/Login";
+        }
+    }
 
-                if (payload.exp && payload.exp < agora) {
-                    alert("Sessão expirada. Faça login novamente.");
-                    localStorage.removeItem("authToken");
-                    window.location.href = "/Login";
-                    return;
+    // Função para alternar o menu hambúrguer em dispositivos móveis
+    function toggleMenu() {
+        const menuIcons = document.getElementById("menuIcons");
+        const menuIcon = document.getElementById("menuIcon");
+
+        menuIcons.classList.toggle("show-menu");
+
+        if (menuIcon.classList.contains("fa-bars")) {
+            menuIcon.classList.remove("fa-bars");
+            menuIcon.classList.add("fa-times");
+        } else {
+            menuIcon.classList.remove("fa-times");
+            menuIcon.classList.add("fa-bars");
+        }
+    }
+
+    // Função para exibir a mensagem de boas-vindas ao usuário
+    function exibirMensagemUsuario() {
+        const token = localStorage.getItem("authToken");
+        const welcomeEl = document.getElementById("welcomeMessage");
+        const logoutBtn = document.getElementById("btnLogout");
+        const areaLogout = document.getElementById("areaLogout");
+
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.nome && welcomeEl) {
+                    welcomeEl.textContent = `Olá, ${payload.nome}`;
                 }
 
-                // Se o destino for a página de perfil, passa o token na URL
-                if (destino === "/perfil") {
-                    // Usando encodeURIComponent para garantir que o token seja transmitido corretamente
-                    window.location.href = `${destino}?token=${encodeURIComponent(token)}`;
-                } else {
-                    // Para outras páginas, apenas navega normalmente
-                    window.location.href = destino;
+                if (logoutBtn) {
+                    areaLogout.style.display = "inline-block";
+                    logoutBtn.onclick = () => {
+                        localStorage.removeItem("authToken");
+                        alert("Você foi desconectado com sucesso!");
+                        window.location.href = "/Login";
+                    };
                 }
             } catch (e) {
                 console.error("Erro ao processar token:", e);
-                alert("Ocorreu um erro com sua autenticação. Por favor, faça login novamente.");
-                localStorage.removeItem("authToken");
-                window.location.href = "/Login";
-            }
-        }
-
-        // Função para alternar o menu hambúrguer em dispositivos móveis
-        function toggleMenu() {
-            const menuIcons = document.getElementById("menuIcons");
-            const menuIcon = document.getElementById("menuIcon");
-
-            menuIcons.classList.toggle("show-menu");
-
-            if (menuIcon.classList.contains("fa-bars")) {
-                menuIcon.classList.remove("fa-bars");
-                menuIcon.classList.add("fa-times");
-            } else {
-                menuIcon.classList.remove("fa-times");
-                menuIcon.classList.add("fa-bars");
-            }
-        }
-
-        // Função para exibir a mensagem de boas-vindas ao usuário
-        function exibirMensagemUsuario() {
-            const token = localStorage.getItem("authToken");
-            const welcomeEl = document.getElementById("welcomeMessage");
-            const logoutBtn = document.getElementById("btnLogout");
-            const areaLogout = document.getElementById("areaLogout");
-
-            if (token) {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    if (payload.nome && welcomeEl) {
-                        welcomeEl.textContent = `Olá, ${payload.nome}`;
-                    }
-
-                    if (logoutBtn) {
-                        areaLogout.style.display = "inline-block";
-                        logoutBtn.onclick = () => {
-                            localStorage.removeItem("authToken");
-                            alert("Você foi desconectado com sucesso!");
-                            window.location.href = "/Login";
-                        };
-                    }
-                } catch (e) {
-                    console.error("Erro ao processar token:", e);
-                    if (welcomeEl) welcomeEl.textContent = "Visitante";
-                    if (areaLogout) areaLogout.style.display = "none";
-                }
-            } else {
-                if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
+                if (welcomeEl) welcomeEl.textContent = "Visitante";
                 if (areaLogout) areaLogout.style.display = "none";
             }
+        } else {
+            if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
+            if (areaLogout) areaLogout.style.display = "none";
         }
+    }
 
-        // Chama a função para exibir a mensagem de boas-vindas ao carregar a página
-        document.addEventListener("DOMContentLoaded", function() {
-            exibirMensagemUsuario();
-        });
-    </script>
+    // Chama a função para exibir a mensagem de boas-vindas ao carregar a página
+    document.addEventListener("DOMContentLoaded", function() {
+        exibirMensagemUsuario();
+    });
+</script>
