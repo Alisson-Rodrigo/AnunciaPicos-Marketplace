@@ -48,8 +48,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\profile\" />
     <Folder Include="wwwroot\products\images\" />
+    <Folder Include="wwwroot\profile\images\" />
   </ItemGroup>
 
 </Project>
