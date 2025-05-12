@@ -145,21 +145,39 @@ body {
     margin-bottom: 15px;
 }
 
-.edit-btn {
-    background-color: transparent;
-    color: white;
+/* Botão de editar perfil */
+.edit-profile-btn {
+    background-color: #7E6EEA;
+    color: #fff;
     border: none;
-    border-radius: 20px;
-    padding: 8px 20px;
+    padding: 8px 16px;
     font-size: 14px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
-    z-index: 100;
+    transition: background-color 0.3s ease;
+}
+
+.edit-profile-btn:hover {
+    background-color: #6a5cd5;
+}
+
+/* Botão de mostrar produtos */
+.edit-btn {
+    background-color: #7E6EEA;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .edit-btn:hover {
-    background-color: transparent;
+    background-color: #6a5cd5;
 }
+
+
 
 /* Form Layout */
 .form-row {

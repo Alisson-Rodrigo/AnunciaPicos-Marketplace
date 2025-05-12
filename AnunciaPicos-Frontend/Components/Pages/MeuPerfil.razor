@@ -12,16 +12,16 @@
         <div class="profile-container">
             <div class="profile-header">
                 <div class="profile-image-container">
-                    <div class="edit-image-overlay">
-                        <button class="edit-btn">Editar</button>
+                    <div class="edit-image-overlay" id="edit-image-overlay" style="display: none;">
+                        <button class="edit-image-btn" onclick="selecionarImagem()">Editar</button>
+                        <input type="file" id="input-imagem" style="display: none;" accept="image/*" onchange="uploadImagem()" />
                     </div>
-                    <!-- Imagem será inserida aqui via JS -->
                 </div>
                 <div class="profile-info">
                     <h2 id="display-name">Nome do Usuário</h2>
                     <p id="display-email">usuario@email.com</p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button class="edit-btn" onclick="habilitarEdicao()">Editar perfil</button>
+                        <button class="edit-profile-btn" onclick="habilitarEdicao()">Editar perfil</button>
                         <button class="edit-btn" onclick="mostrarProdutos()">Mostrar meus produtos</button>
                     </div>
                 </div>
@@ -56,14 +56,13 @@
                             <input type="radio" name="email-principal" id="email-1" checked />
                             <label for="email-1" class="email-label">
                                 <span class="email-text" id="email-text">usuario@email.com</span>
-                                <span class="email-date">1 mês atrás</span>
+                               
                             </label>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Seção de produtos -->
             <div id="produtos-container" style="margin-top: 30px; display: none;">
                 <h2>Meus Produtos</h2>
                 <div id="lista-produtos" style="display: grid; gap: 15px;"></div>
@@ -73,7 +72,6 @@
 <Footer /> 
 
 <script>
-
 let produtosVisiveis = false;
 
 async function carregarPerfil() {
@@ -100,7 +98,6 @@ async function carregarPerfil() {
 
         const data = await response.json();
 
-        // Preenche informações do perfil
         document.getElementById("user-name").textContent = data.name || "Usuário";
         document.getElementById("display-name").textContent = data.name || "Nome do Usuário";
         document.getElementById("display-email").textContent = data.email || "Email";
@@ -110,34 +107,25 @@ async function carregarPerfil() {
         document.getElementById("cpf").value = data.cpf || "";
         document.getElementById("phone").value = data.phone || "";
 
-        // Imagem de perfil (campo: imageProfile)
         if (data.imageProfile) {
             const imageContainer = document.querySelector(".profile-image-container");
-
-            // Remove apenas imagem anterior (se houver)
             const existingImg = imageContainer.querySelector("img");
-            if (existingImg) {
-                existingImg.remove();
-            }
+            if (existingImg) existingImg.remove();
 
-            // Adiciona nova imagem
             const imgElement = document.createElement("img");
             imgElement.src = data.imageProfile;
             imgElement.alt = `${data.name} - Imagem de perfil`;
-            imgElement.style.width = "120px";
-            imgElement.style.height = "120px";
+            imgElement.style.width = "100%";
+            imgElement.style.height = "100%";
             imgElement.style.borderRadius = "50%";
             imgElement.style.objectFit = "cover";
             imgElement.style.position = "absolute";
             imgElement.style.top = "0";
             imgElement.style.left = "0";
-            imgElement.style.width = "100%";
-            imgElement.style.height = "100%";
 
             imageContainer.appendChild(imgElement);
         }
 
-        // Salvar produtos
         window.produtosDoUsuario = data.products || [];
 
     } catch (error) {
@@ -145,11 +133,125 @@ async function carregarPerfil() {
     }
 }
 
-
 function habilitarEdicao() {
     document.getElementById("nome-completo").disabled = false;
-    document.getElementById("cpf").disabled = false;
     document.getElementById("phone").disabled = false;
+
+    // Mostrar botão de editar imagem
+    const overlay = document.querySelector(".edit-image-overlay");
+    if (overlay) {
+        overlay.style.display = "flex"; // Aqui mostramos a overlay de edição de imagem
+    }
+
+    // Criar botão "Salvar alterações" se ainda não existir
+    if (!document.getElementById("btn-salvar")) {
+        const salvarBtn = document.createElement("button");
+        salvarBtn.textContent = "Salvar alterações";
+        salvarBtn.id = "btn-salvar";
+        salvarBtn.className = "edit-profile-btn";
+        salvarBtn.style.marginTop = "20px";
+        salvarBtn.onclick = salvarAlteracoes;
+        document.querySelector(".profile-form").appendChild(salvarBtn);
+    }
+}
+
+// Função para abrir o seletor de arquivos quando clicar no botão Editar
+function selecionarImagem() {
+    document.getElementById("input-imagem").click();
+}
+
+// Função para lidar com o upload da imagem
+function uploadImagem() {
+    const imagemInput = document.getElementById("input-imagem");
+    if (imagemInput && imagemInput.files.length > 0) {
+        const imagemFile = imagemInput.files[0];
+        
+        // Exibir a imagem selecionada como prévia
+        const imageContainer = document.querySelector(".profile-image-container");
+        const existingImg = imageContainer.querySelector("img");
+        if (existingImg) existingImg.remove();
+        
+        const imgElement = document.createElement("img");
+        imgElement.src = URL.createObjectURL(imagemFile);
+        imgElement.alt = "Imagem de perfil";
+        imgElement.style.width = "100%";
+        imgElement.style.height = "100%";
+        imgElement.style.borderRadius = "50%";
+        imgElement.style.objectFit = "cover";
+        imgElement.style.position = "absolute";
+        imgElement.style.top = "0";
+        imgElement.style.left = "0";
+        
+        imageContainer.appendChild(imgElement);
+    }
+}
+
+async function salvarAlteracoes() {
+    const nome = document.getElementById("nome-completo").value;
+    const telefone = document.getElementById("phone").value;
+    const email = document.getElementById("display-email").textContent;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+
+    const formData = new FormData();
+    formData.append("name", nome);
+    formData.append("email", email);
+    formData.append("phone", telefone);
+
+    // Verificando se o usuário selecionou uma nova imagem
+    const imagemInput = document.getElementById("input-imagem");
+    if (imagemInput && imagemInput.files.length > 0) {
+        const imagemFile = imagemInput.files[0];
+        formData.append("imageProfile", imagemFile); // Note a mudança de "ImageProfile" para "imageProfile" (primeira letra minúscula)
+        
+        // Log para debugging
+        console.log("Enviando arquivo:", imagemFile.name, "tipo:", imagemFile.type, "tamanho:", imagemFile.size);
+    }
+
+    try {
+        // Log do FormData para debugging
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + (pair[1] instanceof File ? `Arquivo: ${pair[1].name}` : pair[1]));
+        }
+
+        const response = await fetch("https://api.anunciapicos.shop/profile/atualizar-perfil", {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${token}`
+                // Não definir Content-Type aqui, o FormData vai configurar automaticamente com o boundary correto
+            },
+            body: formData
+        });
+
+        const responseText = await response.text();
+        console.log("Resposta da API:", responseText);
+
+        if (!response.ok) {
+            throw new Error(`Erro ao salvar alterações: ${response.status} - ${responseText}`);
+        }
+
+        alert("Alterações salvas com sucesso!");
+        document.getElementById("nome-completo").disabled = true;
+        document.getElementById("phone").disabled = true;
+        
+        // Remover o botão salvar
+        const btnSalvar = document.getElementById("btn-salvar");
+        if (btnSalvar) btnSalvar.remove();
+        
+        // Esconder a overlay de edição de imagem
+        const overlay = document.querySelector(".edit-image-overlay");
+        if (overlay) {
+            overlay.style.display = "none";
+        }
+        
+        // Recarregar o perfil
+        carregarPerfil();
+
+    } catch (error) {
+        console.error("Erro detalhado:", error);
+        alert("Falha ao salvar alterações: " + error.message);
+    }
 }
 
 function mostrarProdutos() {
@@ -166,7 +268,7 @@ function mostrarProdutos() {
                 const imagem = produto.imageUrl?.[0] || "";
 
                 const card = `
-                    <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
                         ${imagem ? `<img src="${imagem}" alt="${produto.name}" style="width: 100px; height: 100px; object-fit: cover;" />` : ""}
                         <h4>${produto.name}</h4>
                         <p>${produto.description}</p>
@@ -185,8 +287,44 @@ function mostrarProdutos() {
     }
 }
 
-// Carrega o perfil automaticamente ao carregar a página
-window.onload = carregarPerfil;
+// Adicionar estilo para melhorar a aparência
+document.addEventListener("DOMContentLoaded", function() {
+    const style = document.createElement("style");
+    style.textContent = `
+        .profile-image-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .edit-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; /* Inicialmente escondido */
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .edit-image-btn {
+            background-color: #fff;
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    `;
+    document.head.appendChild(style);
+});
 
+window.onload = carregarPerfil;
 </script>
 </body>
