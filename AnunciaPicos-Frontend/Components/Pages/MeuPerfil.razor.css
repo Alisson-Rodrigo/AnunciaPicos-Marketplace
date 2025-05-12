@@ -90,12 +90,18 @@ body {
     margin-right: 30px;
     border-radius: 50%;
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* box-shadow prioritário */
 }
 
 #profile-image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 50%;
+    z-index: 1;
 }
 
 .edit-image-overlay {
@@ -109,6 +115,7 @@ body {
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s;
+    z-index: 2;
 }
 
 .profile-image-container:hover .edit-image-overlay {
@@ -121,6 +128,7 @@ body {
     color: white;
     cursor: pointer;
     font-size: 14px;
+    z-index: 3;
 }
 
 .profile-info {
@@ -138,7 +146,7 @@ body {
 }
 
 .edit-btn {
-    background-color: #6c5ce7;
+    background-color: transparent;
     color: white;
     border: none;
     border-radius: 20px;
@@ -146,10 +154,11 @@ body {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s;
+    z-index: 100;
 }
 
 .edit-btn:hover {
-    background-color: #5649c0;
+    background-color: transparent;
 }
 
 /* Form Layout */
@@ -259,12 +268,12 @@ input[type="radio"] {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .profile-header {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .profile-image-container {
         margin-right: 0;
         margin-bottom: 20px;
