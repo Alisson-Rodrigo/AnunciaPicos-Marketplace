@@ -2,11 +2,11 @@
 using AnunciaPicos.Backend.Infrastructure.Models;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Product;
 using AnunciaPicos.Backend.Infrastructure.Repositories.SaveChanges;
-using AnunciaPicos.Backend.Infrastructure.Repositories.User;
 using AnunciaPicos.Exceptions.ExceptionBase;
 using AnunciaPicos.Shared.Communication.Request.Product;
 using AnunciaPicos.Shared.Exceptions;
 using AutoMapper;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Register
 {
@@ -37,15 +37,22 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Register
             {
                 foreach (var imagem in request.Imagens)
                 {
-                    var nomeArquivo = $"{Guid.NewGuid()}_{imagem.FileName}";
-                    var caminho = Path.Combine("wwwroot/products/images", nomeArquivo);
+                    var nameFileNotExtension = Path.GetFileNameWithoutExtension(imagem.FileName);
+                    var nameFile = $"{Guid.NewGuid()}_{nameFileNotExtension}.webp";
+                    var caminhoWebP = Path.Combine("wwwroot/products/images", nameFile);
 
-                    using (var stream = new FileStream(caminho, FileMode.Create))
+                    using (var inputStream = imagem.OpenReadStream())
+                    using (var image = await Image.LoadAsync(inputStream))
                     {
-                        await imagem.CopyToAsync(stream);
+                        var encoder = new WebpEncoder
+                        {
+                            Quality = 90 // pode ajustar isso se quiser menos qualidade e mais compressão
+                        };
+
+                        await image.SaveAsync(caminhoWebP, encoder);
                     }
 
-                    var url = $"https://api.anunciapicos.shop/products/images/{nomeArquivo}";
+                    var url = $"https://api.anunciapicos.shop/products/images/{nameFile}";
                     imagensUrls.Add(url);
                 }
             }
