@@ -344,3 +344,9 @@
     width: 100%;
   }
 }
+.logo a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold; /* opcional */
+    font-size: 24px;   /* opcional */
+  }
