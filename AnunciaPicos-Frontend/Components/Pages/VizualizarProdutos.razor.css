@@ -448,4 +448,23 @@ body {
     height: 100%;
     object-fit: cover;
   }
-  
+  .seller-info {
+    font-size: 0.85rem; /* menor fonte */
+    color: #888; /* cinza claro */
+    opacity: 0.7; /* transparência leve */
+    margin-bottom: 10px;
+}
+
+.seller-photo {
+    width: 24px;   /* menor imagem */
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 6px;
+    opacity: 0.7;
+}
+
+.seller-details {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
