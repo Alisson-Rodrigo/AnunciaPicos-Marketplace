@@ -4,6 +4,7 @@ using AnunciaPicos.Backend.Infrastructure.Repositories.User;
 using AnunciaPicos.Exceptions.ExceptionBase;
 using AnunciaPicos.Shared.Communication.Request.Profile;
 using AnunciaPicos.Shared.Exceptions;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update
 {
@@ -28,15 +29,22 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update
 
             if (request.ImageProfile != null)
             {
-                var nomeArquivo = $"{Guid.NewGuid()}_{request.ImageProfile.FileName}";
-                var caminho = Path.Combine("wwwroot/profile/images", nomeArquivo);
+                var nameFileNotExtension = Path.GetFileNameWithoutExtension(request.ImageProfile.FileName);
+                var nameFile = $"{Guid.NewGuid()}_{nameFileNotExtension}.webp";
+                var caminhoWebP = Path.Combine("wwwroot/profile/images", nameFile);
 
-                using (var stream = new FileStream(caminho, FileMode.Create))
+                using (var inputStream = request.ImageProfile.OpenReadStream())
+                using (var image = await Image.LoadAsync(inputStream))
                 {
-                    await request.ImageProfile.CopyToAsync(stream);
+                    var encoder = new WebpEncoder
+                    {
+                        Quality = 90 // pode ajustar isso se quiser menos qualidade e mais compressão
+                    };
+
+                    await image.SaveAsync(caminhoWebP, encoder);
                 }
 
-                var url = $"https://api.anunciapicos.shop/profile/images/{nomeArquivo}";
+                var url = $"https://api.anunciapicos.shop/profile/images/{nameFile}";
                 imagensUrl = url;
             }
 
@@ -44,13 +52,13 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update
             user.Email = request.Email;
             user.Phone = request.Phone;
             user.UpdatedAt = DateTime.Now;
+
             if (!string.IsNullOrEmpty(imagensUrl))
             {
                 user.ImageProfile = imagensUrl;
             }
 
             _userRepository.UpdateUser(user);
-
             await _unitOfWork.Commit();
         }
 
