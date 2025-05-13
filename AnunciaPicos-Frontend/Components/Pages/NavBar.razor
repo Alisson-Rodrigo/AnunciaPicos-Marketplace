@@ -1,7 +1,7 @@
 <div class="navbar">
     <div class="logo-area">
         <div class="logo"><a href="/Home">Anuncia Picos!</a></div>
-        <div class="welcome-message" id="welcomeMessage">Você está acessando como visitante.</div>
+
     </div>
 
     <div class="hamburger" onclick="toggleMenu()">
@@ -36,6 +36,38 @@
 </div>
 
 <script>
+   // Adicionar ao arquivo NavBar.js ou no script da NavBar
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Adiciona funcionalidade ao logo da NavBar
+    const logoHomeLink = document.querySelector('.logo a[href="/Home"]');
+    
+    if (logoHomeLink) {
+        console.log("Logo NavBar encontrado, adicionando listener");
+        
+        logoHomeLink.addEventListener('click', function(e) {
+            // Previne o comportamento padrão do link
+            e.preventDefault();
+            
+            console.log("Clique no logo detectado");
+            
+            // Navega para a Home
+            window.location.href = "/Home";
+            
+            // Tenta carregar os produtos usando a função global (se existir)
+            setTimeout(function() {
+                console.log("Tentando carregar produtos após clique no logo");
+                if (typeof window.carregarProdutosHome === 'function') {
+                    window.carregarProdutosHome();
+                } else {
+                    console.log("Função carregarProdutosHome não está disponível");
+                    // Alternativa: reload da página
+                    window.location.reload();
+                }
+            }, 300);
+        });
+    }
+    
     // Função para verificar se o usuário está autenticado e navegar
     function verificarAuthENavegar(destino) {
         const token = localStorage.getItem("authToken");
@@ -74,6 +106,9 @@
         }
     }
 
+    // Expõe a função globalmente
+    window.verificarAuthENavegar = verificarAuthENavegar;
+
     // Função para alternar o menu hambúrguer em dispositivos móveis
     function toggleMenu() {
         const menuIcons = document.getElementById("menuIcons");
@@ -89,6 +124,9 @@
             menuIcon.classList.add("fa-bars");
         }
     }
+
+    // Expõe a função globalmente
+    window.toggleMenu = toggleMenu;
 
     // Função para exibir a mensagem de boas-vindas ao usuário
     function exibirMensagemUsuario() {
@@ -124,15 +162,6 @@
     }
 
     // Chama a função para exibir a mensagem de boas-vindas ao carregar a página
-    document.addEventListener("DOMContentLoaded", function() {
-        exibirMensagemUsuario();
-    });
-    document.addEventListener("DOMContentLoaded", function () {
-        // Corrige o problema de "voltar da outra página" e não carregar os produtos
-        window.addEventListener("pageshow", function (event) {
-            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-                window.location.reload();
-            }
-        });
-    });
+    exibirMensagemUsuario();
+});
 </script>

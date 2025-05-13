@@ -47,6 +47,15 @@ body {
     color: #333;
     font-size: 14px;
 }
+.preview-container img {
+    width: 120px !important;
+    height: 120px !important;
+    object-fit: cover !important;
+    margin: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
 
 /* Estilo para inputs e selects */
 .form-group input[type="text"],

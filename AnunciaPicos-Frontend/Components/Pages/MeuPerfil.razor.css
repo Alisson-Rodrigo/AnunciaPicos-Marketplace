@@ -230,12 +230,12 @@ body {
 }
 
 .save-button {
-    background-color: #0d6efd;
+    background-color:#725fee;
     color: white;
 }
 
 .save-button:hover {
-    background-color: #0b5ed7;
+    background-color: #604ce2;
 }
 
 .cancel-button {
@@ -316,6 +316,7 @@ body {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
 }
 
