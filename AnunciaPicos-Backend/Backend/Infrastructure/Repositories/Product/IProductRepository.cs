@@ -7,7 +7,7 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
     {
         public Task Register (ProductModel request);
         public Task<List<ProductModel>> GetProducts();
-        public Task<ProductModel> GetProductId(int id);
+        public Task<ProductModel?> GetProductId(int id);
         public void UpdateProduct(ProductModel request);
         public void DeleteProduct(ProductModel product);
         public Task<List<ProductModel>> SearchProductsAsync(RequestProductSearchCommunication request);
