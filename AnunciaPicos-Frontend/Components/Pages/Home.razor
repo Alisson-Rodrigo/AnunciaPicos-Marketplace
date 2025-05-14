@@ -41,18 +41,18 @@
         <h3>CATEGORIAS</h3>
         <form id="formCategorias">
             <label><input type="radio" name="categoria" value="" checked> Todas as categorias</label>
-<label><input type="radio" name="categoria" value="0"> Outros</label>
-<label><input type="radio" name="categoria" value="1"> Eletrônicos</label>
-<label><input type="radio" name="categoria" value="2"> Móveis</label>
-<label><input type="radio" name="categoria" value="3"> Roupas</label>
-<label><input type="radio" name="categoria" value="4"> Eletrodomésticos</label>
-<label><input type="radio" name="categoria" value="5"> Livros</label>
-<label><input type="radio" name="categoria" value="6"> Produtos esportivos</label>
-<label><input type="radio" name="categoria" value="7"> Beleza e saúde</label>
-<label><input type="radio" name="categoria" value="8"> Brinquedos</label>
-<label><input type="radio" name="categoria" value="9"> Automotivo</label>
-<label><input type="radio" name="categoria" value="10"> Jardim e exteriores</label>
-<label><input type="radio" name="categoria" value="11"> Alimentos e bebidas</label>
+            <label><input type="radio" name="categoria" value="0"> Outros</label>
+            <label><input type="radio" name="categoria" value="1"> Eletrônicos</label>
+            <label><input type="radio" name="categoria" value="2"> Móveis</label>
+            <label><input type="radio" name="categoria" value="3"> Roupas</label>
+            <label><input type="radio" name="categoria" value="4"> Eletrodomésticos</label>
+            <label><input type="radio" name="categoria" value="5"> Livros</label>
+            <label><input type="radio" name="categoria" value="6"> Produtos esportivos</label>
+            <label><input type="radio" name="categoria" value="7"> Beleza e saúde</label>
+            <label><input type="radio" name="categoria" value="8"> Brinquedos</label>
+            <label><input type="radio" name="categoria" value="9"> Automotivo</label>
+            <label><input type="radio" name="categoria" value="10"> Jardim e exteriores</label>
+            <label><input type="radio" name="categoria" value="11"> Alimentos e bebidas</label>
 
         </form>
 
@@ -90,38 +90,32 @@
 <Footer /> 
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const welcomeEl = document.getElementById("welcomeMessage");
-        const token = localStorage.getItem("authToken");
+ // Adicionar ao arquivo Home.js ou ao script principal da página Home
 
-        function verificarLogin() {
-            if (!token) return null;
+document.addEventListener("DOMContentLoaded", function () {
+    const token = localStorage.getItem("authToken");
 
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const agora = Math.floor(Date.now() / 1000);
-                if (payload.exp && payload.exp < agora) {
-                    localStorage.removeItem("authToken");
-                    return null;
-                }
-                return payload;
-            } catch {
+    // Função para verificar login
+    function verificarLogin() {
+        if (!token) return null;
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const agora = Math.floor(Date.now() / 1000);
+            if (payload.exp && payload.exp < agora) {
                 localStorage.removeItem("authToken");
                 return null;
             }
+            return payload;
+        } catch {
+            localStorage.removeItem("authToken");
+            return null;
         }
+    }
 
-        const usuario = verificarLogin();
-
-        if (usuario) {
-            const nome = usuario.sub || "Usuário";
-            welcomeEl.textContent = `Olá, ${nome}! Seja bem vindo ao Anuncia Picos.`;
-        } else {
-            welcomeEl.textContent = "Você está acessando como visitante.";
-        }
-
-        // Slides
-        const slideContainer = document.getElementById("carouselSlide");
+    // Função para controle do carrossel de imagens
+    const slideContainer = document.getElementById("carouselSlide");
+    if (slideContainer) {
         const slides = document.querySelectorAll(".banner-slide");
         let currentIndex = 0;
 
@@ -144,13 +138,15 @@
         }
 
         setInterval(nextSlide, 5000);
+    }
 
-        // Filtro
-        const toggleFiltro = document.getElementById("toggleFiltro");
-        const fecharFiltro = document.getElementById("fecharFiltro");
-        const filtroLateral = document.getElementById("filtroLateral");
-        const backdrop = document.getElementById("fundoFiltro");
+    // Filtro lateral
+    const toggleFiltro = document.getElementById("toggleFiltro");
+    const fecharFiltro = document.getElementById("fecharFiltro");
+    const filtroLateral = document.getElementById("filtroLateral");
+    const backdrop = document.getElementById("fundoFiltro");
 
+    if (toggleFiltro && fecharFiltro && filtroLateral && backdrop) {
         [toggleFiltro, fecharFiltro, backdrop].forEach(el => {
             el.addEventListener("click", () => {
                 toggleFiltro.classList.toggle("ativo");
@@ -158,158 +154,206 @@
                 backdrop.classList.toggle("ativo");
             });
         });
+    }
 
-        // Produtos
-        let todosProdutos = [], produtosBusca = [];
-        let paginaAtual = 1;
-        const produtosPorPagina = 6;
-        let buscandoProdutos = false;
+    // Função para carregar os produtos
+    let todosProdutos = [], produtosBusca = [];
+    let paginaAtual = 1;
+    const produtosPorPagina = 6;
+    let buscandoProdutos = false;
 
-        function exibirPagina(pagina, lista) {
-            const inicio = (pagina - 1) * produtosPorPagina;
-            const fim = inicio + produtosPorPagina;
-            const produtosPagina = lista.slice(inicio, fim);
-            const container = document.getElementById("produtosContainer");
-            container.innerHTML = "";
+    function exibirPagina(pagina, lista) {
+        const container = document.getElementById("produtosContainer");
+        if (!container) return;
 
-            if (produtosPagina.length === 0) {
-                container.innerHTML = `<div style="text-align: center; width: 100%; padding: 20px;"><p>Nenhum produto encontrado.</p></div>`;
-                return;
-            }
+        const inicio = (pagina - 1) * produtosPorPagina;
+        const fim = inicio + produtosPorPagina;
+        const produtosPagina = lista.slice(inicio, fim);
+        container.innerHTML = "";
 
-            produtosPagina.forEach(prod => {
-                const nome = prod.name || "Produto sem nome";
-                const preco = typeof prod.price === "number" ? parseFloat(prod.price).toFixed(2).replace(".", ",") : "0,00";
-                const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string") ? prod.imageUrl[0] : "images/sem-imagem.png";
-
-                const div = document.createElement("div");
-                div.classList.add("produto");
-                div.innerHTML = `
-                    <img src="${imagem}" alt="${nome}" onerror="this.src='images/sem-imagem.png'">
-                    <p class="titulo">${nome}</p>
-                    <p class="preco">R$ ${preco}</p>
-                    <button class="botao-produto" data-id="${prod.id}">Saiba Mais</button>
-                `;
-                container.appendChild(div);
-
-                // Verificação de login no botão "Saiba Mais"
-                div.querySelector(".botao-produto").addEventListener("click", () => {
-                    if (!verificarLogin()) {
-                        alert("Você precisa estar logado para visualizar o produto.");
-                        return;
-                    }
-                    window.location.href = `/visualizarproduto?id=${prod.id}`;
-                });
-            });
-
-            atualizarPaginacao(lista);
+        if (produtosPagina.length === 0) {
+            container.innerHTML = `<div style="text-align: center; width: 100%; padding: 20px;"><p>Nenhum produto encontrado.</p></div>`;
+            return;
         }
 
-function atualizarPaginacao(lista) {
-    const totalPaginas = Math.ceil(lista.length / produtosPorPagina);
-    const paginacaoBusca = document.getElementById("paginacaoBusca");
-    const paginacaoNormal = document.getElementById("paginacao");
-    paginacaoBusca.innerHTML = "";
-    paginacaoNormal.innerHTML = "";
+        produtosPagina.forEach(prod => {
+            const nome = prod.name || "Produto sem nome";
+            const preco = typeof prod.price === "number" ? parseFloat(prod.price).toFixed(2).replace(".", ",") : "0,00";
+            const imagem = (prod.imageUrl && prod.imageUrl.length > 0 && prod.imageUrl[0] !== "string") ? prod.imageUrl[0] : "images/sem-imagem.png";
 
-    if (totalPaginas <= 1) return;
+            const div = document.createElement("div");
+            div.classList.add("produto");
+            div.innerHTML = `
+                <img src="${imagem}" alt="${nome}" onerror="this.src='images/sem-imagem.png'">
+                <p class="titulo">${nome}</p>
+                <p class="preco">R$ ${preco}</p>
+                <button class="botao-produto" data-id="${prod.id}">Saiba Mais</button>
+            `;
+            container.appendChild(div);
 
-    const paginacao = buscandoProdutos ? paginacaoBusca : paginacaoNormal;
-
-    for (let i = 1; i <= totalPaginas; i++) {
-        const btn = document.createElement("button");
-        btn.textContent = i;
-        btn.classList.add("pagina-btn");
-        if (i === paginaAtual) btn.classList.add("ativa");
-
-        btn.addEventListener("click", () => {
-            paginaAtual = i;
-            exibirPagina(paginaAtual, buscandoProdutos ? produtosBusca : todosProdutos);
+            // Verificação de login no botão "Saiba Mais"
+            div.querySelector(".botao-produto").addEventListener("click", () => {
+                if (!verificarLogin()) {
+                    alert("Você precisa estar logado para visualizar o produto.");
+                    return;
+                }
+                window.location.href = `/visualizarproduto?id=${prod.id}`;
+            });
         });
 
-        paginacao.appendChild(btn);
+        atualizarPaginacao(lista);
     }
-}
 
+    function atualizarPaginacao(lista) {
+        const totalPaginas = Math.ceil(lista.length / produtosPorPagina);
+        const paginacaoBusca = document.getElementById("paginacaoBusca");
+        const paginacaoNormal = document.getElementById("paginacao");
+        
+        if (!paginacaoBusca || !paginacaoNormal) return;
+        
+        paginacaoBusca.innerHTML = "";
+        paginacaoNormal.innerHTML = "";
 
-        async function carregarProdutos() {
-            try {
-                document.getElementById("produtosContainer").innerHTML = `
-                    <div style="text-align: center; width: 100%; padding: 20px;">
-                        <div class="loader"></div>
-                        <p>Carregando produtos...</p>
-                    </div>`;
+        if (totalPaginas <= 1) return;
 
-                const resposta = await fetch("https://api.anunciapicos.shop/product/exibicao-produtos");
-                const dados = await resposta.json();
-                todosProdutos = Array.isArray(dados) ? dados : dados.items || [];
-                paginaAtual = 1;
-                buscandoProdutos = false;
-                exibirPagina(paginaAtual, todosProdutos);
-            } catch (erro) {
-                console.error("Erro ao carregar produtos:", erro);
-                document.getElementById("produtosContainer").innerHTML = `
+        const paginacao = buscandoProdutos ? paginacaoBusca : paginacaoNormal;
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            btn.classList.add("pagina-btn");
+            if (i === paginaAtual) btn.classList.add("ativa");
+
+            btn.addEventListener("click", () => {
+                paginaAtual = i;
+                exibirPagina(paginaAtual, buscandoProdutos ? produtosBusca : todosProdutos);
+            });
+
+            paginacao.appendChild(btn);
+        }
+    }
+
+    async function carregarProdutos() {
+        const container = document.getElementById("produtosContainer");
+        if (!container) return; // Se não estamos na página de produtos, não faz nada
+        
+        console.log("Carregando produtos...");
+        
+        try {
+            container.innerHTML = `
+                <div style="text-align: center; width: 100%; padding: 20px;">
+                    <div class="loader"></div>
+                    <p>Carregando produtos...</p>
+                </div>`;
+
+            const resposta = await fetch("https://api.anunciapicos.shop/product/exibicao-produtos");
+            const dados = await resposta.json();
+            todosProdutos = Array.isArray(dados) ? dados : dados.items || [];
+            paginaAtual = 1;
+            buscandoProdutos = false;
+            exibirPagina(paginaAtual, todosProdutos);
+            console.log("Produtos carregados com sucesso:", todosProdutos.length);
+        } catch (erro) {
+            console.error("Erro ao carregar produtos:", erro);
+            if (container) {
+                container.innerHTML = `
                     <div class="erro-carregamento">
                         <p>Erro ao carregar produtos. Tente novamente mais tarde.</p>
                         <button onclick="carregarProdutos()">Tentar Novamente</button>
                     </div>`;
             }
         }
+    }
 
-        const btnBuscar = document.getElementById("btnBuscar");
-        const inputBusca = document.getElementById("inputBusca");
-        const aplicarFiltros = document.getElementById("aplicarFiltros");
+    const btnBuscar = document.getElementById("btnBuscar");
+    const inputBusca = document.getElementById("inputBusca");
+    const aplicarFiltros = document.getElementById("aplicarFiltros");
 
-        async function realizarBusca() {
-            const termo = inputBusca.value.trim();
-            const categoriaSelecionada = document.querySelector('input[name="categoria"]:checked')?.value;
-            const minPrice = document.getElementById('minPrice').value;
-            const maxPrice = document.getElementById('maxPrice').value;
-
-            const params = new URLSearchParams();
-            if (termo) params.append('Name', termo);
-            if (categoriaSelecionada) params.append('CategoryId', categoriaSelecionada);
-            if (minPrice) params.append('MinPrice', minPrice);
-            if (maxPrice) params.append('MaxPrice', maxPrice);
-
-            buscandoProdutos = params.toString() !== "";
-
-            if (!buscandoProdutos) {
-                await carregarProdutos();
-                return;
-            }
-
-            const textoOriginal = btnBuscar.innerHTML;
-            btnBuscar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            btnBuscar.disabled = true;
-
-            try {
-                const resposta = await fetch(`https://api.anunciapicos.shop/product/busca/produtos/?${params.toString()}`);
-                const dados = await resposta.json();
-                produtosBusca = Array.isArray(dados) ? dados : dados.items || [];
-                paginaAtual = 1;
-                exibirPagina(paginaAtual, produtosBusca);
-            } catch (erro) {
-                console.error("Erro ao buscar produtos:", erro);
-                produtosBusca = [];
-                exibirPagina(1, []);
-            } finally {
-                btnBuscar.innerHTML = textoOriginal;
-                btnBuscar.disabled = false;
-            }
-        }
-
+    // Adiciona listeners para os botões de busca e filtros
+    if (btnBuscar && inputBusca) {
         btnBuscar.addEventListener("click", realizarBusca);
+    }
 
+    if (aplicarFiltros) {
         aplicarFiltros.addEventListener("click", async () => {
             await realizarBusca();
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 768 && toggleFiltro && filtroLateral && backdrop) {
                 toggleFiltro.classList.remove("ativo");
                 filtroLateral.classList.remove("ativo");
                 backdrop.classList.remove("ativo");
             }
         });
+    }
 
+    async function realizarBusca() {
+        const termo = inputBusca ? inputBusca.value.trim() : "";
+        const categoriaSelecionada = document.querySelector('input[name="categoria"]:checked')?.value;
+        const minPrice = document.getElementById('minPrice')?.value;
+        const maxPrice = document.getElementById('maxPrice')?.value;
+
+        const params = new URLSearchParams();
+        if (termo) params.append('Name', termo);
+        if (categoriaSelecionada) params.append('CategoryId', categoriaSelecionada);
+        if (minPrice) params.append('MinPrice', minPrice);
+        if (maxPrice) params.append('MaxPrice', maxPrice);
+
+        buscandoProdutos = params.toString() !== "";
+
+        if (!buscandoProdutos) {
+            await carregarProdutos();
+            return;
+        }
+
+        const textoOriginal = btnBuscar ? btnBuscar.innerHTML : "";
+        if (btnBuscar) {
+            btnBuscar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btnBuscar.disabled = true;
+        }
+
+        try {
+            const resposta = await fetch(`https://api.anunciapicos.shop/product/busca/produtos/?${params.toString()}`);
+            const dados = await resposta.json();
+            produtosBusca = Array.isArray(dados) ? dados : dados.items || [];
+            paginaAtual = 1;
+            exibirPagina(paginaAtual, produtosBusca);
+        } catch (erro) {
+            console.error("Erro ao buscar produtos:", erro);
+            produtosBusca = [];
+            exibirPagina(1, []);
+        } finally {
+            if (btnBuscar) {
+                btnBuscar.innerHTML = textoOriginal;
+                btnBuscar.disabled = false;
+            }
+        }
+    }
+
+    // Recarrega os produtos quando a página for acessada através do botão voltar ou avançar
+    window.addEventListener('popstate', () => {
         carregarProdutos();
     });
+
+    // IMPORTANTE: Corrige o problema de navegação da página Home
+    if (window.location.pathname === '/Home' || window.location.pathname === '/') {
+        carregarProdutos();
+    }
+
+    // Corrige o problema de "voltar da outra página" e não carregar os produtos
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted || 
+            (performance.getEntriesByType && 
+             performance.getEntriesByType("navigation").length > 0 && 
+             performance.getEntriesByType("navigation")[0].type === "back_forward")) {
+            console.log("Navegação de volta detectada, recarregando produtos...");
+            if (window.location.pathname === '/Home' || window.location.pathname === '/') {
+                carregarProdutos();
+            }
+        }
+    });
+
+    // Para garantir que sempre carregue os produtos ao navegar para Home, vamos expor a função globalmente
+    window.carregarProdutosHome = carregarProdutos;
+});
+
 </script>
+
