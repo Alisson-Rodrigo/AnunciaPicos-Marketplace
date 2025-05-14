@@ -41,6 +41,7 @@ using AnunciaPicos.Backend.Aplicattion.Services.Stripe;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Payment;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Product.Search;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Gemini;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -181,12 +182,24 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
+// Configuração do diretório de imagens
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+    RequestPath = "/uploads"
+});
+
+// Outras configurações
 app.MapHub<ChatHub>("/chathub");
-app.UseStaticFiles();
 app.UseRouting();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Este UseStaticFiles agora lida apenas com arquivos padrão
+app.UseStaticFiles();  // Serve arquivos estáticos para outros caminhos
+
 app.MapControllers();
 app.UseCors("AllowSpecificOrigin");  // Aplica a política CORS definida
 app.Run();
+

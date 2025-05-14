@@ -28,7 +28,7 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
                 .ToListAsync();
         }
 
-        public async Task<ProductModel> GetProductId(int id)
+        public async Task<ProductModel?> GetProductId(int id)
         {
             return await _context.Products
                 .Where(x => x.Active)
@@ -63,6 +63,10 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
             if (request.MaxPrice.HasValue)
                 query = query.Where(p => p.Price <= request.MaxPrice.Value);
 
+            if (request.UserId.HasValue)
+                query = query.Where(p => p.UserId == request.UserId.Value);
+
+
             query = request.OrderBy?.ToLower() switch
             {
                 "name" => request.Ascending ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name),
@@ -91,6 +95,10 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
 
             if (request.CategoryId.HasValue)
                 query = query.Where(p => p.Category == request.CategoryId.Value);
+
+            if (request.UserId.HasValue)
+                query = query.Where(p => p.UserId == request.UserId.Value);
+
 
             return await query.CountAsync();
         }
