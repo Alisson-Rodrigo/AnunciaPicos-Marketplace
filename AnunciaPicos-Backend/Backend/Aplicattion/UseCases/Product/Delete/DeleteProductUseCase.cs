@@ -23,14 +23,15 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Delete
         {
             var user = await _logged.UserLogged();
             var product = await _productRepository.GetProductId(id);
+
+            if (user.Id != product!.UserId)
+            {
+                throw new AnunciaPicosExceptions(ResourceMessagesException.USER_NOT_ALLOWED);
+            }
+
             if (product == null)
             {
                 throw new AnunciaPicosExceptions(ResourceMessagesException.NOT_FOUND_PRODUCTS);
-            }
-
-            if (user.Id != product.UserId)
-            {
-                throw new AnunciaPicosExceptions(ResourceMessagesException.USER_NOT_ALLOWED);
             }
 
             _productRepository.DeleteProduct(product);

@@ -14,7 +14,8 @@ namespace AnunciaPicos.Backend.Infrastructure.Data
         public DbSet<ConversationModel> Conversation { get; set; }
         public DbSet<EvaluationModel> Evaluation { get; set; }
         public DbSet<MessageModel> Message { get; set; }
-        public DbSet<PaymentModel> Payments { get; set; } // Substitui Subscription por Payments
+        public DbSet<PaymentModel> Payments { get; set; }
+        public DbSet<FavoriteModel> Favorites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -98,7 +99,18 @@ namespace AnunciaPicos.Backend.Infrastructure.Data
                 .Property(p => p.ExpirationDate)
                 .IsRequired();
 
-            // Removidas as configurações antigas de SubscriptionModel
+            modelBuilder.Entity<FavoriteModel>()
+                .HasKey(f => f.Id);
+
+            modelBuilder.Entity<FavoriteModel>()
+                .HasOne(f => f.User)
+                .WithMany(u => u.Favorites)
+                .HasForeignKey(f => f.UserId);
+
+            modelBuilder.Entity<FavoriteModel>()
+                .HasOne(f => f.Product)
+                .WithMany(p => p.FavoritedBy)
+                .HasForeignKey(f => f.ProductId);
 
             base.OnModelCreating(modelBuilder);
         }

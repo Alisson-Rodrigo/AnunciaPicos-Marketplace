@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnunciaPicos.Backend.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("evaluation")]
     [ApiController]
     public class evaluationController : ControllerBase
     {

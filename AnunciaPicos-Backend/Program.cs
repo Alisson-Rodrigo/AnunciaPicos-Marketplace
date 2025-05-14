@@ -42,6 +42,10 @@ using AnunciaPicos.Backend.Infrastructure.Repositories.Payment;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Product.Search;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Gemini;
 using Microsoft.Extensions.FileProviders;
+using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Delete;
+using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register;
+using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get;
+using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -133,6 +137,10 @@ builder.Services.AddScoped<IStripeService, StripeService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<ISearchAndFiltersUseCase, SearchAndFiltersUseCase>();
 builder.Services.AddScoped<IRequestGeminiChatUseCase, RequestGeminiChatUseCase>();
+builder.Services.AddScoped<IRegisterFavoriteUseCase, RegisterFavoriteUseCase>();
+builder.Services.AddScoped<IDeleteFavoriteUseCase, DeleteFavoriteUseCase>();
+builder.Services.AddScoped<IGetFavoriteUseCase, GetFavoriteUseCase>();
+builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 builder.Services.AddScoped<GetTokenRequest>();
 
 // JWT Authentication
@@ -183,6 +191,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configuração do diretório de imagens
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),

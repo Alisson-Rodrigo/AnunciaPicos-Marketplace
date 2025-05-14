@@ -11,12 +11,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnunciaPicos.Backend.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("product")]
     [ApiController]
     public class productController : ControllerBase
     {
         [Authorize]
-        [HttpPost("cadastro")]
+        [HttpPost("register")]
         [RequestSizeLimit(10_000_000)] // Limita para 10MB por request (ajustável)
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> RegisterProduct([FromForm] RequestRegisterProductCommunication request, [FromServices] IRegisterProductUseCase registerProductUseCase)
@@ -25,7 +25,7 @@ namespace AnunciaPicos.Backend.API.Controllers
             return Created("ProductController", null);
         }
 
-        [HttpGet("exibicao-produtos")]
+        [HttpGet("view-product")]
         [ProducesResponseType(typeof(List<ResponseProductGetCommunication>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProducts([FromServices] IGetProductUseCase getProductsUseCase)
         {
@@ -33,7 +33,7 @@ namespace AnunciaPicos.Backend.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("exibicao-produtos/{id}")]
+        [HttpGet("view-product/{id}")]
         [ProducesResponseType(typeof(ResponseProductGetCommunication), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProduct([FromRoute] int id, [FromServices] IGetProductIdUseCase getProductsUseCase)
         {
@@ -42,7 +42,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         }
 
         [Authorize]
-        [HttpPut("atualizar-produtos/{id}")]
+        [HttpPut("update-product/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id,[FromBody] RequestUpdateProductCommunication request, [FromServices] IUpdateProductUseCase updateProductUseCase)
         {
@@ -51,7 +51,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("deletar-produtos/{id}")]
+        [HttpDelete("delete-product/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteProduct([FromRoute] int id, [FromServices] IDeleteProductUseCase deleteProductUseCase)
         {
@@ -59,7 +59,7 @@ namespace AnunciaPicos.Backend.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("busca/produtos")]
+        [HttpGet("search/products")]
         [ProducesResponseType(typeof(List<ResponseProductSearchCommunication>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Search([FromQuery] RequestProductSearchCommunication request, [FromServices] ISearchAndFiltersUseCase searchAndFiltersUseCase)
         {
@@ -67,7 +67,7 @@ namespace AnunciaPicos.Backend.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("busca/autocomplete")]
+        [HttpGet("search/autocomplete")]
         public async Task<IActionResult> AutoComplete([FromQuery] string term, ISearchAndFiltersUseCase searchAndFiltersUseCase)
         {
             if (string.IsNullOrWhiteSpace(term))
