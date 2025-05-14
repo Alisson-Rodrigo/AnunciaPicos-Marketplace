@@ -145,7 +145,8 @@ function atualizarDadosInterface(data) {
 
     if (data.imageProfile) {
         const container = document.querySelector(".profile-image-container");
-        container.innerHTML = "";
+        container.innerHTML = ""; // Limpa a imagem antiga
+
         const img = document.createElement("img");
         img.src = data.imageProfile;
         img.alt = "Imagem de perfil";
@@ -154,39 +155,72 @@ function atualizarDadosInterface(data) {
             borderRadius: "50%", objectFit: "cover",
             position: "absolute", top: "0", left: "0"
         });
-        container.appendChild(img);
+        container.appendChild(img);  // Adiciona a imagem
 
         const overlay = document.getElementById("edit-image-overlay");
-        if (overlay && overlay.parentNode) {
-            overlay.parentNode.removeChild(overlay);
+        if (overlay) { // Verifica se o overlay existe
+            // Remove o overlay anterior, se houver
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+            container.appendChild(overlay);  // Adiciona o overlay novamente
         }
-        container.appendChild(overlay);
     }
 }
+
 
 function carregarProdutos() {
     const lista = document.getElementById("lista-produtos");
     lista.innerHTML = "";
 
-    if (!produtosDoUsuario.length) {
-        lista.innerHTML = "<p class='no-products'>Você ainda não tem produtos cadastrados.</p>";
+    // Extrai o token da URL ou de onde ele estiver armazenado
+    const token = localStorage.getItem("token") || new URLSearchParams(window.location.search).get("token");
+    
+    if (!token) {
+        console.error("Token não encontrado.");
         return;
     }
 
-    produtosDoUsuario.forEach(produto => {
-        const imagem = produto.imageUrl?.[0] || "";
-        const card = document.createElement("div");
-        card.className = "produto-card";
-        card.innerHTML = `
-            ${imagem ? `<div class="produto-imagem"><img src="${imagem}" alt="${produto.name}" /></div>` : '<div class="produto-sem-imagem"></div>'}
-            <div class="produto-info">
-                <h4>${produto.name}</h4>
-                <p>${produto.description}</p>
-                <strong class="produto-preco">R$ ${produto.price.toFixed(2)}</strong>
-            </div>`;
-        lista.appendChild(card);
+    // Decodificando o token para obter o ID (isso pode ser feito usando uma biblioteca como jwt-decode)
+    const decodedToken = JSON.parse(atob(token.split('.')[1]));
+    const userId = decodedToken.sub; // Aqui você pega o 'sub', que é o ID do usuário
+
+    // Realiza a requisição para obter os produtos
+    fetch(`https://api.anunciapicos.shop/produtos?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(produtos => {
+        if (!produtos.length) {
+            lista.innerHTML = "<p class='no-products'>Você ainda não tem produtos cadastrados.</p>";
+            return;
+        }
+
+        // Popula a lista de produtos
+        produtos.forEach(produto => {
+            const imagem = produto.imageUrl?.[0] || "";
+            const card = document.createElement("div");
+            card.className = "produto-card";
+            card.innerHTML = `
+                ${imagem ? `<div class="produto-imagem"><img src="${imagem}" alt="${produto.name}" /></div>` : '<div class="produto-sem-imagem"></div>'}
+                <div class="produto-info">
+                    <h4>${produto.name}</h4>
+                    <p>${produto.description}</p>
+                    <strong class="produto-preco">R$ ${produto.price.toFixed(2)}</strong>
+                </div>`;
+            lista.appendChild(card);
+        });
+    })
+    .catch(error => {
+        console.error("Erro ao carregar produtos:", error);
+        lista.innerHTML = "<p class='error'>Erro ao carregar produtos. Tente novamente mais tarde.</p>";
     });
 }
+
 
 function trocarSecao(secaoId) {
     document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
