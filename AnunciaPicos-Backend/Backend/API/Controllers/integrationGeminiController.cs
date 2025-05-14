@@ -9,12 +9,12 @@ using Org.BouncyCastle.Ocsp;
 
 namespace AnunciaPicos.Backend.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("gemini")]
     [ApiController]
     public class integrationGeminiController : ControllerBase
     {
 
-        [HttpPost("gemini/conversa")]
+        [HttpPost("gemini/chat")]
         public async Task<IActionResult> ConversaGemini([FromBody] RequestChatGeminiCommunication request, IRequestGeminiChatUseCase requestGeminiChatUseCase)
         {
             var response = await requestGeminiChatUseCase.Execute(request);

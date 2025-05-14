@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
-[Route("[controller]")]
+[Route("message")]
 [ApiController]
 public class messageController : ControllerBase
 {

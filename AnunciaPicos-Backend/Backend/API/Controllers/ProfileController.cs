@@ -2,21 +2,19 @@
 using AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Get;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Profile.GetId;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update;
-using AnunciaPicos.Backend.Infrastructure.Models;
 using AnunciaPicos.Shared.Communication.Request.Profile;
 using AnunciaPicos.Shared.Communication.Response.Profile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Crypto.Operators;
 
 namespace AnunciaPicos.Backend.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("profile")]
     [ApiController]
     public class profileController : ControllerBase
     {
         [Authorize]
-        [HttpGet("perfil")]
+        [HttpGet("myprofile")]
         [ProducesResponseType(typeof(UserModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProfile([FromServices] IGetUserUseCase getUserUseCase)
         {
@@ -24,7 +22,7 @@ namespace AnunciaPicos.Backend.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("perfil/{id}")]
+        [HttpGet("profile-specific/{id}")]
         [ProducesResponseType(typeof(ResponseGetProfileIdCommunication), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProfileId([FromServices] IGetUserIdUseCase getUserByIdUseCase, int id)
         {
@@ -33,7 +31,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         }
 
         [Authorize]
-        [HttpPut("atualizar-perfil")]
+        [HttpPut("update-profile")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [RequestSizeLimit(10_000_000)] // Limita para 10MB por request (ajustável)
         public async Task<IActionResult> UpdateProfile([FromServices] IUpdateUserUseCase updateUserUseCase, [FromForm] RequestUpdateProfileCommunication request)
@@ -44,7 +42,7 @@ namespace AnunciaPicos.Backend.API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("deletar-perfil")]
+        [HttpDelete("delete-profile")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteProfile([FromServices] IDeleteUserUseCase deleteUserUseCase)
         {

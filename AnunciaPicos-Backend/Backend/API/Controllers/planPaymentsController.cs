@@ -8,7 +8,7 @@ using Stripe;
 
 namespace AnunciaPicos.Backend.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("plan")]
     [ApiController]
     public class planPaymentsController : ControllerBase
     {

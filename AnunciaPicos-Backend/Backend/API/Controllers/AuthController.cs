@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnunciaPicos.Backend.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("auth")]
     [ApiController]
     public class authController : ControllerBase
     {
-        [HttpPost("cadastro")]
+        [HttpPost("register")]
         [ProducesResponseType(typeof(ResponseRegisterCommunication), StatusCodes.Status201Created)]
         public async Task<IActionResult> RegisterUser([FromBody] RequestRegisterCommunication registerModel, [FromServices] IRegisterUseCase registerUseCase)
         {
@@ -30,7 +30,7 @@ namespace AnunciaPicos.Backend.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("esqueceu-senha")]
+        [HttpPost("forgot-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdatePassword([FromServices] IUpdatePasswordUseCase updatePassUseCase, [FromBody] RequestUpdatePasswordCommunication updatePasswordModel)
         {
@@ -38,7 +38,7 @@ namespace AnunciaPicos.Backend.API.Controllers
             return Ok();
         }
 
-        [HttpPost("validar-recuperacao")]
+        [HttpPost("validation-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ValidateRecovery([FromServices] IResetUseCase resetUseCase, RequestResetPasswordCommunication resetRequest)
         {

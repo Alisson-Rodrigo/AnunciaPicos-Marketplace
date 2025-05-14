@@ -11,10 +11,10 @@ public class UserModel : InfoBaseModel
     public string? ImageProfile {  get; set; } = string.Empty;
     public Guid UserIdentifier { get; set; }
     public List<ProductModel>? Products { get; set; }
-
     public ICollection<ConversationModel>? Conversation { get; set; }
 
     public virtual ICollection<PaymentModel>? Payments { get; set; }
+    public ICollection<FavoriteModel>? Favorites { get; set; }
 
     public PaymentModel? ActivePayment => Payments?
         .Where(p => p.Status == PaymentStatus.Completed &&

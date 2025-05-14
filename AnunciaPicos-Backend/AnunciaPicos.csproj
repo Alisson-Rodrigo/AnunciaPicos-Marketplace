@@ -50,7 +50,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Backend\Aplicattion\UseCases\Product\GetIdList\" />
     <Folder Include="wwwroot\products\images\" />
     <Folder Include="wwwroot\profile\images\" />
   </ItemGroup>
