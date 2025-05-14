@@ -180,4 +180,41 @@
             }
         }
     });
+
+    // Adicione este código ao seu script JS existente, após a função verificarAutenticacao()
+function limiteDeRedimensionamento() {
+    // Função para ajustar tamanho das imagens de preview
+    document.addEventListener("DOMContentLoaded", function() {
+        const imagePreview = document.getElementById("imagePreview");
+        
+        // Usar MutationObserver para detectar quando novas imagens são adicionadas
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    const images = imagePreview.querySelectorAll('img');
+                    images.forEach(img => {
+                        // Aplicar restrições para CADA imagem com tamanho aumentado
+                        img.style.maxWidth = '180px';
+                        img.style.maxHeight = '180px';
+                        img.style.width = '180px';
+                        img.style.height = '180px';
+                        img.style.objectFit = 'cover';
+                        
+                        // Prevenindo comportamento padrão se a imagem for clicada
+                        img.onclick = function(e) {
+                            e.preventDefault();
+                            return false;
+                        };
+                    });
+                }
+            });
+        });
+        
+        // Configurar o observer para monitorar mudanças nos filhos do elemento
+        observer.observe(imagePreview, { childList: true });
+    });
+}
+
+// Chamar a função de limitação
+limiteDeRedimensionamento();
 </script>

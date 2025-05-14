@@ -25,10 +25,10 @@
                 </div>
             </div>
 
-            <div class="category">Categoria: Computador e laptop</div>
+            <div class="category">Categoria: Desconhecida</div>
             
             <div class="price-container">
-                <span class="current-price">R$10.999</span>
+                <span class="current-price">R$ 0,00</span>
             </div>
 
             <div class="action-buttons">
@@ -55,10 +55,26 @@
         </div>
     </div>
 </div>
+
 <Footer />
 
 <script>
     let currentImageIndex = 0;
+
+    const categoryMap = {
+        0: "Outros",
+        1: "Eletrônicos",
+        2: "Móveis",
+        3: "Roupas",
+        4: "Eletrodomésticos",
+        5: "Livros",
+        6: "Produtos esportivos",
+        7: "Beleza e saúde",
+        8: "Brinquedos",
+        9: "Automotivo",
+        10: "Jardim e exteriores",
+        11: "Alimentos e bebidas"
+    };
 
     window.addEventListener("DOMContentLoaded", async () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -74,14 +90,19 @@
             const product = await response.json();
 
             if (response.ok) {
+                // Título, preço e descrição
                 document.querySelector(".product-title").textContent = product.name || "Produto sem nome";
                 document.querySelector(".current-price").textContent = `R$ ${parseFloat(product.price).toFixed(2).replace(".", ",")}`;
-                document.querySelector(".category").textContent = `Categoria: ${product.category || "Desconhecida"}`;
                 document.querySelector(".description").textContent = product.description || "Descrição não disponível";
+                
+                // Categoria traduzida
+                document.querySelector(".category").textContent = `Categoria: ${categoryMap[product.categories] || "Desconhecida"}`;
 
-                // Carrega o carrossel de imagens
+                // Carrossel de imagens
                 if (product.imageUrl && product.imageUrl.length > 0) {
                     const carouselInner = document.querySelector(".carousel-inner");
+                    carouselInner.innerHTML = ""; // limpar antes de adicionar
+
                     product.imageUrl.forEach((url, index) => {
                         const imgElement = document.createElement("img");
                         imgElement.src = url;
@@ -92,10 +113,23 @@
                     });
                 }
 
-                // Exibe avaliação do vendedor (simulação com nota do produto)
+                // Buscar dados do perfil do vendedor
+                const userId = product.userId || product.usuarioId || product.vendedorId;
+                if (userId) {
+                    const sellerResponse = await fetch(`https://api.anunciapicos.shop/profile/perfil/${userId}`);
+                    const seller = await sellerResponse.json();
+
+                    if (sellerResponse.ok) {
+                        document.querySelector(".seller-name").textContent = seller.name || "Vendedor sem nome";
+                        document.querySelector(".seller-photo").src = seller.imageProfile || "https://via.placeholder.com/30";
+                    } else {
+                        console.warn("Erro ao buscar dados do perfil do vendedor.");
+                    }
+                }
+
+                // Exibe avaliação (simulada por enquanto)
                 document.querySelector(".seller-rating").textContent = 
                     `Nota do vendedor: ${product.rating || "Sem avaliações"} / 5.0`;
-
             } else {
                 alert("Produto não encontrado!");
             }

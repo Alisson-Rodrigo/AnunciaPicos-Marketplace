@@ -299,8 +299,8 @@ body {
 }
 
 .tab.active {
-    color: #ff7722;
-    border-bottom: 2px solid #ff7722;
+    color: #7E6EEA;
+    border-bottom: 2px solid #7E6EEA;
 }
 
 .tab-content {
@@ -448,23 +448,60 @@ body {
     height: 100%;
     object-fit: cover;
   }
-  .seller-info {
-    font-size: 0.85rem; /* menor fonte */
-    color: #888; /* cinza claro */
-    opacity: 0.7; /* transparência leve */
-    margin-bottom: 10px;
+ /* Estilos adicionais para o seller-info */
+.seller-info {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
 }
 
-.seller-photo {
-    width: 24px;   /* menor imagem */
-    height: 24px;
-    border-radius: 50%;
-    margin-right: 6px;
-    opacity: 0.7;
+.seller-info:hover {
+    background-color: #f0f0f0;
 }
 
 .seller-details {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
+}
+
+.seller-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #7E6EEA;
+}
+
+.seller-name {
+    font-weight: 500;
+    color: #333;
+}
+
+
+
+/* Estado de carregamento */
+.loading {
+    opacity: 0.6;
+}
+
+/* Indicador de carregamento */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #7E6EEA;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
