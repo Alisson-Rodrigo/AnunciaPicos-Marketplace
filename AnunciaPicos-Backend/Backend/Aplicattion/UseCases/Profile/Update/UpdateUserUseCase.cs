@@ -27,26 +27,31 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update
 
             var imagensUrl = string.Empty;
 
+            // Defina caminho absoluto da pasta externa
+            var caminhoBase = "/var/www/anunciapicos/uploads/profile/images";
+            Directory.CreateDirectory(caminhoBase); // garante que a pasta exista
+
             if (request.ImageProfile != null)
             {
                 var nameFileNotExtension = Path.GetFileNameWithoutExtension(request.ImageProfile.FileName);
                 var nameFile = $"{Guid.NewGuid()}_{nameFileNotExtension}.webp";
-                var caminhoWebP = Path.Combine("wwwroot/profile/images", nameFile);
+                var caminhoWebP = Path.Combine(caminhoBase, nameFile);
 
                 using (var inputStream = request.ImageProfile.OpenReadStream())
                 using (var image = await Image.LoadAsync(inputStream))
                 {
                     var encoder = new WebpEncoder
                     {
-                        Quality = 90 // pode ajustar isso se quiser menos qualidade e mais compressão
+                        Quality = 90
                     };
 
                     await image.SaveAsync(caminhoWebP, encoder);
                 }
 
-                var url = $"https://api.anunciapicos.shop/profile/images/{nameFile}";
+                var url = $"https://api.anunciapicos.shop/uploads/profile/images/{nameFile}";
                 imagensUrl = url;
             }
+
 
             user.Name = request.Name;
             user.Email = request.Email;

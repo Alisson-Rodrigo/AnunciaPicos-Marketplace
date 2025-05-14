@@ -33,26 +33,30 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Register
             // Crie a lista de URLs de imagens
             var imagensUrls = new List<string>();
 
-            if (request.Imagens != null && request.Imagens.Any())
+            // Defina caminho absoluto da pasta externa
+            var caminhoBase = "/var/www/anunciapicos/uploads/products/images";
+            Directory.CreateDirectory(caminhoBase); // garante que a pasta exista
+
+            if (request.Imagens != null && request.Imagens.Count > 0)
             {
                 foreach (var imagem in request.Imagens)
                 {
                     var nameFileNotExtension = Path.GetFileNameWithoutExtension(imagem.FileName);
                     var nameFile = $"{Guid.NewGuid()}_{nameFileNotExtension}.webp";
-                    var caminhoWebP = Path.Combine("wwwroot/products/images", nameFile);
+                    var caminhoWebP = Path.Combine(caminhoBase, nameFile);
 
                     using (var inputStream = imagem.OpenReadStream())
                     using (var image = await Image.LoadAsync(inputStream))
                     {
                         var encoder = new WebpEncoder
                         {
-                            Quality = 90 // pode ajustar isso se quiser menos qualidade e mais compressão
+                            Quality = 90
                         };
 
                         await image.SaveAsync(caminhoWebP, encoder);
                     }
 
-                    var url = $"https://api.anunciapicos.shop/products/images/{nameFile}";
+                    var url = $"https://api.anunciapicos.shop/uploads/products/images/{nameFile}";
                     imagensUrls.Add(url);
                 }
             }
