@@ -643,3 +643,112 @@
 .plan-button i {
     margin-right: 8px;
 }
+
+/* Estilo geral para os cards de produtos */
+.produto-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;  /* Limita a largura do card */
+    margin: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden; /* Evita que o conteúdo vaze do card */
+}
+
+.produto-card:hover {
+    transform: translateY(-5px);  /* Efeito de elevação no hover */
+}
+
+/* Estilo da imagem dentro do card */
+.produto-imagem img {
+    width: 100%;
+    height: 200px;  /* Define uma altura fixa para a imagem */
+    object-fit: cover;  /* Garante que a imagem cubra a área sem distorções */
+    border-bottom: 2px solid #f0f0f0;
+}
+
+/* Estilo das informações do produto */
+.produto-info {
+    padding: 15px;
+    text-align: center; /* Centraliza o texto */
+}
+
+/* Estilo do nome do produto */
+.produto-info h4 {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #333;
+}
+
+/* Estilo da descrição do produto */
+.produto-info p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* Estilo do preço */
+.produto-preco {
+    font-size: 16px;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+/* Estilo para os botões de ação (editar e deletar) */
+.produto-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.produto-editar,
+.produto-deletar {
+    padding: 8px 14px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    width: 48%; /* Limita a largura dos botões */
+}
+
+/* Estilo para o botão de Editar */
+.produto-editar {
+    background-color: #f39c12;
+    color: white;
+}
+
+.produto-editar:hover {
+    background-color: #e67e22;
+}
+
+/* Estilo para o botão de Deletar */
+.produto-deletar {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.produto-deletar:hover {
+    background-color: #c0392b;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .produto-card {
+        max-width: 100%;
+    }
+    .produto-actions {
+        flex-direction: column; /* Empilha os botões em telas menores */
+        align-items: center;
+    }
+    .produto-editar,
+    .produto-deletar {
+        width: 100%; /* Botões ocupam toda a largura disponível */
+        margin-bottom: 10px;
+    }
+}
