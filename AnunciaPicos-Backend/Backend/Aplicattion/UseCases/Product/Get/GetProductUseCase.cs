@@ -1,6 +1,4 @@
-﻿using AnunciaPicos.Backend.Infrastructure.Data;
-using AnunciaPicos.Backend.Infrastructure.Models;
-using AnunciaPicos.Backend.Infrastructure.Repositories.Product;
+﻿using AnunciaPicos.Backend.Infrastructure.Repositories.Product;
 using AnunciaPicos.Exceptions.ExceptionBase;
 using AnunciaPicos.Shared.Communication.Response.Product;
 using AnunciaPicos.Shared.Exceptions;
@@ -30,7 +28,6 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Get
 
             var products = _mapper.Map<List<ResponseProductGetCommunication>>(response);
 
-            // Nesse ponto, `products` já vai conter a lista de imagens de cada produto
             return products;
         }
 
