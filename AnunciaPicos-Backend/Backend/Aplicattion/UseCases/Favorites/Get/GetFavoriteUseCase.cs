@@ -23,7 +23,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get
 
             var favorites = await _favoriteRepository.GetFavorites(user.Id);
 
-            if (favorites == null || favorites.Any())
+            if (favorites == null || !favorites.Any())
             {
                 throw new AnunciaPicosExceptions("Nenhum produto favoritado.");
             }
