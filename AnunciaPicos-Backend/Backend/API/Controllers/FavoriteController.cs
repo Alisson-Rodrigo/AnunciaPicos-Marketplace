@@ -1,4 +1,5 @@
 ﻿using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Delete;
+using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,13 @@ namespace AnunciaPicos.Backend.API.Controllers
         {
             await deleteFavoriteUseCase.Execute(id);
             return NoContent();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFavorite([FromServices] IGetFavoriteUseCase getFavoriteUseCase)
+        {
+            var products = await getFavoriteUseCase.Execute();
+            return Ok(products);
         }
 
     }

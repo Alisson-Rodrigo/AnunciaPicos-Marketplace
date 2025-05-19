@@ -114,6 +114,15 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Product
                 .ToListAsync();
         }
 
+        public async Task<List<ProductModel>> GetProductsFavorites(List<FavoriteModel> favorites)
+        {
+            var productIds = favorites.Select(f => f.ProductId).ToList();
+
+            return await _context.Products
+                .Where(p => productIds.Contains(p.Id))
+                .ToListAsync();
+        }
+
 
     }
 }
