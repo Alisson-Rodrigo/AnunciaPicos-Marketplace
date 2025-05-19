@@ -20,7 +20,12 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register
         }
         public async Task Execute(int productId)
         {
-            var user = _logged.UserLogged();
+            var user = await _logged.UserLogged();
+
+            if (user == null)
+            {
+                throw new AnunciaPicosExceptions(ResourceMessagesException.USER_WITHOUT_PERMISSION_ACCESS_RESOURCE);
+            }
 
             var favoriteExists = await _favoriteRepository.GetFavoriteByUserIdAndProductId(user.Id, productId);
 
