@@ -1,0 +1,92 @@
+      body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .dropdown {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .favorites-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+        .table-header {
+            background-color: #f2f2f2;
+            text-align: left;
+            padding: 15px;
+            font-weight: bold;
+        }
+        .table-row {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .table-cell {
+            padding: 15px;
+            vertical-align: middle;
+        }
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        .product-details {
+            display: flex;
+            align-items: center;
+        }
+        .product-info {
+            margin-left: 15px;
+        }
+        .product-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .price {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .button {
+            background-color: #7E6EEA;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #6a5cd6;
+        }
+        .action-cell {
+            text-align: center;
+        }
+        .remove-icon {
+            color: #888;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .remove-icon:hover {
+            color: #333;
+        }
