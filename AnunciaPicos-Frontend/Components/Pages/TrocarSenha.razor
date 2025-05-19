@@ -71,7 +71,7 @@
             console.log("Enviando dados para API:", { password, confirmPassword, token });
 
             try {
-                const response = await fetch("https://api.anunciapicos.shop/auth/validar-recuperacao", {
+                const response = await fetch("https://api.anunciapicos.shop/auth/validation-password", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

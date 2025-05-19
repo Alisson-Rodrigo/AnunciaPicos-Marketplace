@@ -1,6 +1,6 @@
 @page "/Planos"
 
-
+<NavBar />
 <div class="planos-container">
     <h1>Escolha seu plano</h1>
     <div id="error-message" class="error-container" style="display: none;"></div>
@@ -39,7 +39,7 @@
         </div>
     </div>
 </div>
-
+<Footer />
 <script>
     async function escolherPlano(idPlano) {
         const token = localStorage.getItem("authToken");

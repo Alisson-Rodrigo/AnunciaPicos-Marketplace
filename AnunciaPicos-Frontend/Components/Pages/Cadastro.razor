@@ -66,7 +66,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
     statusDiv.textContent = "";
 
-    // Validações básicas do frontend
     if (password !== confirmPassword) {
         exibirErro("As senhas não coincidem.");
         return;
@@ -90,7 +89,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         statusDiv.style.color = "blue";
         statusDiv.textContent = "Enviando dados...";
 
-        const response = await fetch("https://api.anunciapicos.shop/auth/cadastro", {
+        const response = await fetch("https://api.anunciapicos.shop/auth/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -104,7 +103,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
             const result = await response.json();
             const token = result.token;
 
-            // Armazena o token e redireciona
             localStorage.setItem("authToken", token);
             statusDiv.style.color = "green";
             statusDiv.textContent = "Cadastro realizado com sucesso! Redirecionando...";
@@ -128,7 +126,6 @@ function exibirErro(mensagem) {
     statusDiv.textContent = mensagem;
 }
 
-// Função para traduzir os códigos de erro da API para mensagens em português
 function traduzirErroAPI(codigoErro) {
     const mensagens = {
         "CPF_EMPTY": "CPF é obrigatório.",
@@ -162,7 +159,6 @@ function traduzirErroAPI(codigoErro) {
     return mensagens[codigoErro] || codigoErro;
 }
 
-// Formatação automática do CPF (apenas visual)
 document.getElementById("CPF").addEventListener("input", function(e) {
     let value = e.target.value.replace(/\D/g, '');
     
@@ -177,7 +173,6 @@ document.getElementById("CPF").addEventListener("input", function(e) {
     e.target.value = value;
 });
 
-// Formatação automática do telefone (apenas visual)
 document.getElementById("Phone").addEventListener("input", function(e) {
     let value = e.target.value.replace(/\D/g, '');
     
@@ -185,7 +180,6 @@ document.getElementById("Phone").addEventListener("input", function(e) {
         value = value.substring(0, 11);
     }
     
-    // Formatação para (DD) 9XXXX-XXXX
     if (value.length > 0) {
         value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
     }

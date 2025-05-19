@@ -72,7 +72,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: auto; /* Empurra o botão pro final */
+    margin-top: auto; 
 }
 
 .card button:hover {
