@@ -21,10 +21,11 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Favorite
             _context.Favorites.Remove(favorite);
         }
 
-        public async Task<List<FavoriteModel>> GetFavorites()
+        public async Task<List<FavoriteModel>> GetFavorites(int id)
         {
             return await _context.Favorites
                 .AsNoTracking()
+                .Where(x => x.Id == id)
                 .ToListAsync();
         }
 

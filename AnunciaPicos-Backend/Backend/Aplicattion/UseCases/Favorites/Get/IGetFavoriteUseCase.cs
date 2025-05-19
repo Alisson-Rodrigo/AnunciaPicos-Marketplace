@@ -1,7 +1,9 @@
-﻿namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get
+﻿using AnunciaPicos.Backend.Infrastructure.Models;
+
+namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get
 {
     public interface IGetFavoriteUseCase
     {
-        public Task Execute();
+        public Task<List<ProductModel>> Execute();
     }
 }

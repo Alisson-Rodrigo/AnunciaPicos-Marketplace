@@ -1,21 +1,30 @@
 ﻿using AnunciaPicos.Backend.Aplicattion.Services.LoggedUser;
+using AnunciaPicos.Backend.Infrastructure.Models;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
+using AnunciaPicos.Backend.Infrastructure.Repositories.Product;
 
 namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get
 {
     public class GetFavoriteUseCase : IGetFavoriteUseCase
     {
         private readonly IFavoriteRepository _favoriteRepository;
+        private readonly IProductRepository _productRepository;
         private readonly ILogged _logged;
-        public GetFavoriteUseCase(IFavoriteRepository favoriteRepository, ILogged logged)
+        public GetFavoriteUseCase(IFavoriteRepository favoriteRepository, ILogged logged, IProductRepository productRepository)
         {
             _favoriteRepository = favoriteRepository;
             _logged = logged;
+            _productRepository = productRepository;
         }
-        public async Task Execute()
+        public async Task<List<ProductModel>> Execute()
         {
+            UserModel user = await _logged.UserLogged();
 
-            var favorites = await _favoriteRepository.GetFavorites();
+            var favorites = await _favoriteRepository.GetFavorites(user.Id);
+
+            var productsFavorites = await _productRepository.GetProductsFavorites(favorites);
+        
+            return productsFavorites;
         }
     }
 
