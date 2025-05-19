@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p>Carregando produtos...</p>
                 </div>`;
 
-            const resposta = await fetch("https://api.anunciapicos.shop/product/exibicao-produtos");
+            const resposta = await fetch("https://api.anunciapicos.shop/product/view-product");
             const dados = await resposta.json();
             todosProdutos = Array.isArray(dados) ? dados : dados.items || [];
             paginaAtual = 1;
@@ -312,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const resposta = await fetch(`https://api.anunciapicos.shop/product/busca/produtos/?${params.toString()}`);
+            const resposta = await fetch(`https://api.anunciapicos.shop/product/search/products?${params.toString()}`);
             const dados = await resposta.json();
             produtosBusca = Array.isArray(dados) ? dados : dados.items || [];
             paginaAtual = 1;
