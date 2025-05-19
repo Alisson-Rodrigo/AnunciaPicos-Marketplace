@@ -31,7 +31,6 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Search
 
             var totalItems = await _productRepository.GetTotalCountAsync(request);
 
-            // Nesse ponto, `products` já vai conter a lista de imagens de cada produto
             return new ResponseProductSearchCommunication
             {
                 Page = request.Page,
