@@ -32,12 +32,16 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Delete
 
             if (favorite == null)
             {
+                throw new AnunciaPicosExceptions("Produto não favoritado");
+            }
+
+            if (favorite == null)
+            {
                 throw new Exception("Favorito não encontrado");
             }
+
             _favoriteRepository.Remove(favorite);
             await _unitOfWork.Commit();
-
-
         }
     }
 }
