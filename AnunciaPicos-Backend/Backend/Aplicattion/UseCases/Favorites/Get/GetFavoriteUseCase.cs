@@ -2,6 +2,7 @@
 using AnunciaPicos.Backend.Infrastructure.Models;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Product;
+using AnunciaPicos.Exceptions.ExceptionBase;
 
 namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get
 {
@@ -22,8 +23,13 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get
 
             var favorites = await _favoriteRepository.GetFavorites(user.Id);
 
+            if (favorites == null || favorites.Any())
+            {
+                throw new AnunciaPicosExceptions("Nenhum produto favoritado.");
+            }
+
             var productsFavorites = await _productRepository.GetProductsFavorites(favorites);
-        
+
             return productsFavorites;
         }
     }
