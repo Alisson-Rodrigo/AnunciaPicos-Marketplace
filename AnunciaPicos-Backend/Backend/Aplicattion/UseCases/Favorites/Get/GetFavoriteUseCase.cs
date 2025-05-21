@@ -30,6 +30,11 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get
 
             var productsFavorites = await _productRepository.GetProductsFavorites(favorites);
 
+            foreach (var Product in productsFavorites)
+            {
+                Console.WriteLine(Product.Name);
+            }
+
             return productsFavorites;
         }
     }
