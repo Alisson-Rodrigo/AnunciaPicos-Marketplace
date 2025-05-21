@@ -191,12 +191,16 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configuração do diretório de imagens
+var uploadsPath = app.Environment.IsDevelopment()
+    ? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+    : "/var/www/anunciapicos/uploads";
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+    FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
+
 
 // Outras configurações
 app.MapHub<ChatHub>("/chathub");

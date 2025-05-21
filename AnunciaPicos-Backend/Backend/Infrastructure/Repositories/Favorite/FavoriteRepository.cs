@@ -24,7 +24,7 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Favorite
         public async Task<List<FavoriteModel>> GetFavorites(int id)
         {
             return await _context.Favorites
-                .Where(x => x.Id == id)
+                .Where(x => x.UserId == id)
                 .ToListAsync();
         }
 

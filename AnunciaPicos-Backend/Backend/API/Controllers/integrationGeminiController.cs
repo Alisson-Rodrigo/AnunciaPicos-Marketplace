@@ -6,6 +6,7 @@ using System.Text;
 using AnunciaPicos.Shared.Communication.Request.Gemini;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Gemini;
 using Org.BouncyCastle.Ocsp;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AnunciaPicos.Backend.API.Controllers
 {
@@ -14,6 +15,7 @@ namespace AnunciaPicos.Backend.API.Controllers
     public class integrationGeminiController : ControllerBase
     {
 
+        [Authorize]
         [HttpPost("gemini/chat")]
         public async Task<IActionResult> ConversaGemini([FromBody] RequestChatGeminiCommunication request, IRequestGeminiChatUseCase requestGeminiChatUseCase)
         {
