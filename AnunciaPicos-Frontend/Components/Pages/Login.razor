@@ -45,50 +45,48 @@
     </div> 
 </div>  
 
-<script>     
-    document.addEventListener("DOMContentLoaded", function () {         
-        const loginForm = document.getElementById("loginForm");          
-        
-        loginForm.addEventListener("submit", async function (e) {             
-            e.preventDefault();              
-            
-            const email = document.getElementById("Email").value.trim();             
-            const password = document.getElementById("Password").value;                          
-            
-            try {                 
-                const response = await fetch("https://api.anunciapicos.shop/auth/login", {                     
-                    method: "POST",                     
-                    headers: {                         
-                        "Content-Type": "application/json"                     
-                    },                     
-                    body: JSON.stringify({ email, password })                 
-                });                  
-                
-                if (response.ok) {                     
-                    const result = await response.json();                      
-                    
-                    // Armazenar token e nome no localStorage                     
-                    const token = result.token;                     
-                    const nome = result.nome;                      
-                    
-                    localStorage.setItem("authToken", token);                     
-                    localStorage.setItem("nome", nome);                      
-                    
-                    // Redirecionar para a home SEM passar o token na URL                     
-                    window.location.href = "/Home";                 
-                } else {                     
-                    alert("Email ou senha incorretos!");                 
-                }             
-            } catch (error) {                 
-                console.error("Erro ao conectar com a API:", error);                 
-                alert("Erro de conexão. Tente novamente mais tarde.");             
-            }         
-        });          
-        
-        document.getElementById("togglePassword").addEventListener("click", function () {             
-            const passwordInput = document.getElementById("Password");             
-            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";             
-            passwordInput.setAttribute("type", type);         
-        });     
-    }); 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById("Email").value.trim();
+        const password = document.getElementById("Password").value;
+
+        try {
+            const response = await fetch("https://api.anunciapicos.shop/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+
+                // ✅ Salva token e nome no localStorage
+                localStorage.setItem("authToken", result.token);
+                localStorage.setItem("nome", result.nome);
+
+                // ✅ Redireciona para a Home
+                window.location.href = "/Home";
+            } else {
+                alert("Email ou senha incorretos!");
+            }
+        } catch (error) {
+            console.error("Erro ao conectar com a API:", error);
+            alert("Erro de conexão. Tente novamente mais tarde.");
+        }
+    });
+
+    // Mostrar/ocultar senha
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordInput = document.getElementById("Password");
+        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+        passwordInput.setAttribute("type", type);
+    });
+});
 </script>
