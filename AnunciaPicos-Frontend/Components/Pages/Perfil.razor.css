@@ -84,6 +84,12 @@ body {
     margin-top: 5px;
 }
 
+.profile-phone {
+    color: #777;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
 .profile-menu {
     list-style: none;
 }
@@ -191,6 +197,8 @@ body {
     color: #777;
 }
 
+
+
 .rating-item {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -200,10 +208,12 @@ body {
 }
 
 .rating-header {
-    display: flex;
-    align-items: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
     margin-bottom: 8px;
     gap: 8px; /* Espaçamento entre os elementos */
+    text-align: left !important;
 }
 
 .rating-user-image {
@@ -215,9 +225,11 @@ body {
 }
 
 .rater-name {
-    font-weight: 600;
-    color: #333;
-    flex-grow: 1; /* Faz o nome ocupar o espaço disponível */
+    font-weight: 600 !important;
+    color: #333 !important;
+    flex-grow: 1 !important;
+    text-align: left !important;
+    margin: 0 !important;
 }
 
 .rating-date {
@@ -237,24 +249,6 @@ body {
     font-size: 14px;
     line-height: 1.4;
     margin: 0;
-}
-.rating-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-.rater-name {
-    font-weight: bold;
-}
-
-.rating-date {
-    color: #777;
-    font-size: 14px;
-}
-
-.rating-comment {
-    line-height: 1.5;
 }
 
 .add-rating {
@@ -349,36 +343,30 @@ textarea {
 }
 
 .product-image {
-    height: 150px;
-    overflow: hidden;
-}
-
-.product-image img {
     width: 100%;
-    height: 100%;
+    height: 200px;
     object-fit: cover;
-}
-
-.product-info {
-    padding: 15px;
+    display: block;
 }
 
 .product-title {
     font-size: 16px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin: 15px 15px 10px 15px;
+}
+
+.product-description {
+    font-size: 14px;
+    color: #666;
+    margin: 0 15px 10px 15px;
+    line-height: 1.4;
 }
 
 .product-price {
     font-size: 18px;
     font-weight: bold;
     color: #8257e6;
-    margin-bottom: 5px;
-}
-
-.product-condition {
-    font-size: 14px;
-    color: #777;
+    margin: 0 15px 15px 15px;
 }
 
 .cancel-rating {
@@ -432,26 +420,40 @@ textarea {
         display: flex;
         align-items: center;
         text-align: left;
+        gap: 15px;
     }
     
     .profile-avatar img {
         width: 80px;
         height: 80px;
-        margin-right: 15px;
+        flex-shrink: 0;
     }
     
     .profile-avatar-info {
         flex: 1;
+        min-width: 0;
     }
     
     .profile-name {
         margin-top: 0;
         font-size: 18px;
+        margin-bottom: 8px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .profile-email {
         font-size: 14px;
-        margin-top: 5px;
+        margin-bottom: 5px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .profile-phone {
+        font-size: 14px;
+        margin-top: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .profile-menu {
@@ -529,12 +531,22 @@ textarea {
     }
     
     .rating-header {
-        flex-direction: column;
-        gap: 5px;
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .rating-user-image {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .rater-name {
+        font-size: 14px;
     }
     
     .rating-date {
-        align-self: flex-start;
+        font-size: 11px;
     }
     
     .star-rating {
@@ -568,24 +580,22 @@ textarea {
     }
     
     .product-image {
-        height: 120px;
-    }
-    
-    .product-info {
-        padding: 12px;
+        height: 150px;
     }
     
     .product-title {
         font-size: 14px;
-        margin-bottom: 8px;
+        margin: 12px 12px 8px 12px;
+    }
+    
+    .product-description {
+        font-size: 13px;
+        margin: 0 12px 8px 12px;
     }
     
     .product-price {
         font-size: 16px;
-    }
-    
-    .product-condition {
-        font-size: 12px;
+        margin: 0 12px 12px 12px;
     }
 }
 
@@ -605,19 +615,26 @@ textarea {
     
     .profile-avatar {
         padding: 15px;
+        gap: 12px;
     }
     
     .profile-avatar img {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
     }
     
     .profile-name {
         font-size: 16px;
+        margin-bottom: 6px;
     }
     
     .profile-email {
-        font-size: 12px;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+    
+    .profile-phone {
+        font-size: 13px;
     }
     
     .profile-menu li a {
@@ -647,19 +664,21 @@ textarea {
     }
     
     .product-image {
-        height: 100px;
-    }
-    
-    .product-info {
-        padding: 10px;
+        height: 120px;
     }
     
     .product-title {
         font-size: 13px;
-        margin-bottom: 6px;
+        margin: 10px 10px 6px 10px;
+    }
+    
+    .product-description {
+        font-size: 12px;
+        margin: 0 10px 6px 10px;
     }
     
     .product-price {
         font-size: 14px;
+        margin: 0 10px 10px 10px;
     }
 }

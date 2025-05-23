@@ -1,5 +1,5 @@
 @page "/perfiluser"
-
+<NavBar />
 <div class="container">
     <div class="profile-welcome">Perfil do Vendedor</div>
 
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 ratingsList.appendChild(ratingItem);
             });
 
-            ratingCount.textContent = `Baseado em ${data.length} avaliação${data.length > 1 ? 's' : ''}`;
+            ratingCount.textContent = `Baseado em ${data.length} avaliaçõe${data.length > 1 ? 's' : ''}`;
         })
         .catch((error) => {
             console.error('Erro ao carregar avaliações:', error);
