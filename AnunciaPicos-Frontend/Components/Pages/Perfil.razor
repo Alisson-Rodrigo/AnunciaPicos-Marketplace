@@ -1,0 +1,322 @@
+@page "/perfiluser"
+<NavBar />
+<div class="container">
+    <div class="profile-welcome">Perfil do Vendedor</div>
+
+    <div class="profile-card">
+        <div class="profile-sidebar">
+            <div class="profile-avatar">
+                <img id="profileAvatar" src="/api/placeholder/150/150" alt="Foto de perfil" />
+                <div class="profile-name" id="profileName">Carregando...</div>
+                <div class="profile-email" id="profileEmail">--</div>
+                <div class="profile-phone" id="profilePhone">--</div>
+            </div>
+
+            <ul class="profile-menu">
+                <li><a href="#" class="active" data-tab="profile-tab">Perfil</a></li>
+                <li><a href="#" data-tab="products-tab">Produtos</a></li>
+            </ul>
+        </div>
+
+        <div class="profile-content">
+            <div class="tab-content active" id="profile-tab">
+                <h2 class="content-title">Informações do Perfil</h2>
+
+                <div class="info-grid">
+                    <div class="info-label">Nome completo:</div>
+                    <div class="info-value" id="profileFullName">--</div>
+
+                    <div class="info-label">Membro desde:</div>
+                    <div class="info-value">--</div>
+
+                    <div class="info-label">Telefone:</div>
+                    <div class="info-value" id="profilePhoneInfo">--</div>
+                </div>
+
+                <button class="contact-btn">Entrar em Contato</button>
+
+                <div class="ratings-section">
+                    <h2 class="content-title">Avaliações</h2>
+
+                    <div class="rating-summary">
+                        <div class="rating-average" id="averageRating">--</div>
+                        <div>
+                            <div class="star-rating" id="averageStarRating">☆☆☆☆☆</div>
+                            <div class="rating-count" id="ratingCount">--</div>
+                        </div>
+                    </div>
+
+                    <div id="ratingsList">
+                        <p>Carregando avaliações...</p>
+                    </div>
+
+                    <button class="add-rating" id="showRatingForm">Adicionar Avaliação</button>
+
+                    <div class="rating-form" id="ratingForm" style="display:none;">
+                        <div class="form-group">
+                            <label class="form-label">Sua avaliação:</label>
+                            <div class="star-input" id="starRating">
+                                <span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Seu comentário:</label>
+                            <textarea placeholder="Conte sua experiência com este vendedor..."></textarea>
+                        </div>
+
+                        <div>
+                            <button class="submit-rating" id="submitRatingBtn">Enviar Avaliação</button>
+                            <button class="cancel-rating" id="cancelRating">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="products-tab">
+                <h2 class="content-title">Produtos do Vendedor</h2>
+                <div class="products-grid" id="productsGrid">
+                    <p>Carregando produtos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const getQueryParam = (param) => new URLSearchParams(window.location.search).get(param);
+    const vendedorId = getQueryParam('id');
+    if (!vendedorId) {
+        alert("ID do vendedor não fornecido na URL.");
+        return;
+    }
+
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profileFullName = document.getElementById('profileFullName');
+    const profilePhone = document.getElementById('profilePhone');
+    const profilePhoneInfo = document.getElementById('profilePhoneInfo');
+    const profileAvatarImg = document.getElementById('profileAvatar');
+    const productsGrid = document.getElementById('productsGrid');
+    const ratingsList = document.getElementById('ratingsList');
+    const averageRating = document.getElementById('averageRating');
+    const averageStarRating = document.getElementById('averageStarRating');
+    const ratingCount = document.getElementById('ratingCount');
+
+    function carregarPerfil(id) {
+        fetch(`https://api.anunciapicos.shop/profile/profile-specific/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                profileName.textContent = data.name || '--';
+                profileFullName.textContent = data.name || '--';
+                profileEmail.textContent = data.email || '--';
+                profilePhone.textContent = data.phone || '--';
+                profilePhoneInfo.textContent = data.phone || '--';
+                if (data.imageProfile) profileAvatarImg.src = data.imageProfile;
+            })
+            .catch(() => {
+                profileName.textContent = 'Erro ao carregar';
+            });
+    }
+
+    function carregarProdutos(id) {
+        fetch(`https://api.anunciapicos.shop/product/search/products?userId=${id}`)
+            .then(res => res.json())
+            .then(data => {
+                productsGrid.innerHTML = '';
+                if (!data.items || data.items.length === 0) {
+                    productsGrid.innerHTML = '<p>Este vendedor ainda não cadastrou produtos.</p>';
+                    return;
+                }
+
+                data.items.forEach(prod => {
+                    const card = document.createElement('div');
+                    card.classList.add('product-card');
+                    card.innerHTML = `
+                        <img src="${prod.imageUrl || '/api/placeholder/200/200'}" alt="${prod.name}" class="product-image" />
+                        <h3 class="product-title">${prod.name}</h3>
+                        <p class="product-description">${prod.description || ''}</p>
+                        <p class="product-price">R$ ${parseFloat(prod.price || 0).toFixed(2)}</p>
+                    `;
+                    productsGrid.appendChild(card);
+                });
+            })
+            .catch(() => {
+                productsGrid.innerHTML = '<p>Erro ao carregar produtos.</p>';
+            });
+    }
+
+    function carregarMediaAvaliacao(id) {
+        fetch(`https://api.anunciapicos.shop/evaluation/average/${id}`)
+            .then(res => res.json())
+            .then(media => {
+                const avg = parseFloat(media).toFixed(1);
+                averageRating.textContent = avg;
+                averageStarRating.innerHTML = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+            })
+            .catch(() => {
+                averageRating.textContent = '--';
+                averageStarRating.innerHTML = '☆☆☆☆☆';
+            });
+    }
+
+    function carregarAvaliacoes(id) {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            ratingsList.innerHTML = '<p>Você precisa estar logado para ver as avaliações.</p>';
+            ratingCount.textContent = '';
+            return;
+        }
+
+        fetch(`https://api.anunciapicos.shop/evaluation/${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('Resposta da API de avaliações:', data);
+            ratingsList.innerHTML = '';
+            if (!data || data.length === 0) {
+                ratingsList.innerHTML = '<p>Este vendedor ainda não possui avaliações.</p>';
+                ratingCount.textContent = 'Baseado em 0 avaliações';
+                return;
+            }
+
+            data.forEach(review => {
+                const ratingItem = document.createElement('div');
+                ratingItem.classList.add('rating-item');
+               ratingItem.innerHTML = `
+    <div class="rating-header">
+        <img src="${review.userImage || '/api/placeholder/50/50'}" alt="Foto do usuário" class="rating-user-image" />
+        <div class="rater-name">${review.name || 'Usuário Anônimo'}</div>
+        <div class="rating-date">${new Date(review.date).toLocaleDateString('pt-BR')}</div>
+    </div>
+    <div class="star-rating">${'★'.repeat(review.note)}${'☆'.repeat(5 - review.note)}</div>
+    <p class="rating-comment">${review.comment || ''}</p>
+`;
+                ratingsList.appendChild(ratingItem);
+            });
+
+            ratingCount.textContent = `Baseado em ${data.length} avaliaçõe${data.length > 1 ? 's' : ''}`;
+        })
+        .catch((error) => {
+            console.error('Erro ao carregar avaliações:', error);
+            ratingsList.innerHTML = '<p>Erro ao carregar avaliações.</p>';
+        });
+    }
+
+    carregarPerfil(vendedorId);
+    carregarProdutos(vendedorId);
+    carregarMediaAvaliacao(vendedorId); 
+    carregarAvaliacoes(vendedorId);
+
+    document.querySelectorAll('.profile-menu a').forEach(tab => {
+        tab.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.profile-menu a').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            const target = this.getAttribute('data-tab');
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.getElementById(target).classList.add('active');
+        });
+    });
+
+    const showRatingFormBtn = document.getElementById('showRatingForm');
+    const ratingForm = document.getElementById('ratingForm');
+    const cancelRatingBtn = document.getElementById('cancelRating');
+    const starRating = document.getElementById('starRating');
+    const ratingCommentInput = ratingForm.querySelector('textarea');
+    const submitRatingBtn = document.getElementById('submitRatingBtn');
+    const stars = starRating.querySelectorAll('span');
+    let currentRating = 0;
+
+    showRatingFormBtn.addEventListener('click', () => {
+        ratingForm.style.display = 'block';
+        showRatingFormBtn.style.display = 'none';
+    });
+
+    cancelRatingBtn.addEventListener('click', () => {
+        ratingForm.style.display = 'none';
+        showRatingFormBtn.style.display = 'inline-block';
+        clearStars();
+        ratingCommentInput.value = '';
+        currentRating = 0;
+    });
+
+    stars.forEach((star, index) => {
+        star.style.cursor = 'pointer';
+        star.addEventListener('click', () => {
+            currentRating = index + 1;
+            setStars(index);
+        });
+    });
+
+    function setStars(index) {
+        stars.forEach((star, i) => {
+            star.textContent = i <= index ? '★' : '☆';
+        });
+    }
+
+    function clearStars() {
+        stars.forEach(star => star.textContent = '☆');
+    }
+
+    submitRatingBtn.addEventListener('click', () => {
+        const token = localStorage.getItem('authToken');
+        const comment = ratingCommentInput.value.trim();
+
+        if (!token) {
+            alert('Você precisa estar logado para enviar uma avaliação.');
+            return;
+        }
+
+        if (currentRating < 1 || currentRating > 5) {
+            alert('Por favor, selecione uma nota válida entre 1 e 5.');
+            return;
+        }
+
+        if (comment.length < 8) {
+            alert('Por favor, escreva um comentário mais detalhado (mínimo 8 caracteres).');
+            return;
+        }
+
+        const avaliacao = {
+            userIdEvaluated: parseInt(vendedorId),
+            note: currentRating,
+            comment: comment
+        };
+
+        fetch('https://api.anunciapicos.shop/evaluation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(avaliacao)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Erro ao enviar avaliação.');
+                });
+            }
+            alert('Avaliação enviada com sucesso!');
+            ratingForm.style.display = 'none';
+            showRatingFormBtn.style.display = 'inline-block';
+            clearStars();
+            ratingCommentInput.value = '';
+            currentRating = 0;
+            carregarAvaliacoes(vendedorId);
+            carregarMediaAvaliacao(vendedorId);
+        })
+        .catch(error => {
+            console.error(error);
+            alert(error.message || 'Erro ao enviar avaliação.');
+        });
+    });
+});
+</script>

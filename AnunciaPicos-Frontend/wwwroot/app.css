@@ -265,29 +265,22 @@
 
 
 
-#paginacao, 
-#paginacaoBusca {
-    grid-row: 3; /* Força para a última linha */
+#paginacao, #paginacaoBusca {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-
-    padding: 10px;
-   
+    padding: 20px 10px;
+    color: white;
     width: 100%;
     margin-top: auto; /* Empurra para o final */
-    position: sticky;
-    bottom: 0;
-    z-index: 1000;
 }
+
 .pagina-btn {
     padding: 10px;
     border: 2px solid #7E6EEA;
     border-radius: 50%;
-    background-color: white;
-    color: #7E6EEA;
     font-weight: 500;
     font-size: 16px;
     cursor: pointer;
@@ -303,6 +296,7 @@
 .pagina-btn:hover {
     background-color: #7E6EEA;
     color: white;
+    transform: scale(1.05); /* Pequeno efeito de hover */
 }
 
 /* Página atual */
@@ -310,7 +304,6 @@
     background-color: #7E6EEA;
     color: white;
     font-weight: bold;
-    box-shadow: 0 0 6px rgba(126, 110, 234, 0.6);
 }
 
 /* Responsividade para telas menores */
@@ -880,3 +873,67 @@
         .btn-relatorio:hover {
             background-color: #27ae60;
         }
+        
+
+        
+        
+        
+        .rating-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: #fff;
+}
+
+.rating-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    margin-bottom: 8px;
+    gap: 8px; /* Espaçamento entre os elementos */
+    text-align: left !important;
+}
+
+.rating-user-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover; /* Para manter a proporção da imagem */
+    flex-shrink: 0; /* Impede que a imagem seja comprimida */
+}
+
+.rater-name {
+    font-weight: 600 !important;
+    color: #333 !important;
+    flex-grow: 1 !important;
+    text-align: left !important;
+    margin: 0 !important;
+}
+
+.rating-date {
+    font-size: 12px;
+    color: #666;
+    margin-left: auto; /* Empurra a data para a direita */
+}
+
+.star-rating {
+    color: #ffa500;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.rating-comment {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+
+.star-rating {
+    color: gold;
+    font-size: 1.2rem;
+    margin-left: 8px;
+    vertical-align: middle;
+}

@@ -19,7 +19,7 @@
             <h1 class="product-title">Nome do Produto</h1>
 
             <div class="seller-info">
-                <div class="seller-details">
+                <div class="seller-details" onclick="goToSellerProfile()" style="cursor: pointer;">
                     <img src="https://via.placeholder.com/30" alt="Foto do Vendedor" class="seller-photo">
                     <span class="seller-name">João da Feira</span>
                 </div>
@@ -41,7 +41,7 @@
     <div class="product-tabs">
         <div class="tabs-header">
             <div class="tab active" onclick="showTab('descricao')">DESCRIÇÃO</div>
-            <div class="tab" onclick="showTab('avaliacoes')">AVALIAÇÕES DO VENDEDOR</div>
+            <div class="tab" onclick="showTab('avaliacoes')">NOTA DO VENDEDOR</div>
         </div>
         
         <div class="tab-content" id="descricao">
@@ -51,7 +51,7 @@
 
         <div class="tab-content" id="avaliacoes" style="display: none;">
             <h3>Avaliações do Vendedor</h3>
-            <p class="seller-rating">Carregando avaliação do vendedor...</p>
+            <p class="seller-rating"></p> <!-- Removido valor fixo -->
         </div>
     </div>
 </div>
@@ -60,6 +60,7 @@
 
 <script>
     let currentImageIndex = 0;
+    let currentSellerId = null;
 
     const categoryMap = {
         0: "Outros",
@@ -90,19 +91,14 @@
             const product = await response.json();
 
             if (response.ok) {
-                // Título, preço e descrição
                 document.querySelector(".product-title").textContent = product.name || "Produto sem nome";
                 document.querySelector(".current-price").textContent = `R$ ${parseFloat(product.price).toFixed(2).replace(".", ",")}`;
                 document.querySelector(".description").textContent = product.description || "Descrição não disponível";
-                
-                // Categoria traduzida
                 document.querySelector(".category").textContent = `Categoria: ${categoryMap[product.categories] || "Desconhecida"}`;
 
-                // Carrossel de imagens
                 if (product.imageUrl && product.imageUrl.length > 0) {
                     const carouselInner = document.querySelector(".carousel-inner");
-                    carouselInner.innerHTML = ""; // limpar antes de adicionar
-
+                    carouselInner.innerHTML = "";
                     product.imageUrl.forEach((url, index) => {
                         const imgElement = document.createElement("img");
                         imgElement.src = url;
@@ -113,8 +109,9 @@
                     });
                 }
 
-                // Buscar dados do perfil do vendedor
                 const userId = product.userId || product.usuarioId || product.vendedorId;
+                currentSellerId = userId;
+
                 if (userId) {
                     const sellerResponse = await fetch(`https://api.anunciapicos.shop/profile/profile-specific/${userId}`);
                     const seller = await sellerResponse.json();
@@ -122,14 +119,13 @@
                     if (sellerResponse.ok) {
                         document.querySelector(".seller-name").textContent = seller.name || "Vendedor sem nome";
                         document.querySelector(".seller-photo").src = seller.imageProfile || "https://via.placeholder.com/30";
+
+                        await carregarMediaAvaliacoes(userId);
                     } else {
                         console.warn("Erro ao buscar dados do perfil do vendedor.");
+                        document.querySelector(".seller-rating").textContent = "";
                     }
                 }
-
-                // Exibe avaliação (simulada por enquanto)
-                document.querySelector(".seller-rating").textContent = 
-                    `Nota do vendedor: ${product.rating || "Sem avaliações"} / 5.0`;
             } else {
                 alert("Produto não encontrado!");
             }
@@ -163,8 +159,52 @@
     function showTab(tabName) {
         document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-
         document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
         document.getElementById(tabName).style.display = 'block';
     }
+
+    function goToSellerProfile() {
+        if (currentSellerId) {
+            window.location.href = `/perfiluser?id=${currentSellerId}`;
+        }
+    }
+
+    async function carregarMediaAvaliacoes(id) {
+    try {
+        const response = await fetch(`https://api.anunciapicos.shop/evaluation/average/${id}`);
+        if (!response.ok) {
+            throw new Error("Não foi possível obter a média de avaliações");
+        }
+
+        const media = await response.json(); // valor direto
+        console.log("Retorno da API de média de avaliações:", media);
+
+        const notaFormatada = Number(media).toFixed(1);
+
+        // Criar as estrelas
+        const estrelasInteiras = Math.floor(media);
+        const meiaEstrela = media % 1 >= 0.5;
+        const totalEstrelas = 5;
+
+        let estrelasHTML = "";
+        for (let i = 0; i < estrelasInteiras; i++) {
+            estrelasHTML += "★";
+        }
+        if (meiaEstrela) {
+            estrelasHTML += "☆"; // meia estrela visualmente simples
+        }
+        while (estrelasHTML.length < totalEstrelas) {
+            estrelasHTML += "☆";
+        }
+
+        document.querySelector(".seller-rating").innerHTML = `
+            Nota do vendedor: ${notaFormatada} / 5.0 
+            <span class="star-rating">${estrelasHTML}</span>
+        `;
+    } catch (error) {
+        console.error("Erro ao carregar média de avaliações:", error);
+        document.querySelector(".seller-rating").textContent = "Nota do vendedor: Sem avaliações";
+    }
+}
+
 </script>
