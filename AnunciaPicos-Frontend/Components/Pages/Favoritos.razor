@@ -1,13 +1,58 @@
 @page "/favoritos"
+<head>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+
+       
+        .button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Botão Roxo */
+        .button {
+            padding: 8px 16px;
+            background-color: #6f42c1;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-block;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            color: white;
+            background-color: #5a32a3;
+            transform: translateY(-2px);
+        }
+
+   
+    </style>
+</head>
 
 <NavBar />
+
 <body>
     <div class="container">
-        <!-- Botão de categoria removido -->
-
-        
         <div class="favorites-title">Favoritos</div>
-        
+
         <table class="table">
             <thead>
                 <tr>
@@ -17,114 +62,102 @@
                     <th class="table-header" style="width: 5%"></th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Produto 1 -->
-                <tr class="table-row">
-                    <td class="table-cell">
-                        <div class="product-details">
-                            <img src="/api/placeholder/80/80" alt="Fones de ouvido" class="product-image">
-                            <div class="product-info">
-                                <div class="product-name">Boos Sport Earbuds - Wireless Earphones - Bluetooth In Ear Headphones for Workouts and Running, Triple Black</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="table-cell">
-                        <div class="price">R$999</div>
-                    </td>
-                    <td class="table-cell action-cell">
-                        <button class="button">IR PARA O PRODUTO</button>
-                    </td>
-                    <td class="table-cell">
-                        <span class="remove-icon">✕</span>
-                    </td>
-                </tr>
-                
-                <!-- Produto 2 -->
-                <tr class="table-row">
-                    <td class="table-cell">
-                        <div class="product-details">
-                            <img src="/api/placeholder/80/80" alt="Fone Simple Mobile" class="product-image">
-                            <div class="product-info">
-                                <div class="product-name">Simple Mobile 5G LTE Galaxy 12 Mini 512GB Gaming Phone</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="table-cell">
-                        <div class="price">R$2.300,00</div>
-                    </td>
-                    <td class="table-cell action-cell">
-                        <button class="button">IR PARA O PRODUTO</button>
-                    </td>
-                    <td class="table-cell">
-                        <span class="remove-icon">✕</span>
-                    </td>
-                </tr>
-                
-                <!-- Produto 3 -->
-                <tr class="table-row">
-                    <td class="table-cell">
-                        <div class="product-details">
-                            <img src="/api/placeholder/80/80" alt="Máquina de lavar" class="product-image">
-                            <div class="product-info">
-                                <div class="product-name">Portable Washing Machine, 10lbs capacity Model 18NWFAM</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="table-cell">
-                        <div class="price">R$7000,00</div>
-                    </td>
-                    <td class="table-cell action-cell">
-                        <button class="button">IR PARA O PRODUTO</button>
-                    </td>
-                    <td class="table-cell">
-                        <span class="remove-icon">✕</span>
-                    </td>
-                </tr>
-                
-                <!-- Produto 4 -->
-                <tr class="table-row">
-                    <td class="table-cell">
-                        <div class="product-details">
-                            <img src="/api/placeholder/80/80" alt="Fones wireless" class="product-image">
-                            <div class="product-info">
-                                <div class="product-name">TOZO T6 True Wireless Earbuds Bluetooth Headphones Touch Control with Wireless Charging Case IPX8 Waterproof Stereo Earphones in Ear</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="table-cell">
-                        <div class="price">R$2200,00</div>
-                    </td>
-                    <td class="table-cell action-cell">
-                        <button class="button">IR PARA O PRODUTO</button>
-                    </td>
-                    <td class="table-cell">
-                        <span class="remove-icon">✕</span>
-                    </td>
-                </tr>
-                
-                <!-- Produto 5 -->
-                <tr class="table-row">
-                    <td class="table-cell">
-                        <div class="product-details">
-                            <img src="/api/placeholder/80/80" alt="Câmera Wyze" class="product-image">
-                            <div class="product-info">
-                                <div class="product-name">Wyze Cam Pan v2 1080p Pan/Tilt/Zoom Wi-Fi Indoor Smart Home Camera with Color Night Vision, 2-Way Audio</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="table-cell">
-                        <div class="price">R$1.499,99</div>
-                    </td>
-                    <td class="table-cell action-cell">
-                        <button class="button">IR PARA O PRODUTO</button>
-                    </td>
-                    <td class="table-cell">
-                        <span class="remove-icon">✕</span>
-                    </td>
-                </tr>
+            <tbody id="favorites-body">
+                <!-- Produtos favoritos serão inseridos aqui via JS -->
             </tbody>
         </table>
     </div>
-    </body>
+</body>
 
-    <Footer />
+<Footer />
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const token = localStorage.getItem("authToken");
+
+        if (!token) {
+            alert("Você precisa estar logado para ver seus favoritos.");
+            return;
+        }
+
+        try {
+            const response = await fetch("https://api.anunciapicos.shop/favorite", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                alert("Erro ao carregar favoritos.");
+                return;
+            }
+
+            const favoritos = await response.json();
+            const tbody = document.getElementById("favorites-body");
+            tbody.innerHTML = "";
+
+            if (favoritos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center">Nenhum favorito encontrado.</td></tr>`;
+                return;
+            }
+
+            favoritos.forEach(produto => {
+                const imagemUrl = (produto.imageUrl && produto.imageUrl.length > 0)
+                    ? produto.imageUrl[0]
+                    : '/api/placeholder/80/80';
+
+                const row = document.createElement("tr");
+                row.classList.add("table-row");
+
+                row.innerHTML = `
+                    <td class="table-cell">
+                        <div class="product-details">
+                            <img src="${imagemUrl}" alt="${produto.name}" class="product-image">
+                            <div class="product-info">
+                                <div class="product-name">${produto.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="table-cell">
+                        <div class="price">R$${produto.price?.toFixed(2) ?? "0,00"}</div>
+                    </td>
+                    <td class="table-cell action-cell">
+                        <a class="button" href="/visualizarproduto?id=${produto.id}">IR PARA O PRODUTO</a>
+                    </td>
+                    <td class="table-cell">
+                        <span class="remove-icon" onclick="removerFavorito(${produto.id})">✕</span>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Erro ao buscar favoritos:", error);
+            alert("Erro inesperado ao carregar favoritos.");
+        }
+    });
+
+    async function removerFavorito(id) {
+        const token = localStorage.getItem("authToken");
+        if (!confirm("Deseja remover este produto dos favoritos?")) return;
+
+        try {
+            const response = await fetch(`https://api.anunciapicos.shop/favorite/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert("Removido com sucesso.");
+                location.reload();
+            } else {
+                alert("Erro ao remover favorito.");
+            }
+        } catch (error) {
+            console.error("Erro ao remover favorito:", error);
+            alert("Erro inesperado.");
+        }
+    }
+</script>
