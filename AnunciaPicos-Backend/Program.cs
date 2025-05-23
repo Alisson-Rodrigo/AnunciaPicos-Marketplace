@@ -65,7 +65,7 @@ builder.Services.AddCors(options =>
               .WithOrigins("http://anunciapicos.shop")
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials();  // Permitir cookies/autenticação com credenciais
+              .AllowCredentials();  // Permitir cookies/autenticaï¿½ï¿½o com credenciais
     });
 });
 
@@ -79,7 +79,7 @@ builder.Services.AddOpenApiDocument(config =>
     config.Title = "AnunciaPicos API";
     config.Version = "v1";
 
-    // Configuração do token JWT no Swagger
+    // Configuraï¿½ï¿½o do token JWT no Swagger
     config.AddSecurity("Bearer", new OpenApiSecurityScheme
     {
         Type = OpenApiSecuritySchemeType.Http,
@@ -167,7 +167,7 @@ string mySqlConnection = builder.Configuration.GetConnectionString("Database")!;
 builder.Services.AddDbContextPool<AnunciaPicosDbContext>(options =>
     options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
 
-// Adicionando filtro global de exceções
+// Adicionando filtro global de exceï¿½ï¿½es
 builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionsFilter)));
 
 builder.Services.AddHostedService<PlanExpiredVerification>();
@@ -176,7 +176,7 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configuração do Swagger no ambiente de desenvolvimento
+// Configuraï¿½ï¿½o do Swagger no ambiente de desenvolvimento
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
@@ -186,29 +186,29 @@ if (app.Environment.IsDevelopment())
         settings.DocumentPath = "/swagger/v1/swagger.json";
     });
 
-    // Redirecionamento para a documentação Swagger
+    // Redirecionamento para a documentaï¿½ï¿½o Swagger
     app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
-// Configuração do diretório de imagens
+// Configuraï¿½ï¿½o do diretï¿½rio de imagens
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
-    RequestPath = "/uploads"
-});
+// app.UseStaticFiles(new StaticFileOptions
+// {
+//     FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+//     RequestPath = "/uploads"
+// });
 
-// Outras configurações
+// Outras configuraï¿½ï¿½es
 app.MapHub<ChatHub>("/chathub");
 app.UseRouting();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Este UseStaticFiles agora lida apenas com arquivos padrão
-app.UseStaticFiles();  // Serve arquivos estáticos para outros caminhos
+// Este UseStaticFiles agora lida apenas com arquivos padrï¿½o
+app.UseStaticFiles();  // Serve arquivos estï¿½ticos para outros caminhos
 
 app.MapControllers();
-app.UseCors("AllowSpecificOrigin");  // Aplica a política CORS definida
+app.UseCors("AllowSpecificOrigin");  // Aplica a polï¿½tica CORS definida
 app.Run();
 

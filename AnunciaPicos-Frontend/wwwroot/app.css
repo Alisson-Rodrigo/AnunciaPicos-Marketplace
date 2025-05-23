@@ -1224,3 +1224,54 @@
             font-size: 14px;
             color: #777;
         }
+
+
+
+/*PERFIL DOS OUTROS*/
+.rating-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: #fff;
+}
+
+.rating-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px; /* Espaçamento entre os elementos */
+}
+
+.rating-user-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover; /* Para manter a proporção da imagem */
+    flex-shrink: 0; /* Impede que a imagem seja comprimida */
+}
+
+.rater-name {
+    font-weight: 600;
+    color: #333;
+    flex-grow: 1; /* Faz o nome ocupar o espaço disponível */
+}
+
+.rating-date {
+    font-size: 12px;
+    color: #666;
+    margin-left: auto; /* Empurra a data para a direita */
+}
+
+.star-rating {
+    color: #ffa500;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.rating-comment {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0;
+}
