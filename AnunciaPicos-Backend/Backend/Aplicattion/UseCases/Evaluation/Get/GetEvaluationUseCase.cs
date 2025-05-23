@@ -42,6 +42,12 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Evaluation.Get
 
             var evaluationMap = _mapper.Map<List<ResponseGetEvaluationCommunicattion>>(evaluation);
 
+            foreach (var item in evaluationMap)
+            {
+                item.Name = verifyUserEvaluationExists.Name;
+                item.UserImage = verifyUserEvaluationExists.ImageProfile ?? string.Empty;
+            }
+
             return evaluationMap;
         }
 

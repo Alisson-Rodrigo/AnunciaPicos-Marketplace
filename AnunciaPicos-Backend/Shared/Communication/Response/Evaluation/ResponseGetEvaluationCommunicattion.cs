@@ -2,6 +2,7 @@
 {
     public class ResponseGetEvaluationCommunicattion
     {
+        public string UserImage { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
 
         public int Note { get; set; }

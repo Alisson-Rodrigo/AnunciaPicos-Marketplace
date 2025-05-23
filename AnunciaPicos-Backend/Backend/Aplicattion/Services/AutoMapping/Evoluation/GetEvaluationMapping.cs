@@ -8,7 +8,6 @@ namespace AnunciaPicos.Backend.Aplicattion.Services.AutoMapping.Evoluation
         public GetEvaluationMapping()
         {
             CreateMap<EvaluationModel, ResponseGetEvaluationCommunicattion>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User!.Name))
                 .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note))
                 .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.UpdatedAt));
