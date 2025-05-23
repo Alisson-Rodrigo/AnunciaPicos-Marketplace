@@ -28,7 +28,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Profile.Update
             var imagensUrl = string.Empty;
 
             // Defina caminho absoluto da pasta externa
-            var caminhoBase = "/var/www/anunciapicos/uploads/profile/images";
+            var caminhoBase = "/var/www/anunciapicos/uploads/profile/images"; // Para produção
             Directory.CreateDirectory(caminhoBase); // garante que a pasta exista
 
             if (request.ImageProfile != null)

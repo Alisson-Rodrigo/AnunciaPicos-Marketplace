@@ -35,6 +35,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Product.Register
 
             // Defina caminho absoluto da pasta externa
             var caminhoBase = "/var/www/anunciapicos/uploads/products/images";
+
             Directory.CreateDirectory(caminhoBase); // garante que a pasta exista
 
             if (request.Imagens != null && request.Imagens.Count > 0)

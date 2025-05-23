@@ -42,6 +42,26 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Evaluation.Get
 
             var evaluationMap = _mapper.Map<List<ResponseGetEvaluationCommunicattion>>(evaluation);
 
+
+            // Neste ponto, iremos colocar o nome e a imagem de cada pessoa que fez a avaliaçao
+            // Adiciona nome e imagem do avaliador
+            foreach (var evaluationItem in evaluationMap)
+            {
+                // Encontra a avaliação correspondente no modelo original
+                var model = evaluation.FirstOrDefault(e => e.Id == evaluationItem.Id);
+
+                if (model != null)
+                {
+                    var user = await _userRepository.GetUserById(model.UserId);
+                    if (user != null)
+                    {
+                        evaluationItem.Name = user.Name; // ou Nome, dependendo do campo
+                        evaluationItem.UserImage = user.ImageProfile ?? string.Empty; // ou outro campo equivalente
+                    }
+                }
+            }
+
+
             return evaluationMap;
         }
 
