@@ -206,5 +206,46 @@
         document.querySelector(".seller-rating").textContent = "Nota do vendedor: Sem avaliações";
     }
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const currentProductId = new URLSearchParams(window.location.search).get("id");
+
+    const btn = document.querySelector(".favorite-btn");
+    if (!btn) {
+        console.warn("Botão .favorite-btn não encontrado.");
+        return;
+    }
+
+    btn.addEventListener("click", async () => {
+        console.log("Clique no botão de favorito");
+
+        if (!currentProductId) {
+            alert("Produto inválido.");
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem("authToken");
+
+            const response = await fetch(`https://api.anunciapicos.shop/favorite/${currentProductId}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                alert("Produto adicionado aos favoritos!");
+            } else if (response.status === 409) {
+                alert("Este produto já está nos seus favoritos.");
+            } else {
+                alert("Erro ao adicionar aos favoritos.");
+            }
+        } catch (error) {
+            console.error("Erro ao adicionar favorito:", error);
+            alert("Erro inesperado.");
+        }
+    });
+});
 
 </script>
