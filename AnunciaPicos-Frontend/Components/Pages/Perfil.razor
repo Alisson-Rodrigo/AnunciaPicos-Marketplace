@@ -1,37 +1,28 @@
 @page "/perfiluser"
 <head>
     <style>
-.button {
-  background-color: #6a0dad; /* Seu roxo */
-  color: white;
-  padding: 8px 16px;       /* Padding reduzido (botão menos "gordo") */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;          /* Tamanho da fonte ligeiramente reduzido */
-  text-align: center;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
+    .button {
+      background-color: #6a0dad;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      text-align: center;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
 
-  /* --- Novas/Modificadas propriedades --- */
-  display: block;           /* Para permitir margens automáticas laterais e definir largura */
-  width: 70%;               /* Exemplo: Largura de 70% do container pai (o card) */
-                            /* Ou use um valor fixo: width: 150px; */
-  margin-left: auto;        /* Centraliza o botão horizontalmente */
-  margin-right: auto;       /* Centraliza o botão horizontalmente */
-  margin-top: 10px;         /* Espaço opcional acima do botão */
-  margin-bottom: 15px;      /* ESSENCIAL: Descola o botão do final do card */
-}
+    .button:hover {
+      background-color: #500778;
+    }
 
-.button:hover {
-  background-color: #500778;
-}
-
-.button:active {
-  background-color: #410660;
-  transform: translateY(1px);
-}
-    </style>
+    .button:active {
+      background-color: #410660;
+      transform: translateY(1px);
+    }
+  </style>
 </head>
 
 <NavBar />
@@ -62,7 +53,9 @@
                     <div class="info-value" id="profileFullName">--</div>
 
                     <div class="info-label">Membro desde:</div>
-                    <div class="info-value">--</div>
+<div class="info-value" id="profileMemberSinceYear">--</div>
+
+
 
                     <div class="info-label">Telefone:</div>
                     <div class="info-value" id="profilePhoneInfo">--</div>
@@ -137,22 +130,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const averageRating = document.getElementById('averageRating');
     const averageStarRating = document.getElementById('averageStarRating');
     const ratingCount = document.getElementById('ratingCount');
+    const profileMemberSinceYear = document.getElementById('profileMemberSinceYear');
 
-    function carregarPerfil(id) {
-        fetch(`https://api.anunciapicos.shop/profile/profile-specific/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                profileName.textContent = data.name || '--';
-                profileFullName.textContent = data.name || '--';
-                profileEmail.textContent = data.email || '--';
-                profilePhone.textContent = data.phone || '--';
-                profilePhoneInfo.textContent = data.phone || '--';
-                if (data.imageProfile) profileAvatarImg.src = data.imageProfile;
-            })
-            .catch(() => {
-                profileName.textContent = 'Erro ao carregar';
-            });
-    }
+
+   function carregarPerfil(id) {
+    fetch(`https://api.anunciapicos.shop/profile/profile-specific/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            profileName.textContent = data.name || '--';
+            profileFullName.textContent = data.name || '--';
+            profileEmail.textContent = data.email || '--';
+            profilePhone.textContent = data.phone || '--';
+            profilePhoneInfo.textContent = data.phone || '--';
+            if (data.imageProfile) profileAvatarImg.src = data.imageProfile;
+
+            // 🟢 Setar o ano da data de criação
+            if (data.creationDate) {
+                const year = new Date(data.creationDate).getFullYear();
+                profileMemberSinceYear.textContent = `${year}`;
+            }
+        })
+        .catch(() => {
+            profileName.textContent = 'Erro ao carregar';
+        });
+}
 
 function carregarProdutos(id) {
     fetch(`https://api.anunciapicos.shop/product/search/products?userId=${id}`)
