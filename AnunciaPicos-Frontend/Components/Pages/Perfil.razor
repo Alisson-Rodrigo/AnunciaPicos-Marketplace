@@ -119,32 +119,40 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    function carregarProdutos(id) {
-        fetch(`https://api.anunciapicos.shop/product/search/products?userId=${id}`)
-            .then(res => res.json())
-            .then(data => {
-                productsGrid.innerHTML = '';
-                if (!data.items || data.items.length === 0) {
-                    productsGrid.innerHTML = '<p>Este vendedor ainda não cadastrou produtos.</p>';
-                    return;
+ function carregarProdutos(id) {
+    fetch(`https://api.anunciapicos.shop/product/search/products?userId=${id}`)
+        .then(res => res.json())
+        .then(data => {
+            productsGrid.innerHTML = '';
+            if (!data.items || data.items.length === 0) {
+                productsGrid.innerHTML = '<p>Este vendedor ainda não cadastrou produtos.</p>';
+                return;
+            }
+
+            data.items.forEach(prod => {
+                // Suporte a múltiplas imagens
+                let imageUrl = 'https://via.placeholder.com/200';
+                if (Array.isArray(prod.imageUrl) && prod.imageUrl.length > 0) {
+                    imageUrl = prod.imageUrl[0];
+                } else if (typeof prod.imageUrl === 'string' && prod.imageUrl !== '') {
+                    imageUrl = prod.imageUrl;
                 }
 
-                data.items.forEach(prod => {
-                    const card = document.createElement('div');
-                    card.classList.add('product-card');
-                    card.innerHTML = `
-                        <img src="${prod.imageUrl || '/api/placeholder/200/200'}" alt="${prod.name}" class="product-image" />
-                        <h3 class="product-title">${prod.name}</h3>
-                        <p class="product-description">${prod.description || ''}</p>
-                        <p class="product-price">R$ ${parseFloat(prod.price || 0).toFixed(2)}</p>
-                    `;
-                    productsGrid.appendChild(card);
-                });
-            })
-            .catch(() => {
-                productsGrid.innerHTML = '<p>Erro ao carregar produtos.</p>';
+                const card = document.createElement('div');
+                card.classList.add('product-card');
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${prod.name}" class="product-image" />
+                    <h3 class="product-title">${prod.name}</h3>
+                    <p class="product-price">R$ ${parseFloat(prod.price || 0).toFixed(2)}</p>
+                `;
+                productsGrid.appendChild(card);
             });
-    }
+        })
+        .catch(() => {
+            productsGrid.innerHTML = '<p>Erro ao carregar produtos.</p>';
+        });
+}
+
 
     function carregarMediaAvaliacao(id) {
         fetch(`https://api.anunciapicos.shop/evaluation/average/${id}`)

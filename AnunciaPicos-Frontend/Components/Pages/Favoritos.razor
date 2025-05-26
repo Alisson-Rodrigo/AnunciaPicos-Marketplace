@@ -224,7 +224,7 @@
                 });
 
                 if (!response.ok) {
-                    alert("Erro ao carregar favoritos.");
+                   
                     return;
                 }
 
@@ -289,34 +289,80 @@
             }
         });
 
-        async function removerFavorito(id) {
-            const token = localStorage.getItem("authToken");
-            if (!confirm("Tem certeza que deseja remover este produto dos seus favoritos?")) return;
+       async function removerFavorito(id, clickedElement) {
+    // clickedElement é o elemento que foi clicado (ex: o botão "remover")
+    const token = localStorage.getItem("authToken");
 
-            try {
-                const response = await fetch(`https://api.anunciapicos.shop/favorite/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
+    // Confirmação com o usuário
+    if (!confirm("Tem certeza que deseja remover este produto dos seus favoritos?")) {
+        return; // Usuário cancelou
+    }
 
-                if (response.ok) {
-                    const row = event.target.closest('.table-row');
-                    row.style.opacity = '0';
-                    row.style.transform = 'translateX(-100%)';
+    let rowToRemove = null;
+    // Tenta encontrar a linha da tabela (elemento .table-row) mais próxima do botão clicado
+    if (clickedElement) {
+        rowToRemove = clickedElement.closest('.table-row');
+    }
 
-                    setTimeout(() => {
-                        location.reload();
-                    }, 300);
-                } else {
-                    alert("Erro ao remover favorito.");
-                }
-            } catch (error) {
-                console.error("Erro ao remover favorito:", error);
-                alert("Erro inesperado.");
+    try {
+        const response = await fetch(`https://api.anunciapicos.shop/favorite/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                // "Content-Type": "application/json" // Geralmente não necessário para DELETE sem corpo, mas não prejudica.
             }
+        });
+
+        // --- Para Depuração ---
+        console.log("Resposta completa do servidor:", response);
+        console.log("Status da resposta:", response.status);
+        console.log("Propriedade 'ok' da resposta:", response.ok);
+        // ---------------
+
+        if (response.ok) { // Entra aqui se o status HTTP for 200-299
+            if (rowToRemove) {
+                // Aplica estilos para animação de saída
+                // Garanta que a transição esteja definida no seu CSS para .table-row ou defina aqui:
+                rowToRemove.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                rowToRemove.style.opacity = '0';
+                rowToRemove.style.transform = 'translateX(-100%)';
+
+                // Espera a animação terminar para remover o elemento da DOM
+                setTimeout(() => {
+                    rowToRemove.remove();
+                    // Opcional: Exibir uma notificação de sucesso não bloqueante (toast)
+                    // ex: mostrarNotificacao("Favorito removido com sucesso!");
+                }, 300); // Deve ser igual à duração da transição CSS
+            } else {
+                // Fallback: se não encontrar a linha para remover, recarrega a página
+                // Isso pode acontecer se 'clickedElement' não for passado ou a estrutura do HTML for inesperada
+                alert("Favorito removido com sucesso! A lista será atualizada.");
+                location.reload();
+            }
+        } else {
+            // Se response.ok for false (status fora de 200-299)
+            let errorMessage = `Erro ao remover favorito (Status: ${response.status})`;
+            try {
+                // Tenta ler o corpo da resposta para uma mensagem de erro mais detalhada
+                const errorData = await response.json(); // Tenta parsear como JSON
+                if (errorData && (errorData.message || errorData.error)) {
+                    errorMessage += `: ${errorData.message || errorData.error}`;
+                }
+            } catch (e) {
+                // Se não for JSON ou o corpo estiver vazio, usa o statusText se disponível
+                if (response.statusText) {
+                    errorMessage += `: ${response.statusText}`;
+                }
+                console.warn("Não foi possível parsear a resposta de erro como JSON, ou o corpo estava vazio.", e);
+            }
+            alert(errorMessage);
         }
+    } catch (error) {
+        // Erro de rede ou algum outro erro que impediu a requisição de ser completada
+        console.error("Erro crítico ao tentar remover favorito (bloco catch):", error);
+        alert("Erro de conexão ou inesperado ao tentar remover o favorito. Verifique sua internet e tente novamente.");
+    }
+}
     </script>
 
 </body>

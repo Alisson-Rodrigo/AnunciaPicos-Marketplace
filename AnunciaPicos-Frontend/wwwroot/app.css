@@ -939,3 +939,98 @@
 }
 
 
+/* Estilização da aba de Produtos do Vendedor */
+#products-tab .content-title {
+    color: #333;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Cria colunas responsivas */
+    gap: 20px; /* Espaçamento entre os cards de produto */
+    padding-top: 10px;
+}
+
+.products-grid p { /* Estilo para mensagens como "Carregando produtos..." ou "Nenhum produto" */
+    grid-column: 1 / -1; /* Faz a mensagem ocupar todas as colunas */
+    text-align: center;
+    font-size: 1.1em;
+    color: #777;
+    padding: 20px;
+}
+
+.product-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden; /* Garante que a imagem não ultrapasse as bordas arredondadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+    width: 100%;
+    height: 180px; /* Altura fixa para a imagem */
+    object-fit: cover; /* Garante que a imagem cubra o espaço sem distorcer */
+    border-bottom: 1px solid #eee;
+}
+
+.product-card h3.product-title {
+    font-size: 1.1em;
+    color: #333;
+    margin: 15px; /* Espaçamento interno para o título */
+    font-weight: 600;
+    flex-grow: 1; /* Faz o título ocupar o espaço disponível, ajudando no alinhamento */
+}
+
+.product-card p.product-price {
+    font-size: 1.2em;
+    color: #007bff; /* Cor de destaque para o preço */
+    font-weight: bold;
+    margin: 0 15px 15px 15px; /* Espaçamento inferior e lateral para o preço */
+    text-align: left;
+}
+
+/* Ajustes para telas menores (exemplo) */
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .product-card h3.product-title {
+        font-size: 1em;
+        margin: 10px;
+    }
+
+    .product-card p.product-price {
+        font-size: 1.1em;
+        margin: 0 10px 10px 10px;
+    }
+
+    .product-image {
+        height: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr; /* Uma coluna para telas muito pequenas */
+        gap: 15px;
+    }
+
+     #products-tab .content-title {
+        font-size: 1.5em;
+    }
+}
