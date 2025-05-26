@@ -192,11 +192,11 @@ if (app.Environment.IsDevelopment())
 
 
 
-// app.UseStaticFiles(new StaticFileOptions
-// {
-//     FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
-//     RequestPath = "/uploads"
-// });
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+    RequestPath = "/uploads"
+});
 
 // Outras configura��es
 app.MapHub<ChatHub>("/chathub");

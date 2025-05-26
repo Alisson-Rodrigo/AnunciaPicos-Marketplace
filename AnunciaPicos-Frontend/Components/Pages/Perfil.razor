@@ -1,4 +1,39 @@
 @page "/perfiluser"
+<head>
+    <style>
+.button {
+  background-color: #6a0dad; /* Seu roxo */
+  color: white;
+  padding: 8px 16px;       /* Padding reduzido (botão menos "gordo") */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;          /* Tamanho da fonte ligeiramente reduzido */
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+
+  /* --- Novas/Modificadas propriedades --- */
+  display: block;           /* Para permitir margens automáticas laterais e definir largura */
+  width: 70%;               /* Exemplo: Largura de 70% do container pai (o card) */
+                            /* Ou use um valor fixo: width: 150px; */
+  margin-left: auto;        /* Centraliza o botão horizontalmente */
+  margin-right: auto;       /* Centraliza o botão horizontalmente */
+  margin-top: 10px;         /* Espaço opcional acima do botão */
+  margin-bottom: 15px;      /* ESSENCIAL: Descola o botão do final do card */
+}
+
+.button:hover {
+  background-color: #500778;
+}
+
+.button:active {
+  background-color: #410660;
+  transform: translateY(1px);
+}
+    </style>
+</head>
+
 <NavBar />
 <div class="container">
     <div class="profile-welcome">Perfil do Vendedor</div>
@@ -119,11 +154,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
- function carregarProdutos(id) {
+function carregarProdutos(id) {
     fetch(`https://api.anunciapicos.shop/product/search/products?userId=${id}`)
         .then(res => res.json())
         .then(data => {
-            productsGrid.innerHTML = '';
+            productsGrid.innerHTML = ''; // Assuming productsGrid is a globally accessible element or defined elsewhere
             if (!data.items || data.items.length === 0) {
                 productsGrid.innerHTML = '<p>Este vendedor ainda não cadastrou produtos.</p>';
                 return;
@@ -144,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <img src="${imageUrl}" alt="${prod.name}" class="product-image" />
                     <h3 class="product-title">${prod.name}</h3>
                     <p class="product-price">R$ ${parseFloat(prod.price || 0).toFixed(2)}</p>
+                    <button class="button" onclick="window.location.href='/visualizarproduto?id=${prod.id}'">Ver Produto</button>
                 `;
                 productsGrid.appendChild(card);
             });
