@@ -12,5 +12,8 @@
 
         public string Phone { get; set; } = string.Empty;
 
+        public DateTime? CreationDate { get; set; } 
+
+
     }
 }
