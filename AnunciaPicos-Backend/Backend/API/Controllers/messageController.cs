@@ -43,11 +43,12 @@ public class messageController : ControllerBase
         if (messageDTO == null || string.IsNullOrEmpty(messageDTO.Message))
             return BadRequest(ResourceMessagesException.MESSAGE_EMPTY);
 
+        UserModel user = await _logged.UserLogged();
+
         // Verificar se os usuários existem
-        var user1 = await _userRepository.GetUserById(messageDTO.SenderId);
+        var user1 = await _userRepository.GetUserById(user.Id);
         var user2 = await _userRepository.GetUserById(messageDTO.ReceiverId);
 
-        UserModel user = await _logged.UserLogged();
 
         if (user1 == null || user2 == null)
             return BadRequest(ResourceMessagesException.USER_NOT_FOUND);
@@ -56,14 +57,14 @@ public class messageController : ControllerBase
             return Unauthorized(ResourceMessagesException.USER_WITHOUT_PERMISSION_ACCESS_RESOURCE);
 
         // Verificar se a conversa já existe
-        var conversation = await _conversationRepository.GetConversationByUsers(messageDTO.SenderId, messageDTO.ReceiverId);
+        var conversation = await _conversationRepository.GetConversationByUsers(user1.Id, messageDTO.ReceiverId);
 
         // Se a conversa não existir, criar uma nova
         if (conversation == null)
         {
             conversation = new ConversationModel
             {
-                UserId1 = messageDTO.SenderId,
+                UserId1 = user1.Id,
                 UserId2 = messageDTO.ReceiverId,
                 ConversationId = Guid.NewGuid().ToString(),
                 CreatedAt = DateTime.Now
@@ -78,7 +79,7 @@ public class messageController : ControllerBase
         var newMessage = new MessageModel
         {
             ConversationId = conversation.Id,  // Garantir que o ConversationId seja válido
-            SenderId = messageDTO.SenderId,
+            SenderId = user1.Id,
             Message = messageDTO.Message,
             IsRead = false,
             Created = DateTime.Now
