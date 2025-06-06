@@ -46,6 +46,7 @@ using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Delete;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
+using AnunciaPicos.Backend.Aplicattion.Services.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -147,9 +148,31 @@ builder.Services.AddScoped<GetTokenRequest>();
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings.GetValue<string>("SecretKey");
 
+// No seu ficheiro Program.cs
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        // --- INÍCIO DA CORREÇÃO ---
+        // Adicionar este evento para lidar com a autenticação do SignalR
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // O token é enviado pelo cliente SignalR como um parâmetro na query string
+                var accessToken = context.Request.Query["access_token"];
+
+                // Se o token estiver presente, configure-o no contexto de autenticação
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+        // --- FIM DA CORREÇÃO ---
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -192,23 +215,42 @@ if (app.Environment.IsDevelopment())
 
 
 
-app.UseStaticFiles(new StaticFileOptions
+if (app.Environment.IsDevelopment())
 {
-    FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
-    RequestPath = "/uploads"
-});
+    // Se for Desenvolvimento, usa uma pasta "uploads" dentro do projeto
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
+        RequestPath = "/uploads"
+    });
+}
+else
+{
+    // Para qualquer outro ambiente (Produção, Staging, etc.)
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+        RequestPath = "/uploads"
+    });
+}
 
 // Outras configura��es
 app.MapHub<ChatHub>("/chathub");
 app.UseRouting();
 app.UseHttpsRedirection();
+
+// --- CORREÇÃO AQUI ---
+// A política CORS deve ser aplicada aqui
+app.UseCors("AllowSpecificOrigin");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Este UseStaticFiles agora lida apenas com arquivos padr�o
-app.UseStaticFiles();  // Serve arquivos est�ticos para outros caminhos
+// Este UseStaticFiles agora lida apenas com arquivos padrão
+app.UseStaticFiles();
 
 app.MapControllers();
-app.UseCors("AllowSpecificOrigin");  // Aplica a pol�tica CORS definida
+
 app.Run();
 

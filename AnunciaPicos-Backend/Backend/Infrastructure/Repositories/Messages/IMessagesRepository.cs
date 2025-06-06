@@ -5,9 +5,12 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Messages
 {
     public interface IMessagesRepository
     {
-        public Task AddMessage(MessageModel message);
-
-        public Task<List<MessageModel>> GetMessagesByConversationId(string conversationId);
-
-}
+        Task AddMessage(MessageModel message);
+        Task<List<MessageModel>> GetMessagesByConversationId(string conversationId);
+        Task<MessageModel> GetMessageById(int messageId);
+        Task UpdateMessage(MessageModel message);
+        Task DeleteMessage(int messageId);
+        Task MarkMessagesAsRead(string conversationId, int userId);
+        Task<int> GetUnreadMessageCount(int userId);
+    }
 }
