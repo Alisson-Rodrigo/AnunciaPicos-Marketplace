@@ -192,23 +192,41 @@ if (app.Environment.IsDevelopment())
 
 
 
-app.UseStaticFiles(new StaticFileOptions
+if (app.Environment.IsDevelopment())
 {
-    FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
-    RequestPath = "/uploads"
-});
+    // Se for Desenvolvimento, usa uma pasta "uploads" dentro do projeto
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
+        RequestPath = "/uploads"
+    });
+}
+else
+{
+    // Para qualquer outro ambiente (Produção, Staging, etc.)
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+        RequestPath = "/uploads"
+    });
+}
 
 // Outras configura��es
 app.MapHub<ChatHub>("/chathub");
 app.UseRouting();
 app.UseHttpsRedirection();
+
+// --- CORREÇÃO AQUI ---
+// A política CORS deve ser aplicada aqui
+app.UseCors("AllowSpecificOrigin");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Este UseStaticFiles agora lida apenas com arquivos padr�o
-app.UseStaticFiles();  // Serve arquivos est�ticos para outros caminhos
+// Este UseStaticFiles agora lida apenas com arquivos padrão
+app.UseStaticFiles();
 
 app.MapControllers();
-app.UseCors("AllowSpecificOrigin");  // Aplica a pol�tica CORS definida
-app.Run();
 
+app.Run();
