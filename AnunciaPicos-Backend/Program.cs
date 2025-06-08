@@ -59,6 +59,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3001")  // Coloque a URL do seu frontend aqui
               .WithOrigins("http://localhost:3000")
+              .WithOrigins("http://localhost:5173")
+              .WithOrigins("http://localhost:5174")
               .WithOrigins("http://localhost:63789")
               .WithOrigins("http://localhost:5222")
               .WithOrigins("https://anunciapicos.shop")
