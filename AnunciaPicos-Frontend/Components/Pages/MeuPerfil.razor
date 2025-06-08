@@ -269,33 +269,30 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 async function carregarPerfil() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-
-    if (!token) return;
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+        console.warn("Usuário não autenticado");
+        return;
+    }
 
     try {
-        const payload = decodeJwt(token);
         const response = await fetch("https://api.anunciapicos.shop/profile/myprofile", {
             method: "GET",
             headers: { "Authorization": `Bearer ${token}` }
         });
-
-        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        if (!response.ok) throw new Error("Erro ao carregar perfil");
         const data = await response.json();
-        dadosUsuario = data;
-        produtosDoUsuario = data.products || [];
-        userId = data.id;
-
-        // Salva token no localStorage para próxima navegação
-        localStorage.setItem("authToken", token);
-
+        // Atualiza a interface
         atualizarDadosInterface(data);
-        carregarProdutos();
+        userId = data.id;
+        // Pode guardar userId no localStorage para outras páginas, se quiser
+        localStorage.setItem("userId", data.id);
     } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
+        console.error(error);
     }
 }
+
+
 
 function atualizarDadosInterface(data) {
     document.getElementById("user-name").textContent = data.name || "Usuário";

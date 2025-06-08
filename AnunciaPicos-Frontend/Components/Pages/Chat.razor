@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-window {
+            width: 100%;
+            max-width: 400px;
+            height: 90vh;
+            max-height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #075E54;
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            text-align: center;
+        }
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+        }
+        .message-input-area {
+            display: flex;
+            padding: 10px;
+            background-color: #f0f2f5;
+        }
+        #messageInput {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            margin-right: 10px;
+        }
+        #sendButton {
+            border: none;
+            background-color: #128C7E;
+            color: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #sendButton:hover {
+            background-color: #075E54;
+        }
+        #status {
+            padding: 5px 20px;
+            font-size: 0.8em;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-window">
+    <div class="chat-header">
+        <h1>Chat</h1>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <p>Envie uma mensagem para iniciar a conversa.</p>
+    </div>
+    <div id="status"></div>
+    <div class="message-input-area">
+        <input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
+        <button id="sendButton" onclick="sendMessage()">&#10148;</button>
+    </div>
+</div>
+
+<script>
+    // Envia mensagem ao apertar Enter
+    document.getElementById('messageInput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Obtém receiverId da URL
+    function getReceiverIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('receiverId');
+    }
+
+    // Função para enviar a mensagem para a API
+    async function sendMessage() {
+        const messageText = document.getElementById('messageInput').value.trim();
+        const receiverId = getReceiverIdFromUrl();
+        const statusElement = document.getElementById('status');
+
+        const authToken = localStorage.getItem("authToken");
+
+        if (!authToken) {
+            statusElement.textContent = "Erro: Usuário não autenticado. Faça o login novamente.";
+            statusElement.style.color = 'red';
+            return;
+        }
+
+        if (!receiverId) {
+            statusElement.textContent = "Erro: ID do destinatário não encontrado na URL.";
+            statusElement.style.color = 'red';
+            return;
+        }
+
+        if (!messageText) {
+            statusElement.textContent = "Por favor, digite uma mensagem.";
+            statusElement.style.color = 'orange';
+            return;
+        }
+
+        statusElement.textContent = 'Enviando...';
+        statusElement.style.color = '#666';
+
+        try {
+            const response = await fetch('https://api.anunciapicos.shop/message/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Aqui depende do que a API espera — geralmente Authorization é o padrão:
+                    'Authorization': `Bearer ${authToken}`
+                    // Caso a API só aceite 'authToken' substitua a linha acima por:
+                    // 'authToken': authToken
+                },
+                body: JSON.stringify({
+                    receiverId: parseInt(receiverId),
+                    message: messageText
+                })
+            });
+
+            if (response.ok) {
+                statusElement.textContent = 'Mensagem enviada!';
+                statusElement.style.color = 'green';
+                document.getElementById('messageInput').value = '';
+                // Opcional: atualizar a lista de mensagens aqui
+            } else if (response.status === 401) {
+                statusElement.textContent = 'Erro de autenticação (401). Token inválido ou expirado.';
+                statusElement.style.color = 'red';
+            } else {
+                statusElement.textContent = `Erro ${response.status}: Falha ao enviar a mensagem.`;
+                statusElement.style.color = 'red';
+            }
+        } catch (error) {
+            console.error('Erro na requisição:', error);
+            statusElement.textContent = 'Erro de rede ou CORS. Verifique o console.';
+            statusElement.style.color = 'red';
+        }
+    }
+</script>
+
+</body>
+</html>
