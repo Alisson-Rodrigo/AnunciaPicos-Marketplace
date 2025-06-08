@@ -9,5 +9,12 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Messages
 
         public Task<List<MessageModel>> GetMessagesByConversationId(string conversationId);
 
-}
+        Task<MessageModel?> GetLastMessageByConversationId(int conversationId);
+        Task<int> GetUnreadMessagesCount(int conversationId, int userId);
+
+        Task MarkMessagesAsReadByConversation(int conversationId, int userId);
+        Task<int> GetTotalUnreadMessagesCount(int userId);
+        Task MarkMessageAsRead(int messageId);
+
+    }
 }

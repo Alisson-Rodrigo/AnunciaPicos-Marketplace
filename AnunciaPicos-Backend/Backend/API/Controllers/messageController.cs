@@ -166,9 +166,132 @@ public class messageController : ControllerBase
         {
             return StatusCode(500, "Erro ao carregar as mensagens");
         }
+
     }
 
 
+    [Authorize]
+    [HttpPut]
+    [Route("mark-as-read/{conversationId}")]
+    public async Task<IActionResult> MarkMessagesAsRead(string conversationId)
+    {
+        try
+        {
+            var user = await _logged.UserLogged();
+
+            // Verificar se a conversa existe e se o usuário faz parte dela
+            var conversation = await _conversationRepository.GetConversationByConversationId(conversationId);
+
+            if (conversation == null)
+            {
+                return NotFound(ResourceMessagesException.CONVERSATION_NOT_EXISTS);
+            }
+
+            // Verificar se o usuário faz parte da conversa
+            if (conversation.UserId1 != user.Id && conversation.UserId2 != user.Id)
+            {
+                return Unauthorized(ResourceMessagesException.USER_WITHOUT_PERMISSION_ACCESS_RESOURCE);
+            }
+
+            // Marcar todas as mensagens NÃO ENVIADAS pelo usuário atual como lidas
+            await _messageRepository.MarkMessagesAsReadByConversation(conversation.Id, user.Id);
+
+            await _unitOfWork.Commit();
+
+            // Notificar via SignalR que as mensagens foram lidas
+            await _chatHubContext.Clients.Group(conversationId).SendAsync("MessagesMarkedAsRead", new
+            {
+                ConversationId = conversationId,
+                ReadByUserId = user.Id
+            });
+
+            return Ok(new { Message = "Mensagens marcadas como lidas" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Erro ao marcar mensagens como lidas: " + ex.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet]
+    [Route("unread-count")]
+    public async Task<IActionResult> GetUnreadMessagesCount()
+    {
+        try
+        {
+            var user = await _logged.UserLogged();
+
+            // Contar total de mensagens não lidas do usuário
+            var unreadCount = await _messageRepository.GetTotalUnreadMessagesCount(user.Id);
+
+            return Ok(new { UnreadCount = unreadCount });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Erro ao buscar mensagens não lidas: " + ex.Message);
+        }
+    }
+
+
+    [Authorize]
+    [HttpGet]
+    [Route("conversations")]
+    public async Task<IActionResult> GetUserConversations()
+    {
+        try
+        {
+            var user = await _logged.UserLogged();
+
+            // Buscar conversas do usuário
+            var conversations = await _conversationRepository.GetConversationsUser(user.Id);
+
+            if (conversations == null || !conversations.Any())
+            {
+                return Ok(new List<ResponseUserConversationCommunication>());
+            }
+
+            var conversationDtos = new List<ResponseUserConversationCommunication>();
+
+            foreach (var conversation in conversations)
+            {
+                // Identificar o outro usuário na conversa
+                int otherUserId = conversation.UserId1 == user.Id ? conversation.UserId2 : conversation.UserId1;
+
+                // Buscar informações do outro usuário
+                var otherUser = await _userRepository.GetUserById(otherUserId);
+
+                // Buscar a última mensagem da conversa
+                var lastMessage = await _messageRepository.GetLastMessageByConversationId(conversation.Id);
+
+                // Contar mensagens não lidas do usuário atual
+                var unreadCount = await _messageRepository.GetUnreadMessagesCount(conversation.Id, user.Id);
+
+                var conversationDto = new ResponseUserConversationCommunication
+                {
+                    ConversationId = conversation.ConversationId,
+                    OtherUserId = otherUserId,
+                    OtherUserName = otherUser?.Name ?? "Usuário não encontrado",
+                    OtherUserProfilePicture = otherUser?.ImageProfile, // se existir
+                    LastMessage = lastMessage?.Message ?? "",
+                    LastMessageDate = lastMessage?.Created ?? conversation.CreatedAt,
+                    UnreadMessagesCount = unreadCount,
+                    IsLastMessageFromMe = lastMessage?.SenderId == user.Id
+                };
+
+                conversationDtos.Add(conversationDto);
+            }
+
+            // Ordenar por data da última mensagem (mais recente primeiro)
+            conversationDtos = conversationDtos.OrderByDescending(c => c.LastMessageDate).ToList();
+
+            return Ok(conversationDtos);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Erro ao carregar conversas: " + ex.Message);
+        }
+    }
 
 
 }

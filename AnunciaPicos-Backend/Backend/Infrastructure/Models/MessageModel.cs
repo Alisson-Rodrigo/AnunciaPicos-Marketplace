@@ -20,6 +20,8 @@
 
         //Status reader
         public bool IsRead { get; set; }
+        public DateTime? ReadAt { get; set; } // Nova propriedade para quando foi lida
+
 
     }
 }
