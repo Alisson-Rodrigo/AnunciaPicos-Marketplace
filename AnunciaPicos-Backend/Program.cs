@@ -46,7 +46,6 @@ using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Delete;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
-using AnunciaPicos.Backend.Aplicattion.Services.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +59,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3001")  // Coloque a URL do seu frontend aqui
               .WithOrigins("http://localhost:3000")
+              .WithOrigins("http://localhost:5173")
+              .WithOrigins("http://localhost:5174")
               .WithOrigins("http://localhost:63789")
               .WithOrigins("http://localhost:5222")
               .WithOrigins("https://anunciapicos.shop")
@@ -148,31 +149,9 @@ builder.Services.AddScoped<GetTokenRequest>();
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings.GetValue<string>("SecretKey");
 
-// No seu ficheiro Program.cs
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        // --- INÍCIO DA CORREÇÃO ---
-        // Adicionar este evento para lidar com a autenticação do SignalR
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
-            {
-                // O token é enviado pelo cliente SignalR como um parâmetro na query string
-                var accessToken = context.Request.Query["access_token"];
-
-                // Se o token estiver presente, configure-o no contexto de autenticação
-                if (!string.IsNullOrEmpty(accessToken))
-                {
-                    context.Token = accessToken;
-                }
-
-                return Task.CompletedTask;
-            }
-        };
-        // --- FIM DA CORREÇÃO ---
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -253,4 +232,3 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.Run();
-
