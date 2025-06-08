@@ -1,12 +1,14 @@
+@page "/chat"
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Chat</title>
     <style>
+        /* CSS: Estilos para a aparência do chat (sem alterações) */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: #f0f2f5;
             display: flex;
             justify-content: center;
@@ -14,41 +16,82 @@
             height: 100vh;
             margin: 0;
         }
-        .chat-window {
+
+        .chat-container {
             width: 100%;
-            max-width: 400px;
-            height: 90vh;
-            max-height: 600px;
+            max-width: 600px;
+            height: 80vh;
+            max-height: 700px;
+            background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
+
         .chat-header {
-            background-color: #075E54;
+            background-color: #007bff;
             color: white;
             padding: 15px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
+            font-size: 1.2em;
             text-align: center;
         }
-        .chat-header h1 {
-            margin: 0;
-            font-size: 1.2em;
+        
+        /* NOVO: Estilo para a área de status */
+        .chat-status {
+            padding: 10px 20px;
+            background: #e9ecef;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            text-align: center;
+            color: #495057;
         }
+        .chat-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            font-weight: bold;
+        }
+
+
         .chat-messages {
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
-            border-bottom: 1px solid #ddd;
-        }
-        .message-input-area {
             display: flex;
-            padding: 10px;
-            background-color: #f0f2f5;
+            flex-direction: column;
+            gap: 12px;
         }
-        #messageInput {
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.error {
+            background-color: #dc3545;
+            color: white;
+            align-self: center;
+            font-size: 0.9em;
+        }
+
+        .chat-input-form {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .chat-input-form input {
             flex-grow: 1;
             border: 1px solid #ccc;
             border-radius: 20px;
@@ -56,124 +99,170 @@
             font-size: 1em;
             margin-right: 10px;
         }
-        #sendButton {
+        
+        /* Desabilita o input e o botão se houver erro */
+        .chat-input-form input:disabled, .chat-input-form button:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .chat-input-form button {
             border: none;
-            background-color: #128C7E;
+            background-color: #007bff;
             color: white;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1.5em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            transition: background-color 0.3s;
         }
-        #sendButton:hover {
-            background-color: #075E54;
-        }
-        #status {
-            padding: 5px 20px;
-            font-size: 0.8em;
-            text-align: center;
-            color: #666;
+
+        .chat-input-form button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
-<div class="chat-window">
-    <div class="chat-header">
-        <h1>Chat</h1>
+    <div class="chat-container">
+        <div class="chat-header">
+            Chat Anuncia Picos
+        </div>
+        
+        <div id="chatStatus" class="chat-status">
+            Carregando informações da conversa...
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            </div>
+        
+        <form class="chat-input-form" id="messageForm">
+            <input type="text" id="messageInput" placeholder="Digite sua mensagem..." autocomplete="off" required>
+            <button type="submit">Enviar</button>
+        </form>
     </div>
-    <div class="chat-messages" id="chatMessages">
-        <p>Envie uma mensagem para iniciar a conversa.</p>
-    </div>
-    <div id="status"></div>
-    <div class="message-input-area">
-        <input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
-        <button id="sendButton" onclick="sendMessage()">&#10148;</button>
-    </div>
-</div>
 
-<script>
-    // Envia mensagem ao apertar Enter
-    document.getElementById('messageInput').addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            sendMessage();
-        }
-    });
+    <script>
+        // JavaScript: Lógica atualizada para ser automática
 
-    // Obtém receiverId da URL
-    function getReceiverIdFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('receiverId');
-    }
+        document.addEventListener('DOMContentLoaded', () => {
 
-    // Função para enviar a mensagem para a API
-    async function sendMessage() {
-        const messageText = document.getElementById('messageInput').value.trim();
-        const receiverId = getReceiverIdFromUrl();
-        const statusElement = document.getElementById('status');
+            // Seleciona os elementos do HTML
+            const messageForm = document.getElementById('messageForm');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = messageForm.querySelector('button');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatStatus = document.getElementById('chatStatus');
 
-        const authToken = localStorage.getItem("authToken");
+            let receiverId;
+            let authToken;
 
-        if (!authToken) {
-            statusElement.textContent = "Erro: Usuário não autenticado. Faça o login novamente.";
-            statusElement.style.color = 'red';
-            return;
-        }
+            // --- INICIALIZAÇÃO AUTOMÁTICA ---
+            function initializeChat() {
+                // 1. Pega o ID do destinatário da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                receiverId = urlParams.get('receiverId');
 
-        if (!receiverId) {
-            statusElement.textContent = "Erro: ID do destinatário não encontrado na URL.";
-            statusElement.style.color = 'red';
-            return;
-        }
+                // 2. Pega o token do localStorage
+                authToken = localStorage.getItem("authToken");
 
-        if (!messageText) {
-            statusElement.textContent = "Por favor, digite uma mensagem.";
-            statusElement.style.color = 'orange';
-            return;
-        }
+                // 3. Valida se tudo foi encontrado
+                if (!receiverId) {
+                    chatStatus.textContent = "ERRO: O ID do destinatário não foi encontrado na URL.";
+                    chatStatus.classList.add("error");
+                    disableChat();
+                    return;
+                }
+                
+                if (!authToken) {
+                    chatStatus.textContent = "ERRO: Token de autenticação não encontrado.";
+                    chatStatus.classList.add("error");
+                    disableChat();
+                    return;
+                }
 
-        statusElement.textContent = 'Enviando...';
-        statusElement.style.color = '#666';
+                // Se tudo estiver OK, atualiza o status
+                chatStatus.textContent = `Conversando com o usuário ID: ${receiverId}`;
+            }
 
-        try {
-            const response = await fetch('https://api.anunciapicos.shop/message/send', {
-                method: 'POST',
-                headers: {
+            function disableChat() {
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                messageInput.placeholder = "Chat desabilitado por erro de configuração.";
+            }
+
+            // --- FUNÇÕES DO CHAT ---
+
+            function addMessageToUI(text, type) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', type);
+                messageElement.textContent = text;
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            async function enviarMensagem(receiverId, message, authToken) {
+                // A URL da API do seu backend, não a URL do frontend
+                const apiUrl = 'https://api.anunciapicos.shop/message/send';
+
+                const bodyPayload = {
+                    receiverId: parseInt(receiverId, 10),
+                    message: message,
+                };
+
+                const headers = {
                     'Content-Type': 'application/json',
-                    // Aqui depende do que a API espera — geralmente Authorization é o padrão:
-                    'Authorization': `Bearer ${authToken}`
-                    // Caso a API só aceite 'authToken' substitua a linha acima por:
-                    // 'authToken': authToken
-                },
-                body: JSON.stringify({
-                    receiverId: parseInt(receiverId),
-                    message: messageText
-                })
+                    'Authorization': `Bearer ${authToken}`,
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(bodyPayload),
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => null);
+                    const errorMessage = errorData?.message || `Erro HTTP: ${response.status}`;
+                    throw new Error(errorMessage);
+                }
+                return await response.json();
+            }
+
+            // --- EVENT LISTENER ---
+            
+            messageForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const messageText = messageInput.value.trim();
+
+                if (!messageText) {
+                    return; // Não envia mensagens vazias
+                }
+
+                // Verifica novamente se o token e o ID são válidos antes de enviar
+                if (!receiverId || !authToken) {
+                    alert("Erro de configuração. Não é possível enviar a mensagem.");
+                    return;
+                }
+                
+                addMessageToUI(messageText, 'sent');
+                messageInput.value = '';
+
+                try {
+                    const apiResponse = await enviarMensagem(receiverId, messageText, authToken);
+                    console.log('API respondeu com sucesso:', apiResponse);
+                    
+                } catch (error) {
+                    console.error('Falha ao enviar a mensagem:', error);
+                    addMessageToUI(`Falha ao enviar. Erro: ${error.message}`, 'error');
+                    messageInput.value = messageText;
+                }
             });
 
-            if (response.ok) {
-                statusElement.textContent = 'Mensagem enviada!';
-                statusElement.style.color = 'green';
-                document.getElementById('messageInput').value = '';
-                // Opcional: atualizar a lista de mensagens aqui
-            } else if (response.status === 401) {
-                statusElement.textContent = 'Erro de autenticação (401). Token inválido ou expirado.';
-                statusElement.style.color = 'red';
-            } else {
-                statusElement.textContent = `Erro ${response.status}: Falha ao enviar a mensagem.`;
-                statusElement.style.color = 'red';
-            }
-        } catch (error) {
-            console.error('Erro na requisição:', error);
-            statusElement.textContent = 'Erro de rede ou CORS. Verifique o console.';
-            statusElement.style.color = 'red';
-        }
-    }
-</script>
-
+            // Inicia o chat quando a página carrega
+            initializeChat();
+        });
+    </script>
 </body>
 </html>
