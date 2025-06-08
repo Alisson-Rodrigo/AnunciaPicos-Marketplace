@@ -7,6 +7,8 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.Messages
         public Task<ConversationModel> GetConversationByUsers(int userId1, int userId2);
         public Task AddConversation(ConversationModel conversation);
         public Task<ConversationModel> GetConversationByConversationId(string conversationId);
+        public Task<List<ConversationModel>> GetConversationsUser(int userId);
+
 
     }
 }
