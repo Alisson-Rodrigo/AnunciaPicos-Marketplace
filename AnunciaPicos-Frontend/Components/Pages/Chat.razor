@@ -1,268 +1,271 @@
 @page "/chat"
+@using Microsoft.AspNetCore.SignalR.Client
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Chat</title>
+    <title>Chat - Dinâmico</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
     <style>
-        /* CSS: Estilos para a aparência do chat (sem alterações) */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 600px;
-            height: 80vh;
-            max-height: 700px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
-            font-size: 1.2em;
-            text-align: center;
-        }
-        
-        /* NOVO: Estilo para a área de status */
-        .chat-status {
-            padding: 10px 20px;
-            background: #e9ecef;
-            border-bottom: 1px solid #ddd;
-            font-size: 0.9em;
-            text-align: center;
-            color: #495057;
-        }
-        .chat-status.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            font-weight: bold;
-        }
-
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            padding: 10px 15px;
-            border-radius: 18px;
-            max-width: 75%;
-            word-wrap: break-word;
-        }
-
-        .message.sent {
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-        
-        .message.error {
-            background-color: #dc3545;
-            color: white;
-            align-self: center;
-            font-size: 0.9em;
-        }
-
-        .chat-input-form {
-            display: flex;
-            border-top: 1px solid #ddd;
-            padding: 10px;
-            background-color: #f8f9fa;
-        }
-
-        .chat-input-form input {
-            flex-grow: 1;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            padding: 10px 15px;
-            font-size: 1em;
-            margin-right: 10px;
-        }
-        
-        /* Desabilita o input e o botão se houver erro */
-        .chat-input-form input:disabled, .chat-input-form button:disabled {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-        }
-
-        .chat-input-form button {
-            border: none;
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .chat-input-form button:hover {
-            background-color: #0056b3;
-        }
+     .loader {
+       border-top-color: #3498db;
+       animation: spin 1s linear infinite;
+     }
+     @* @keyframes spin {
+       0% { transform: rotate(0deg); }
+       100% { transform: rotate(360deg); }
+     } *@
+     .hidden { display: none !important; }
     </style>
 </head>
-<body>
+<body class="bg-gray-100">
 
-    <div class="chat-container">
-        <div class="chat-header">
-            Chat Anuncia Picos
+    <div id="chat-system-container" class="hidden">
+      <div class="flex h-screen">
+        <div class="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200"><div class="flex items-center justify-between"><h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Conversas</h2><div class="flex items-center gap-2"><svg id="connection-status-icon" width="12" height="12" viewBox="0 0 24 24" class="text-red-500"><circle cx="12" cy="12" r="10" fill="currentColor"></circle></svg><span id="global-unread-badge" class="bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden"></span></div></div></div>
+            <div id="conversations-list" class="flex-1 overflow-y-auto"><div id="conversations-loader" class="p-8 text-center text-gray-400">Carregando...</div></div>
+            <div id="no-conversations-placeholder" class="p-8 text-center text-gray-500 hidden"><div class="flex justify-center mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><p>Nenhuma conversa encontrada</p></div>
         </div>
-        
-        <div id="chatStatus" class="chat-status">
-            Carregando informações da conversa...
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
+
+        <div class="flex-1 flex flex-col">
+            <div id="welcome-screen" class="flex-1 flex items-center justify-center bg-gray-50"><div class="text-center text-gray-500"><div class="flex justify-center mb-4"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><h3 class="text-lg font-medium mb-2">Selecione uma conversa</h3><p>Suas conversas recentes aparecerão aqui.</p></div></div>
+            <div id="active-chat-container" class="flex-1 flex-col hidden">
+                <div class="p-4 bg-white border-b border-gray-200"><div class="flex items-center gap-3"><div id="chat-header-avatar" class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"></div><div><h3 id="chat-header-name" class="font-medium text-gray-900"></h3><p id="typing-indicator" class="text-sm text-blue-500 h-5"></p></div></div></div>
+                <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"><div id="messages-loader" class="flex justify-center items-center h-full hidden"><div class="loader h-8 w-8 border-4 border-gray-200 rounded-full"></div></div></div>
+                <div id="messages-end-ref"></div>
+                <div class="p-4 bg-white border-t border-gray-200"><form id="message-form" class="flex gap-2"><input id="message-input" type="text" placeholder="Conectando..." disabled class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 disabled:bg-gray-100"/><button id="send-button" type="submit" disabled class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22,2 15,22 11,13 2,9"></polygon></svg></button></form></div>
             </div>
-        
-        <form class="chat-input-form" id="messageForm">
-            <input type="text" id="messageInput" placeholder="Digite sua mensagem..." autocomplete="off" required>
-            <button type="submit">Enviar</button>
-        </form>
+        </div>
+      </div>
     </div>
 
+    <div id="error-container" class="flex items-center justify-center h-screen hidden"><div class="text-center text-gray-600"><h2 class="text-2xl font-bold mb-2">Acesso Negado</h2><p id="error-message">Você precisa estar logado para acessar o chat.</p></div></div>
+
+    <template id="conversation-template"><div class="conversation-item p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors"><div class="flex items-center gap-3"><div class="avatar-container w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-500"></div><div class="flex-1 min-w-0"><div class="flex items-center justify-between"><h3 class="other-user-name font-medium text-gray-900 truncate"></h3><span class="last-message-date text-xs text-gray-500"></span></div><div class="flex items-center justify-between mt-1"><p class="last-message text-sm text-gray-600 truncate"></p><span class="unread-messages-count bg-blue-500 text-white text-xs rounded-full px-2 py-1 ml-2 hidden"></span></div></div></div></div></template>
+    <template id="message-template"><div class="message-wrapper flex"><div class="message-bubble max-w-xs lg:max-w-md px-4 py-2 rounded-lg"><p class="text-sm message-content"></p><div class="flex items-center justify-end mt-1 space-x-2"><span class="text-xs opacity-75 message-timestamp"></span><span class="text-xs opacity-75 message-read-receipt hidden">✓</span></div></div></div></template>
+
     <script>
-        // JavaScript: Lógica atualizada para ser automática
+    document.addEventListener('DOMContentLoaded', async () => {
+    
+      let connection = null, conversations = [], activeConversation = null, messages = [], typingUsers = new Set();
+      let isConnected = false, isTyping = false, typingTimeout = null, currentUser = null; 
 
-        document.addEventListener('DOMContentLoaded', () => {
+      const API_BASE_URL = 'https://api.anunciapicos.shop';
+      const getAuthToken = () => localStorage.getItem('authToken');
 
-            // Seleciona os elementos do HTML
-            const messageForm = document.getElementById('messageForm');
-            const messageInput = document.getElementById('messageInput');
-            const sendButton = messageForm.querySelector('button');
-            const chatMessages = document.getElementById('chatMessages');
-            const chatStatus = document.getElementById('chatStatus');
+      // SELETORES DO DOM
+      const chatSystemContainer = document.getElementById('chat-system-container'), errorContainer = document.getElementById('error-container'), errorMessageEl = document.getElementById('error-message'), conversationsListEl = document.getElementById('conversations-list'), noConversationsPlaceholderEl = document.getElementById('no-conversations-placeholder'), conversationsLoaderEl = document.getElementById('conversations-loader'), welcomeScreenEl = document.getElementById('welcome-screen'), activeChatContainerEl = document.getElementById('active-chat-container'), messagesContainerEl = document.getElementById('messages-container'), messagesLoaderEl = document.getElementById('messages-loader'), messageFormEl = document.getElementById('message-form'), messageInputEl = document.getElementById('message-input'), sendButtonEl = document.getElementById('send-button'), chatHeaderNameEl = document.getElementById('chat-header-name'), chatHeaderAvatarEl = document.getElementById('chat-header-avatar'), typingIndicatorEl = document.getElementById('typing-indicator'), connectionStatusIconEl = document.getElementById('connection-status-icon'), globalUnreadBadgeEl = document.getElementById('global-unread-badge'), messagesEndRef = document.getElementById('messages-end-ref'), conversationTemplate = document.getElementById('conversation-template'), messageTemplate = document.getElementById('message-template');
+      
+      const showApp = () => { chatSystemContainer.classList.remove('hidden'); errorContainer.classList.add('hidden'); };
+      const showError = (message) => { errorMessageEl.textContent = message; chatSystemContainer.classList.add('hidden'); errorContainer.classList.remove('hidden'); };
+      const scrollToBottom = () => messagesEndRef.scrollIntoView({ behavior: 'smooth' });
+      const renderAvatar = (container, user) => { container.innerHTML = ''; if (user.profilePicture) { const img = document.createElement('img'); img.src = user.profilePicture; img.alt = user.name; img.className = 'w-full h-full rounded-full object-cover'; container.appendChild(img); } else { container.innerHTML = `<svg width="50%" height="50%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`; } };
+      const formatDate = (dateString) => new Date(dateString).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      
+      const fetchWithAuth = async (url, options = {}) => { const token = getAuthToken(); return fetch(url, { ...options, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...options.headers } }); };
 
-            let receiverId;
-            let authToken;
+      const parseJwt = (token) => {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error("Erro ao decodificar token", e);
+            return null;
+        }
+      };
 
-            // --- INICIALIZAÇÃO AUTOMÁTICA ---
-            function initializeChat() {
-                // 1. Pega o ID do destinatário da URL
-                const urlParams = new URLSearchParams(window.location.search);
-                receiverId = urlParams.get('receiverId');
+      const fetchUserDetails = async (userId) => { try { const response = await fetchWithAuth(`${API_BASE_URL}/api/users/${userId}`); if (!response.ok) return null; return await response.json(); } catch { return null; } };
+      
+      const loadConversations = async () => { try { const response = await fetchWithAuth(`${API_BASE_URL}/message/conversations`); if (response.ok) { conversations = await response.json(); renderConversations(); } } catch (error) { console.error('Erro ao carregar conversas:', error); } };
+      const loadMessages = async (conversationId) => { messagesLoaderEl.classList.remove('hidden'); messagesContainerEl.innerHTML = ''; messages = []; try { const response = await fetchWithAuth(`${API_BASE_URL}/message/history/${conversationId}`); if (response.ok) { const data = await response.json(); messages = Array.isArray(data) ? data.sort((a,b) => new Date(a.created) - new Date(b.created)) : []; } } catch (error) { messages = []; } finally { renderMessages(); } };
+      const markMessagesAsRead = async (conversationId) => { try { await fetchWithAuth(`${API_BASE_URL}/message/mark-as-read/${conversationId}`, { method: 'PUT' }); /* O hub irá atualizar a contagem */ } catch (error) { console.error('Erro ao marcar como lida:', error); }};
 
-                // 2. Pega o token do localStorage
-                authToken = localStorage.getItem("authToken");
+      const renderConversations = () => { conversationsLoaderEl.classList.add('hidden'); conversationsListEl.innerHTML = ''; if (conversations.length === 0) { noConversationsPlaceholderEl.classList.remove('hidden'); return; } noConversationsPlaceholderEl.classList.add('hidden'); conversations.forEach(convo => { const clone = conversationTemplate.content.cloneNode(true); const item = clone.querySelector('.conversation-item'); item.dataset.conversationId = convo.conversationId; item.dataset.otherUserId = convo.otherUserId; item.querySelector('.other-user-name').textContent = convo.otherUserName; item.querySelector('.last-message').textContent = (convo.isLastMessageFromMe ? 'Você: ' : '') + (convo.lastMessage || '...'); item.querySelector('.last-message-date').textContent = convo.lastMessageDate ? formatDate(convo.lastMessageDate) : ''; const unreadCountEl = item.querySelector('.unread-messages-count'); if (convo.unreadMessagesCount > 0) { unreadCountEl.textContent = convo.unreadMessagesCount; unreadCountEl.classList.remove('hidden'); } renderAvatar(item.querySelector('.avatar-container'), { name: convo.otherUserName, profilePicture: convo.otherUserProfilePicture }); if (activeConversation && activeConversation.conversationId === convo.conversationId) { item.classList.add('bg-blue-50', 'border-l-4', 'border-l-blue-500'); } conversationsListEl.appendChild(item); }); };
+      const renderMessages = () => { messagesLoaderEl.classList.add('hidden'); messagesContainerEl.innerHTML = ''; messages.forEach(msg => { const clone = messageTemplate.content.cloneNode(true); const wrapper = clone.querySelector('.message-wrapper'); const bubble = clone.querySelector('.message-bubble'); const receipt = clone.querySelector('.message-read-receipt'); clone.querySelector('.message-content').textContent = msg.message; clone.querySelector('.message-timestamp').textContent = formatDate(msg.created); if (msg.senderId == currentUser.id) { wrapper.classList.add('justify-end'); bubble.classList.add('bg-blue-500', 'text-white'); receipt.classList.remove('hidden'); receipt.textContent = msg.isRead ? '✓✓' : '✓'; } else { wrapper.classList.add('justify-start'); bubble.classList.add('bg-gray-200', 'text-gray-800'); } messagesContainerEl.appendChild(clone); }); scrollToBottom(); };
 
-                // 3. Valida se tudo foi encontrado
-                if (!receiverId) {
-                    chatStatus.textContent = "ERRO: O ID do destinatário não foi encontrado na URL.";
-                    chatStatus.classList.add("error");
-                    disableChat();
-                    return;
-                }
-                
-                if (!authToken) {
-                    chatStatus.textContent = "ERRO: Token de autenticação não encontrado.";
-                    chatStatus.classList.add("error");
-                    disableChat();
-                    return;
-                }
+      const startSignalRConnection = () => { 
+          connection = new signalR.HubConnectionBuilder()
+              .withUrl(`${API_BASE_URL}/chathub`, { accessTokenFactory: getAuthToken })
+              .withAutomaticReconnect()
+              .build(); 
+          
+          connection.on('ReceiveMessage', (message) => { 
+              if (activeConversation && message.conversationId === activeConversation.conversationId) { 
+                  messages.push(message); 
+                  renderMessages(); 
+                  if (message.senderId != currentUser.id) markMessagesAsRead(activeConversation.conversationId); 
+              } 
+              loadConversations(); 
+          }); 
 
-                // Se tudo estiver OK, atualiza o status
-                chatStatus.textContent = `Conversando com o usuário ID: ${receiverId}`;
-            }
+          connection.on('MessagesMarkedAsRead', (data) => { 
+              if (activeConversation && data.conversationId === activeConversation.conversationId) { 
+                  messages.forEach(msg => { if (msg.senderId == currentUser.id) msg.isRead = true; }); 
+                  renderMessages(); 
+              } 
+          }); 
 
-            function disableChat() {
-                messageInput.disabled = true;
-                sendButton.disabled = true;
-                messageInput.placeholder = "Chat desabilitado por erro de configuração.";
-            }
+          connection.on('UserTyping', (data) => { 
+              if (activeConversation && data.conversationId === activeConversation.conversationId) { 
+                  if(data.isTyping) typingUsers.add(data.userName); 
+                  else typingUsers.delete(data.userName); 
+                  typingIndicatorEl.textContent = Array.from(typingUsers).join(', ') + (typingUsers.size > 0 ? ' está digitando...' : ''); 
+              } 
+          }); 
+          
+          connection.onreconnected(() => { 
+              isConnected = true; 
+              // Atualizar status visual para online aqui se desejar
+              if (activeConversation) connection.invoke('JoinConversation', activeConversation.conversationId); 
+          }); 
 
-            // --- FUNÇÕES DO CHAT ---
+          connection.onclose(() => { 
+              isConnected = false; 
+              // Atualizar status visual para offline aqui se desejar
+          }); 
+          
+          return connection.start().then(() => { 
+              isConnected = true; 
+              // Atualizar status visual para online aqui se desejar
+          }).catch((err) => { 
+              console.error("SignalR Connection Error: ", err); 
+              isConnected = false; 
+              showError("Não foi possível conectar ao servidor de chat.");
+          }); 
+      };
 
-            function addMessageToUI(text, type) {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', type);
-                messageElement.textContent = text;
-                chatMessages.appendChild(messageElement);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
+      const handleSelectConversation = async (convoData) => { 
+          if (activeConversation && activeConversation.conversationId === convoData.conversationId) return; 
+          if (activeConversation) await connection.invoke('LeaveConversation', activeConversation.conversationId); 
+          
+          activeConversation = convoData; 
+          messages = []; 
+          renderConversations(); 
+          
+          welcomeScreenEl.classList.add('hidden'); 
+          activeChatContainerEl.classList.remove('hidden'); 
+          activeChatContainerEl.classList.add('flex'); 
+          
+          chatHeaderNameEl.textContent = activeConversation.otherUserName; 
+          renderAvatar(chatHeaderAvatarEl, { name: activeConversation.otherUserName, profilePicture: activeConversation.otherUserProfilePicture }); 
+          
+          if (activeConversation.conversationId > 0) { 
+              await connection.invoke('JoinConversation', activeConversation.conversationId); 
+              await loadMessages(activeConversation.conversationId); 
+              await markMessagesAsRead(activeConversation.conversationId); 
+          } 
+      };
 
-            async function enviarMensagem(receiverId, message, authToken) {
-                // A URL da API do seu backend, não a URL do frontend
-                const apiUrl = 'https://api.anunciapicos.shop/message/send';
+      const handleSendMessage = async (e) => { 
+          e.preventDefault(); 
+          const messageText = messageInputEl.value.trim(); 
+          if (!messageText || !activeConversation || !isConnected) return; 
+          
+          try { 
+              const response = await fetchWithAuth(`${API_BASE_URL}/message/send`, { 
+                  method: 'POST', 
+                  body: JSON.stringify({ receiverId: activeConversation.otherUserId, message: messageText }) 
+              }); 
+              
+              if (response.ok) { 
+                  const sentMessage = await response.json(); 
+                  if(activeConversation.conversationId === 0) { 
+                      activeConversation.conversationId = sentMessage.conversationId; 
+                      await connection.invoke('JoinConversation', activeConversation.conversationId); 
+                  } 
+                  messages.push(sentMessage); 
+                  renderMessages(); 
+                  messageInputEl.value = ''; 
+                  sendButtonEl.disabled = true; 
+                  if(isTyping) { 
+                      isTyping = false; 
+                      connection.invoke('NotifyStoppedTyping', activeConversation.conversationId, currentUser.name); 
+                  } 
+                  loadConversations(); 
+              } else { 
+                  console.error('Erro API ao enviar msg'); 
+              } 
+          } catch (error) { 
+              console.error('Erro de rede ao enviar msg', error); 
+          } 
+      };
 
-                const bodyPayload = {
-                    receiverId: parseInt(receiverId, 10),
-                    message: message,
-                };
+      const initializeChat = async () => {
+          const token = getAuthToken();
+          if (!token) {
+              showError("Token de autenticação não encontrado. Por favor, faça o login.");
+              return;
+          }
 
-                const headers = {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`,
-                };
+          try {
+              const decodedToken = parseJwt(token);
+              if (!decodedToken) throw new Error("Token malformado.");
+              
+              currentUser = {
+                  id: decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid'], 
+                  name: decodedToken.sub 
+              };
 
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(bodyPayload),
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => null);
-                    const errorMessage = errorData?.message || `Erro HTTP: ${response.status}`;
-                    throw new Error(errorMessage);
-                }
-                return await response.json();
-            }
-
-            // --- EVENT LISTENER ---
-            
-            messageForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-
-                const messageText = messageInput.value.trim();
-
-                if (!messageText) {
-                    return; // Não envia mensagens vazias
-                }
-
-                // Verifica novamente se o token e o ID são válidos antes de enviar
-                if (!receiverId || !authToken) {
-                    alert("Erro de configuração. Não é possível enviar a mensagem.");
-                    return;
-                }
-                
-                addMessageToUI(messageText, 'sent');
-                messageInput.value = '';
-
-                try {
-                    const apiResponse = await enviarMensagem(receiverId, messageText, authToken);
-                    console.log('API respondeu com sucesso:', apiResponse);
-                    
-                } catch (error) {
-                    console.error('Falha ao enviar a mensagem:', error);
-                    addMessageToUI(`Falha ao enviar. Erro: ${error.message}`, 'error');
-                    messageInput.value = messageText;
-                }
-            });
-
-            // Inicia o chat quando a página carrega
-            initializeChat();
-        });
+              if (!currentUser.id || !currentUser.name) {
+                  console.error("Claims não encontradas no token:", decodedToken);
+                  throw new Error("Não foi possível encontrar as claims de ID e Nome no token.");
+              }
+          } catch (error) {
+              showError("Seu token é inválido ou expirou. Faça o login novamente.");
+              console.error("Erro ao processar o token:", error);
+              return;
+          }
+          
+          showApp();
+          await startSignalRConnection();
+          await loadConversations();
+          
+          const receiverId = new URLSearchParams(window.location.search).get('receiverId');
+          if (receiverId && Number(receiverId) !== currentUser.id) {
+              const existingConvo = conversations.find(c => c.otherUserId == receiverId);
+              if (existingConvo) {
+                  handleSelectConversation(existingConvo);
+              } else {
+                  const receiverDetails = await fetchUserDetails(receiverId);
+                  if (receiverDetails) {
+                      handleSelectConversation({ 
+                          conversationId: 0, 
+                          otherUserId: receiverDetails.id, 
+                          otherUserName: receiverDetails.name || 'Usuário', 
+                          otherUserProfilePicture: receiverDetails.profilePicture, 
+                          lastMessage: 'Inicie a conversa!'
+                      });
+                  }
+              }
+          }
+      };
+      
+      messageFormEl.addEventListener('submit', handleSendMessage);
+      conversationsListEl.addEventListener('click', (e) => { 
+          const item = e.target.closest('.conversation-item'); 
+          if(item) { 
+              const convo = conversations.find(c => c.conversationId == item.dataset.conversationId); 
+              if(convo) handleSelectConversation(convo); 
+          } 
+      });
+      messageInputEl.addEventListener('input', () => {
+          sendButtonEl.disabled = messageInputEl.value.trim().length === 0;
+          // Lógica de "Está digitando..." pode ser adicionada aqui
+      });
+      
+      initializeChat();
+    });
     </script>
+
 </body>
 </html>
