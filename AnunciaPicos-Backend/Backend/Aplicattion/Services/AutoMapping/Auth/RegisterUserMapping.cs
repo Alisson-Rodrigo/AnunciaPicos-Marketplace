@@ -9,6 +9,7 @@ namespace AnunciaPicos.Backend.Aplicattion.Services.AutoMapping.Auth
         public RegisterUserMapping()
         {
             CreateMap<RequestRegisterCommunication, UserModel>()
+                .ForMember(dest => dest.Apelido, opt => opt.MapFrom(src => src.Apelido))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
