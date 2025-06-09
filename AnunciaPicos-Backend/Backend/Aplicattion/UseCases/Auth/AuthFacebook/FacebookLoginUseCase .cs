@@ -1,4 +1,5 @@
 ﻿using AnunciaPicos.Backend.Aplicattion.Services.TokenLogin;
+using AnunciaPicos.Backend.Infrastructure.Repositories.SaveChanges;
 using AnunciaPicos.Backend.Infrastructure.Repositories.User;
 using AnunciaPicos.Shared.Communication.Request.Auth;
 using AnunciaPicos.Shared.Communication.Response.Auth;
@@ -13,17 +14,20 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Auth.AuthFacebook
         private readonly IUserRepository _userRepository; // Assumindo que você tem esse repositório
         private readonly TokenJwt _jwtService; // Seu serviço JWT existente
         private readonly IMapper _mapper; // Se você usar AutoMapper
+        private readonly IUnitOfWork _unitOfWork;
 
         public FacebookLoginUseCase(
             IHttpClientFactory httpClientFactory,
             IUserRepository userRepository,
             TokenJwt jwtService,
-            IMapper mapper)
+            IMapper mapper,
+            IUnitOfWork unitOfWork)
         {
             _httpClientFactory = httpClientFactory;
             _userRepository = userRepository;
             _jwtService = jwtService;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ResponseFacebookLoginCommunication> Execute(RequestFacebookLoginCommunication request)
@@ -89,7 +93,9 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Auth.AuthFacebook
 
                 // 3. Gerar JWT token
                 var token = _jwtService.GenerateToken(user);
-                var expiresAt = DateTime.UtcNow.AddHours(1); 
+                var expiresAt = DateTime.UtcNow.AddHours(1);
+
+                await _unitOfWork.Commit();
 
                 // 4. Retornar resposta
                 return new ResponseFacebookLoginCommunication

@@ -5,8 +5,6 @@ using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.ResetPassword;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.UpdatePassword;
 using AnunciaPicos.Shared.Communication.Request.Auth;
 using AnunciaPicos.Shared.Communication.Response.Auth;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AnunciaPicos.Backend.API.Controllers
@@ -47,7 +45,6 @@ namespace AnunciaPicos.Backend.API.Controllers
             return Ok();
         }
 
-        // NOVO ENDPOINT PARA FACEBOOK LOGIN
         [HttpPost("facebook-login")]
         [ProducesResponseType(typeof(ResponseFacebookLoginCommunication), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
