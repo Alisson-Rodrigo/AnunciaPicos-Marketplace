@@ -89,7 +89,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Auth.AuthFacebook
 
                 // 3. Gerar JWT token
                 var token = _jwtService.GenerateToken(user);
-                var expiresAt = DateTime.UtcNow.AddHours(24); // ou sua configuração
+                var expiresAt = DateTime.UtcNow.AddHours(1); 
 
                 // 4. Retornar resposta
                 return new ResponseFacebookLoginCommunication
