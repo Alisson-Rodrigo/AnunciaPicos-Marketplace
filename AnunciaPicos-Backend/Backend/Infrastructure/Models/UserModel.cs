@@ -13,6 +13,12 @@ public class UserModel : InfoBaseModel
     public List<ProductModel>? Products { get; set; }
     public ICollection<ConversationModel>? Conversation { get; set; }
 
+    // NOVOS CAMPOS PARA AUTENTICAÇÃO SOCIAL
+    public string? Provider { get; set; } // "Facebook", "Google", etc.
+    public string? ProviderId { get; set; } // ID do usuário no provider
+    public bool IsSocialLogin { get; set; } = false;
+
+
     public virtual ICollection<PaymentModel>? Payments { get; set; }
     public ICollection<FavoriteModel>? Favorites { get; set; }
 

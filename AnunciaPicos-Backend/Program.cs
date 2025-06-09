@@ -46,6 +46,7 @@ using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Delete;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
+using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.AuthFacebook;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -143,26 +144,46 @@ builder.Services.AddScoped<IRegisterFavoriteUseCase, RegisterFavoriteUseCase>();
 builder.Services.AddScoped<IDeleteFavoriteUseCase, DeleteFavoriteUseCase>();
 builder.Services.AddScoped<IGetFavoriteUseCase, GetFavoriteUseCase>();
 builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+builder.Services.AddScoped<IFacebookLoginUseCase, FacebookLoginUseCase>();
 builder.Services.AddScoped<GetTokenRequest>();
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings.GetValue<string>("SecretKey");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// Adiciona os serviços de autenticação ao contêiner.
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
-            ValidAudience = jwtSettings.GetValue<string>("Audience"),
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
+        ValidAudience = jwtSettings.GetValue<string>("Audience"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+    };
+})
+.AddFacebook(options =>
+{
+    // CORREÇÃO 3: Corrigido o erro de digitação de 'vconfiguration' para 'configuration'
+    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+    options.SaveTokens = true;
+
+    options.Scope.Add("email");
+    options.Scope.Add("public_profile");
+
+    options.Fields.Add("name");
+    options.Fields.Add("email");
+    options.Fields.Add("picture");
+});
 
 // Banco de Dados - MySQL
 string mySqlConnection = builder.Configuration.GetConnectionString("Database")!;

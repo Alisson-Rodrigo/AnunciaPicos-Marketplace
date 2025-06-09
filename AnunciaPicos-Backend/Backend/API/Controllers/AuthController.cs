@@ -1,4 +1,5 @@
-﻿using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.Login;
+﻿using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.AuthFacebook;
+using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.Login;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.Register;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.ResetPassword;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.UpdatePassword;
@@ -44,6 +45,30 @@ namespace AnunciaPicos.Backend.API.Controllers
         {
             await resetUseCase.Execute(resetRequest);
             return Ok();
+        }
+
+        // NOVO ENDPOINT PARA FACEBOOK LOGIN
+        [HttpPost("facebook-login")]
+        [ProducesResponseType(typeof(ResponseFacebookLoginCommunication), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> FacebookLogin(
+            [FromBody] RequestFacebookLoginCommunication facebookModel,
+            [FromServices] IFacebookLoginUseCase facebookLoginUseCase)
+        {
+            try
+            {
+                var response = await facebookLoginUseCase.Execute(facebookModel);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
     }
