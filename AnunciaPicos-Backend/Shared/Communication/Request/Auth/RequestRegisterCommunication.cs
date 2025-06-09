@@ -5,6 +5,7 @@ namespace AnunciaPicos.Shared.Communication.Request.Auth
     public class RequestRegisterCommunication
     {
         // Mapeia para UserModel.Name
+        public string Apelido { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;

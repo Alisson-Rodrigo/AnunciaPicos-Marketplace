@@ -14,6 +14,9 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.User
         public void UpdateUser(UserModel user);
         public void DeleteUser(UserModel user);
 
+        Task<UserModel?> GetByProviderIdAsync(string provider, string providerId);
+        Task<UserModel?> GetByEmailAsync(string email);
+
 
 
 
