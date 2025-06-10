@@ -16,7 +16,7 @@ namespace AnunciaPicos.Backend.API.Controllers
     {
 
         [Authorize]
-        [HttpPost("gemini/chat")]
+        [HttpPost("chat")]
         public async Task<IActionResult> ConversaGemini([FromBody] RequestChatGeminiCommunication request, IRequestGeminiChatUseCase requestGeminiChatUseCase)
         {
             var response = await requestGeminiChatUseCase.Execute(request);
