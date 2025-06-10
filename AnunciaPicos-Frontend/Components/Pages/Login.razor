@@ -13,7 +13,7 @@
         
         <div class="logins">             
             <button class="google-btn"><i class="fab fa-google"></i> Entrar com o Google</button>             
-            <button class="facebook-btn"><i class="fab fa-facebook-f"></i> Entrar com o Facebook</button>         
+            <button class="facebook-btn" id="facebookLoginBtn"><i class="fab fa-facebook-f"></i> Entrar com o Facebook</button>         
         </div>          
         
         <form id="loginForm">             
@@ -47,46 +47,137 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-    const loginForm = document.getElementById("loginForm");
+        const loginForm = document.getElementById("loginForm");
+        const facebookLoginBtn = document.getElementById("facebookLoginBtn");
 
-    loginForm.addEventListener("submit", async function (e) {
-        e.preventDefault();
+        // Login tradicional
+        loginForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-        const email = document.getElementById("Email").value.trim();
-        const password = document.getElementById("Password").value;
+            const email = document.getElementById("Email").value.trim();
+            const password = document.getElementById("Password").value;
 
-        try {
-            const response = await fetch("https://api.anunciapicos.shop/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, password })
-            });
+            try {
+                const response = await fetch("https://api.anunciapicos.shop/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email, password })
+                });
 
-            if (response.ok) {
-                const result = await response.json();
+                if (response.ok) {
+                    const result = await response.json();
 
-                // ✅ Salva token e nome no localStorage
-                localStorage.setItem("authToken", result.token);
-                localStorage.setItem("nome", result.nome);
+                    // ✅ Salva token e nome no localStorage
+                    localStorage.setItem("authToken", result.token);
+                    localStorage.setItem("nome", result.nome);
 
-                // ✅ Redireciona para a Home
-                window.location.href = "/Home";
-            } else {
-                alert("Email ou senha incorretos!");
+                    // ✅ Redireciona para a Home
+                    window.location.href = "/Home";
+                } else {
+                    alert("Email ou senha incorretos!");
+                }
+            } catch (error) {
+                console.error("Erro ao conectar com a API:", error);
+                alert("Erro de conexão. Tente novamente mais tarde.");
             }
-        } catch (error) {
-            console.error("Erro ao conectar com a API:", error);
-            alert("Erro de conexão. Tente novamente mais tarde.");
+        });
+
+        // Login com Facebook - Popup simples
+        facebookLoginBtn.addEventListener("click", function() {
+            const facebookAppId = 3977438012470679; // Substitua pelo seu App ID
+            const redirectUri = encodeURIComponent(window.location.origin + '/facebook-callback');
+            
+            const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${facebookAppId}&redirect_uri=${redirectUri}&scope=email,public_profile&response_type=token`;
+            
+            // Abrir popup do Facebook
+            const popup = window.open(
+                facebookAuthUrl,
+                'facebook-login',
+                'width=600,height=600,scrollbars=yes,resizable=yes'
+            );
+
+            // Monitorar o popup para capturar o token
+            const checkClosed = setInterval(function() {
+                if (popup.closed) {
+                    clearInterval(checkClosed);
+                    // Verificar se temos o token armazenado
+                    const accessToken = sessionStorage.getItem('facebook_access_token');
+                    if (accessToken) {
+                        sessionStorage.removeItem('facebook_access_token');
+                        loginWithFacebook(accessToken);
+                    }
+                }
+            }, 1000);
+        });
+
+        // Função para processar o retorno do Facebook
+        window.processFacebookCallback = function(accessToken) {
+            sessionStorage.setItem('facebook_access_token', accessToken);
+            // Fechar o popup será detectado pelo interval acima
+        };
+
+        // Função para fazer login com Facebook usando a API
+        async function loginWithFacebook(accessToken) {
+            try {
+                console.log("Enviando accessToken para API:", accessToken);
+                
+                const response = await fetch("https://api.anunciapicos.shop/auth/facebook-login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ 
+                        accessToken: accessToken 
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log("Login Facebook bem-sucedido:", result);
+
+                    // ✅ Salva token e dados do usuário
+                    localStorage.setItem("authToken", result.token);
+                    localStorage.setItem("nome", result.user.name);
+                    localStorage.setItem("email", result.user.email);
+                    
+                    if (result.user.imageProfile) {
+                        localStorage.setItem("imageProfile", result.user.imageProfile);
+                    }
+
+                    alert("Login com Facebook realizado com sucesso!");
+                    
+                    // ✅ Redireciona para a Home
+                    window.location.href = "/Home";
+                } else {
+                    const errorData = await response.json();
+                    console.error("Erro da API:", errorData);
+                    alert("Erro no login com Facebook: " + (errorData.message || "Tente novamente"));
+                }
+            } catch (error) {
+                console.error("Erro ao conectar com a API:", error);
+                alert("Erro de conexão. Tente novamente mais tarde.");
+            }
         }
+
+        // Mostrar/ocultar senha
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const passwordInput = document.getElementById("Password");
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+            passwordInput.setAttribute("type", type);
+        });
     });
 
-    // Mostrar/ocultar senha
-    document.getElementById("togglePassword").addEventListener("click", function () {
-        const passwordInput = document.getElementById("Password");
-        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-        passwordInput.setAttribute("type", type);
-    });
-});
+    // Detectar se estamos na página de callback do Facebook
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = urlParams.get('access_token');
+        
+        if (accessToken && window.opener) {
+            // Enviar token para a janela pai
+            window.opener.processFacebookCallback(accessToken);
+            window.close();
+        }
+    }
 </script>

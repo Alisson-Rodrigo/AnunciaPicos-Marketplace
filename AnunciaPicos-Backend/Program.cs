@@ -215,25 +215,25 @@ if (app.Environment.IsDevelopment())
 
 
 
-if (app.Environment.IsDevelopment())
-{
-    // Se for Desenvolvimento, usa uma pasta "uploads" dentro do projeto
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(
-            Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
-        RequestPath = "/uploads"
-    });
-}
-else
-{
-    // Para qualquer outro ambiente (Produção, Staging, etc.)
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
-        RequestPath = "/uploads"
-    });
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     // Se for Desenvolvimento, usa uma pasta "uploads" dentro do projeto
+//     app.UseStaticFiles(new StaticFileOptions
+//     {
+//         FileProvider = new PhysicalFileProvider(
+//             Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
+//         RequestPath = "/uploads"
+//     });
+// }
+// else
+// {
+//     // Para qualquer outro ambiente (Produção, Staging, etc.)
+//     app.UseStaticFiles(new StaticFileOptions
+//     {
+//         FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+//         RequestPath = "/uploads"
+//     });
+// }
 
 // Outras configura��es
 app.MapHub<ChatHub>("/chathub");
