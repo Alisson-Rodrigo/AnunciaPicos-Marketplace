@@ -1,167 +1,699 @@
-<div class="navbar">
-    <div class="logo-area">
-        <div class="logo"><a href="/Home">Anuncia Picos!</a></div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar base */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #7e6eea 0%, #6b5ed9 100%);
+            color: white;
+            padding: 20px 30px;
+            height: 80px;
+            flex-wrap: wrap;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(126, 110, 234, 0.3);
+        }
+
+        .logo-area {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 26px;
+            margin: 0;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            width: auto;
+        }
+
+        .logo a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 26px;
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo a:hover {
+            transform: scale(1.05);
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .welcome-message {
+            font-size: 16px;
+            font-weight: 500;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            border-radius: 25px;
+            position: absolute;
+            left: 0;
+            margin: 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 20px;
+            position: relative;
+            width: 100%;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding-right: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            box-shadow: 0 6px 20px rgba(126, 110, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #7e6eea, #6b5ed9);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: linear-gradient(135deg, #6b5ed9, #5a4fc8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .icons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            position: absolute;
+            right: 20px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .icon {
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon i {
+            transition: all 0.3s ease;
+        }
+
+        .icon:hover i {
+            transform: scale(1.1);
+        }
+
+        .cart-count, .chat-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @* @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        } *@
+
+        /* Botão de logout melhorado */
+        #areaLogout {
+            display: flex;
+            align-items: center;
+        }
+
+        #btnLogout {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #btnLogout:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Sub navbar */
+        .sub-navbar {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sub-navbar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .plan-button {
+            background: linear-gradient(135deg, #7e6eea 0%, #6b5ed9 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(126, 110, 234, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plan-button:hover {
+            background: linear-gradient(135deg, #6b5ed9 0%, #5a4fc8 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(126, 110, 234, 0.4);
+        }
+
+        .plan-button i {
+            transition: transform 0.3s ease;
+        }
+
+        .plan-button:hover i {
+            transform: scale(1.1);
+        }
+
+        .categories-dropdown {
+            background: linear-gradient(135deg, #6b6bff 0%, #5a5aff 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(107, 107, 255, 0.3);
+        }
+
+        .categories-dropdown:hover {
+            background: linear-gradient(135deg, #5a5aff 0%, #4949ff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(107, 107, 255, 0.4);
+        }
+
+        .categories-dropdown::after {
+            content: '\25BC';
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .categories-dropdown:hover::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-top: 10px;
+            z-index: 1000;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .dropdown-content.show {
+            display: block;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 15px 20px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: linear-gradient(135deg, #f3f3ff 0%, #e6e6ff 100%);
+            color: #7e6eea;
+            transform: translateX(5px);
+        }
+
+        .dropdown-content a:first-child {
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            border-bottom: none;
+        }
+
+        /* Hamburger icon animation */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            transition: all 0.3s ease-in-out;
+            z-index: 100;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        .hamburger:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        .hamburger i {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .hamburger i.fa-times {
+            transform: rotate(180deg);
+        }
+
+        /* Responsividade */
+        @* @media (max-width: 992px) {
+            .navbar {
+                flex-direction: column;
+                align-items: center;
+                padding: 15px 20px;
+                height: auto;
+            }
+
+            .logo-area {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                position: relative;
+                margin-bottom: 10px;
+                min-height: 50px;
+            }
+
+            .logo {
+                position: static;
+                transform: none;
+                font-size: 22px;
+            }
+
+            .welcome-message {
+                position: static;
+                margin: 0;
+                font-size: 14px;
+                background: rgba(255, 255, 255, 0.15);
+                padding: 8px 12px;
+                border-radius: 20px;
+                white-space: normal;
+                text-align: center;
+            }
+
+            .search-container {
+                margin: 10px 0;
+                width: 100%;
+                max-width: 100%;
+                display: none;
+            }
+
+            .search-box {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .icons {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 15px;
+                background: rgba(255, 255, 255, 0.1);
+                padding: 0;
+                border-radius: 20px;
+                width: 100%;
+                margin-top: 10px;
+                position: relative;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-20px);
+                max-height: 0;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                backdrop-filter: blur(10px);
+            }
+
+            .icons.show-menu {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+                max-height: 200px;
+                padding: 15px 10px;
+            }
+
+            .icons > * {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .icons a, .icons button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .hamburger {
+                display: block;
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                font-size: 24px;
+                color: white;
+                cursor: pointer;
+                z-index: 100;
+            }
+
+            .sub-navbar-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .plan-button,
+            .categories-dropdown {
+                padding: 12px 20px;
+                font-size: 14px;
+                width: 90%;
+                max-width: 300px;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .dropdown-content {
+                left: 0;
+                transform: none;
+                width: 100%;
+            }
+        }
+
+        /* Animações adicionais */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        } *@
+
+        .navbar {
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        /* Efeito de hover para ícones específicos */
+        .icon[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        /* Estilos para o ícone de chat */
+        .chat-icon {
+            position: relative;
+        }
+
+        .chat-icon::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo-area">
+            <div class="logo"><a href="/Home">Anuncia Picos!</a></div>
+        </div>
+
+        <div class="hamburger" onclick="toggleMenu()">
+            <i class="fas fa-bars" id="menuIcon"></i>
+        </div>
+
+        <div class="icons" id="menuIcons">
+            <a href="#" class="icon" onclick="verificarAuthENavegar('/favoritos')" data-tooltip="Favoritos">
+                <i class="far fa-heart"></i>
+            </a>
+            <a href="#" class="icon chat-icon" onclick="verificarAuthENavegar('/chat')" data-tooltip="Chat">
+                <i class="far fa-comment"></i>
+                <span class="chat-count">3</span>
+            </a>
+            <a href="#" class="icon" onclick="verificarAuthENavegar('/perfil')" data-tooltip="Perfil">
+                <i class="far fa-user"></i>
+            </a>
+            <div id="areaLogout">
+                <button id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="hamburger" onclick="toggleMenu()">
-        <i class="fas fa-bars" id="menuIcon"></i>
-    </div>
-
-    <div class="icons" id="menuIcons">
-        <a href="#" class="icon" onclick="verificarAuthENavegar('/favoritos')">
-            <i class="far fa-heart"></i>
-        </a>
-        <a href="#" class="icon" onclick="verificarAuthENavegar('/perfil')">
-            <i class="far fa-user"></i>
-        </a>
-        <div id="areaLogout">
-            <button id="btnLogout">
-                <i class="fas fa-sign-out-alt"></i> Sair
+    <div class="sub-navbar">
+        <div class="sub-navbar-container">
+            <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">
+                <i class="fas fa-cogs"></i> Escolha um Plano
+            </button>
+            <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')" class="plan-button">
+                <i class="fas fa-plus"></i> Anunciar Produto
             </button>
         </div>
     </div>
-</div>
 
-
-<div class="sub-navbar">
-    <div class="sub-navbar-container">
-        <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">
-            <i class="fas fa-cogs"></i> Escolha um Plano
-        </button>
-        <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')" class="plan-button">
-            <i class="fas fa-plus"></i>  Anunciar Produto
-        </button>
-    </div>
-</div>
-
-<script>
-   // Adicionar ao arquivo NavBar.js ou no script da NavBar
-
-document.addEventListener("DOMContentLoaded", function() {
-    // Adiciona funcionalidade ao logo da NavBar
-    const logoHomeLink = document.querySelector('.logo a[href="/Home"]');
-    
-    if (logoHomeLink) {
-        console.log("Logo NavBar encontrado, adicionando listener");
-        
-        logoHomeLink.addEventListener('click', function(e) {
-            // Previne o comportamento padrão do link
-            e.preventDefault();
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const logoHomeLink = document.querySelector('.logo a[href="/Home"]');
             
-            console.log("Clique no logo detectado");
-            
-            // Navega para a Home
-            window.location.href = "/Home";
-            
-            // Tenta carregar os produtos usando a função global (se existir)
-            setTimeout(function() {
-                console.log("Tentando carregar produtos após clique no logo");
-                if (typeof window.carregarProdutosHome === 'function') {
-                    window.carregarProdutosHome();
-                } else {
-                    console.log("Função carregarProdutosHome não está disponível");
-                    // Alternativa: reload da página
-                    window.location.reload();
-                }
-            }, 300);
-        });
-    }
-    
-    // Função para verificar se o usuário está autenticado e navegar
-    function verificarAuthENavegar(destino) {
-        const token = localStorage.getItem("authToken");
-
-        if (!token) {
-            alert("Você precisa estar logado para acessar essa funcionalidade.");
-            window.location.href = "/Login";
-            return;
-        }
-
-        try {
-            // Decodifica o token para verificar expiração
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const agora = Math.floor(Date.now() / 1000);
-
-            if (payload.exp && payload.exp < agora) {
-                alert("Sessão expirada. Faça login novamente.");
-                localStorage.removeItem("authToken");
-                window.location.href = "/Login";
-                return;
+            if (logoHomeLink) {
+                console.log("Logo NavBar encontrado, adicionando listener");
+                
+                logoHomeLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log("Clique no logo detectado");
+                    window.location.href = "/Home";
+                    
+                    setTimeout(function() {
+                        console.log("Tentando carregar produtos após clique no logo");
+                        if (typeof window.carregarProdutosHome === 'function') {
+                            window.carregarProdutosHome();
+                        } else {
+                            console.log("Função carregarProdutosHome não está disponível");
+                            window.location.reload();
+                        }
+                    }, 300);
+                });
             }
+            
+            function verificarAuthENavegar(destino) {
+                const token = localStorage.getItem("authToken");
 
-            // Se o destino for a página de perfil, passa o token na URL
-            if (destino === "/perfil") {
-                // Usando encodeURIComponent para garantir que o token seja transmitido corretamente
-                window.location.href = `${destino}?token=${encodeURIComponent(token)}`;
-            } else {
-                // Para outras páginas, apenas navega normalmente
-                window.location.href = destino;
-            }
-        } catch (e) {
-            console.error("Erro ao processar token:", e);
-            alert("Ocorreu um erro com sua autenticação. Por favor, faça login novamente.");
-            localStorage.removeItem("authToken");
-            window.location.href = "/Login";
-        }
-    }
-
-    // Expõe a função globalmente
-    window.verificarAuthENavegar = verificarAuthENavegar;
-
-    // Função para alternar o menu hambúrguer em dispositivos móveis
-    function toggleMenu() {
-        const menuIcons = document.getElementById("menuIcons");
-        const menuIcon = document.getElementById("menuIcon");
-
-        menuIcons.classList.toggle("show-menu");
-
-        if (menuIcon.classList.contains("fa-bars")) {
-            menuIcon.classList.remove("fa-bars");
-            menuIcon.classList.add("fa-times");
-        } else {
-            menuIcon.classList.remove("fa-times");
-            menuIcon.classList.add("fa-bars");
-        }
-    }
-
-    // Expõe a função globalmente
-    window.toggleMenu = toggleMenu;
-
-    // Função para exibir a mensagem de boas-vindas ao usuário
-    function exibirMensagemUsuario() {
-        const token = localStorage.getItem("authToken");
-        const welcomeEl = document.getElementById("welcomeMessage");
-        const logoutBtn = document.getElementById("btnLogout");
-        const areaLogout = document.getElementById("areaLogout");
-
-        if (token) {
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                if (payload.nome && welcomeEl) {
-                    welcomeEl.textContent = `Olá, ${payload.nome}`;
+                if (!token) {
+                    alert("Você precisa estar logado para acessar essa funcionalidade.");
+                    window.location.href = "/Login";
+                    return;
                 }
 
-                if (logoutBtn) {
-                    areaLogout.style.display = "inline-block";
-                    logoutBtn.onclick = () => {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const agora = Math.floor(Date.now() / 1000);
+
+                    if (payload.exp && payload.exp < agora) {
+                        alert("Sessão expirada. Faça login novamente.");
                         localStorage.removeItem("authToken");
-                        alert("Você foi desconectado com sucesso!");
                         window.location.href = "/Login";
-                    };
-                }
-            } catch (e) {
-                console.error("Erro ao processar token:", e);
-                if (welcomeEl) welcomeEl.textContent = "Visitante";
-                if (areaLogout) areaLogout.style.display = "none";
-            }
-        } else {
-            if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
-            if (areaLogout) areaLogout.style.display = "none";
-        }
-    }
+                        return;
+                    }
 
-    // Chama a função para exibir a mensagem de boas-vindas ao carregar a página
-    exibirMensagemUsuario();
-});
-</script>
+                    if (destino === "/perfil") {
+                        window.location.href = `${destino}?token=${encodeURIComponent(token)}`;
+                    } else {
+                        window.location.href = destino;
+                    }
+                } catch (e) {
+                    console.error("Erro ao processar token:", e);
+                    alert("Ocorreu um erro com sua autenticação. Por favor, faça login novamente.");
+                    localStorage.removeItem("authToken");
+                    window.location.href = "/Login";
+                }
+            }
+
+            window.verificarAuthENavegar = verificarAuthENavegar;
+
+            function toggleMenu() {
+                const menuIcons = document.getElementById("menuIcons");
+                const menuIcon = document.getElementById("menuIcon");
+
+                menuIcons.classList.toggle("show-menu");
+
+                if (menuIcon.classList.contains("fa-bars")) {
+                    menuIcon.classList.remove("fa-bars");
+                    menuIcon.classList.add("fa-times");
+                } else {
+                    menuIcon.classList.remove("fa-times");
+                    menuIcon.classList.add("fa-bars");
+                }
+            }
+
+            window.toggleMenu = toggleMenu;
+
+            function exibirMensagemUsuario() {
+                const token = localStorage.getItem("authToken");
+                const welcomeEl = document.getElementById("welcomeMessage");
+                const logoutBtn = document.getElementById("btnLogout");
+                const areaLogout = document.getElementById("areaLogout");
+
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        if (payload.nome && welcomeEl) {
+                            welcomeEl.textContent = `Olá, ${payload.nome}`;
+                        }
+
+                        if (logoutBtn) {
+                            areaLogout.style.display = "inline-block";
+                            logoutBtn.onclick = () => {
+                                localStorage.removeItem("authToken");
+                                alert("Você foi desconectado com sucesso!");
+                                window.location.href = "/Login";
+                            };
+                        }
+                    } catch (e) {
+                        console.error("Erro ao processar token:", e);
+                        if (welcomeEl) welcomeEl.textContent = "Visitante";
+                        if (areaLogout) areaLogout.style.display = "none";
+                    }
+                } else {
+                    if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
+                    if (areaLogout) areaLogout.style.display = "none";
+                }
+            }
+
+            exibirMensagemUsuario();
+        });
+    </script>
+</body>
+</html>
