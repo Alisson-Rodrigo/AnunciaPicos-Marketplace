@@ -1,0 +1,473 @@
+
+@page "/chat"
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Picos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --light-bg: #f8f9fa;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --text-muted: #6c757d;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .chat-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar {
+            width: 30%;
+            max-width: 350px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+        #conversationsList {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .conversation-item {
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        .conversation-item:hover {
+            background-color: #f1f1f1;
+        }
+        .conversation-item.active {
+            background-color: #e0eafc;
+            border-right: 3px solid var(--primary-color);
+        }
+        .conversation-title {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .conversation-preview {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chatTitle {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        #status {
+            font-size: 0.8rem;
+        }
+        #chatMessages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            max-width: 70%;
+            padding: 0.5rem 1rem;
+            border-radius: 1.25rem;
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+        }
+        .message.sent {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .message.received {
+            background-color: #e9ecef;
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        #messageInput {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 2rem;
+            margin-right: 0.5rem;
+        }
+        #messageInput:disabled {
+            background-color: #e9ecef;
+        }
+        #sendButton {
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        #sendButton:disabled {
+            background-color: var(--secondary-color);
+            cursor: not-allowed;
+        }
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            color: var(--text-muted);
+        }
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <aside class="sidebar">
+            <header class="sidebar-header">Conversas</header>
+            <div id="conversationsList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔄</div>
+                    <h3>Carregando...</h3>
+                </div>
+            </div>
+        </aside>
+        <main class="main-chat">
+            <header class="chat-header">
+                <div id="chatTitle">Selecione uma conversa</div>
+                <div id="status"></div>
+            </header>
+            <div id="chatMessages">
+                <div class="empty-state">
+                    <div class="empty-state-icon">👈</div>
+                    <h3>Nenhuma conversa selecionada</h3>
+                    <p>Escolha uma conversa na lista ao lado.</p>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Selecione uma conversa..." disabled>
+                <button id="sendButton" disabled>➤</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- VARIÁVEIS DE ESTADO ---
+        let conversations = [];
+        let activeConversation = null;
+        let currentUser = null;
+        let signalRConnection = null;
+
+        // --- SELETORES DE DOM ---
+        const conversationsListEl = document.getElementById('conversationsList');
+        const chatTitleEl = document.getElementById('chatTitle');
+        const statusEl = document.getElementById('status');
+        const chatMessagesEl = document.getElementById('chatMessages');
+        const messageInputEl = document.getElementById('messageInput');
+        const sendButtonEl = document.getElementById('sendButton');
+
+        // --- FUNÇÕES AUXILIARES ---
+        const getUrlParams = () => {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                userId: params.get('userId') || params.get('recipientId'),
+                userName: params.get('userName') || params.get('recipientName'),
+                conversationId: params.get('conversationId'),
+            };
+        };
+
+        const parseJwt = (token) => {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error("Erro ao decodificar token:", e);
+                return null;
+            }
+        };
+
+        const fetchWithAuth = async (url, options = {}) => {
+            const token = localStorage.getItem('authToken');
+            if (!token) throw new Error("Usuário não autenticado");
+            return fetch(url, {
+                ...options,
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers }
+            });
+        };
+        
+        // --- FUNÇÕES DE RENDERIZAÇÃO ---
+        const renderConversations = () => {
+            conversationsListEl.innerHTML = '';
+            if (!conversations.length) {
+                conversationsListEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><h3>Nenhuma conversa</h3><p>Inicie uma nova conversa.</p></div>`;
+                return;
+            }
+            conversations.forEach(conv => {
+                const convId = conv.conversationId || conv.id;
+                const displayName = conv.otherUserName || conv.participantName || `Conversa`;
+                const item = document.createElement('div');
+                item.className = 'conversation-item';
+                item.dataset.conversationId = convId;
+                if (activeConversation && (activeConversation.conversationId === convId)) {
+                    item.classList.add('active');
+                }
+                item.innerHTML = `<div class="conversation-title">${displayName}</div><div class="conversation-preview">${conv.lastMessage || '...'}</div>`;
+                item.onclick = () => selectConversation(conv);
+                conversationsListEl.appendChild(item);
+            });
+        };
+
+        const renderMessages = (messages) => {
+            chatMessagesEl.innerHTML = '';
+            if (!messages || !messages.length) {
+                chatMessagesEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💬</div><h3>Comece a conversa!</h3><p>Seja o primeiro a enviar uma mensagem.</p></div>`;
+                return;
+            }
+            messages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.classList.add('message');
+                // CORREÇÃO: Usar a claim 'sid' para o ID do usuário.
+                msgDiv.classList.add(msg.senderId === currentUser.id ? 'sent' : 'received');
+                msgDiv.textContent = msg.message;
+                chatMessagesEl.appendChild(msgDiv);
+            });
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        };
+
+        // --- LÓGICA PRINCIPAL ---
+        const selectConversation = async (conversation) => {
+            if (!conversation) return;
+            activeConversation = conversation;
+            
+            // Atualiza a UI
+            chatTitleEl.textContent = conversation.otherUserName || conversation.participantName || "Chat";
+            document.querySelectorAll('.conversation-item').forEach(el => el.classList.remove('active'));
+            const activeEl = document.querySelector(`[data-conversation-id="${conversation.conversationId}"]`);
+            if (activeEl) activeEl.classList.add('active');
+
+            messageInputEl.disabled = false;
+            sendButtonEl.disabled = false;
+            messageInputEl.placeholder = "Digite uma mensagem...";
+
+            // Atualiza a URL sem recarregar a página
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('conversationId', conversation.conversationId);
+            newUrl.searchParams.delete('userId'); // Limpa params antigos
+            newUrl.searchParams.delete('recipientId');
+            window.history.pushState({}, '', newUrl);
+
+            // Entra na sala do SignalR
+            if (signalRConnection && signalRConnection.state === 'Connected' && conversation.conversationId) {
+                 await signalRConnection.invoke('JoinConversation', conversation.conversationId);
+            }
+            
+            // Carrega o histórico de mensagens
+            try {
+                if (conversation.conversationId) { // Só carrega se a conversa já existe no banco
+                    statusEl.textContent = "Carregando...";
+                    const res = await fetchWithAuth(`https://api.anunciapicos.shop/message/history/${conversation.conversationId}`);
+                    const messages = await res.json();
+                    renderMessages(messages);
+                    statusEl.textContent = "Online";
+                } else { // Conversa "virtual" que ainda não foi criada
+                    renderMessages([]);
+                    statusEl.textContent = "Pronto para enviar";
+                }
+            } catch (error) {
+                console.error("Erro ao carregar mensagens:", error);
+                statusEl.textContent = "Erro ao carregar";
+            }
+        };
+
+        const sendMessage = async () => {
+            const messageText = messageInputEl.value.trim();
+            if (!messageText || !activeConversation) return;
+
+            // Bloqueia o input para evitar envios duplicados
+            messageInputEl.disabled = true;
+            sendButtonEl.disabled = true;
+            
+            try {
+                // A API /send é inteligente: se conversationId for nulo, ela cria uma nova
+                // conversa com base no receiverId.
+                const payload = {
+                    message: messageText,
+                    receiverId: activeConversation.otherUserId, // ID do outro usuário
+                    conversationId: activeConversation.conversationId || null // Envia o ID se já existir
+                };
+                
+                await fetchWithAuth('https://api.anunciapicos.shop/message/send', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                messageInputEl.value = '';
+
+            } catch (error) {
+                console.error("Erro ao enviar mensagem:", error);
+                statusEl.textContent = "Falha no envio";
+            } finally {
+                // Reabilita o input
+                messageInputEl.disabled = false;
+                sendButtonEl.disabled = false;
+                messageInputEl.focus();
+            }
+        };
+
+        // --- INICIALIZAÇÃO E SIGNALR ---
+        const startSignalRConnection = async () => {
+            try {
+                const token = localStorage.getItem('authToken');
+                signalRConnection = new signalR.HubConnectionBuilder()
+                    .withUrl("https://api.anunciapicos.shop/chathub", {
+                        accessTokenFactory: () => token
+                    })
+                    .withAutomaticReconnect()
+                    .build();
+
+                // Listener para novas mensagens
+                signalRConnection.on("ReceiveMessage", (message) => {
+                    // Se a mensagem for da conversa ativa, adiciona à tela
+                    if (activeConversation && message.conversationId === activeConversation.conversationId) {
+                         const msgDiv = document.createElement('div');
+                         msgDiv.classList.add('message');
+                         msgDiv.classList.add(message.senderId === currentUser.id ? 'sent' : 'received');
+                         msgDiv.textContent = message.message;
+                         chatMessagesEl.appendChild(msgDiv);
+                         chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+                    }
+                    
+                    // Atualiza a lista de conversas para refletir a nova "última mensagem"
+                    loadInitialData(false); // `false` para não tentar selecionar de novo
+                });
+
+                await signalRConnection.start();
+                statusEl.textContent = "Conectado";
+                statusEl.style.color = 'var(--success-color)';
+
+            } catch (error) {
+                console.error("Falha na conexão com SignalR:", error);
+                statusEl.textContent = "Desconectado";
+                statusEl.style.color = 'var(--danger-color)';
+            }
+        };
+
+        const loadInitialData = async (shouldAutoSelect = true) => {
+            try {
+                const res = await fetchWithAuth('https://api.anunciapicos.shop/message/conversations');
+                conversations = await res.json();
+                
+                if (!shouldAutoSelect) {
+                    renderConversations();
+                    return;
+                }
+
+                const params = getUrlParams();
+
+                // Cenário 1: URL tem userId para criar/abrir uma conversa
+                if (params.userId) {
+                    let targetConv = conversations.find(c => c.otherUserId === params.userId);
+                    if (targetConv) {
+                        // Conversa já existe, vamos selecioná-la
+                        selectConversation(targetConv);
+                    } else {
+                        // Conversa não existe, cria uma "virtual" para a UI
+                        const virtualConv = {
+                            conversationId: null, // Ainda não existe no DB
+                            otherUserId: params.userId,
+                            otherUserName: params.userName || `Usuário ${params.userId.substring(0,4)}...`,
+                            lastMessage: "Inicie a conversa"
+                        };
+                        conversations.unshift(virtualConv); // Adiciona no topo da lista
+                        selectConversation(virtualConv);
+                    }
+                } 
+                // Cenário 2: URL tem conversationId para abrir uma conversa existente
+                else if (params.conversationId) {
+                    const targetConv = conversations.find(c => c.conversationId === params.conversationId);
+                    if (targetConv) selectConversation(targetConv);
+                }
+
+                renderConversations();
+
+            } catch (error) {
+                console.error("Erro ao carregar dados iniciais:", error);
+                conversationsListEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Erro ao carregar</h3><p>${error.message}</p></div>`;
+            }
+        };
+        
+        const initializeApp = async () => {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                document.body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🚫</div><h3>Não autenticado</h3><p>Faça login para acessar o chat.</p></div>`;
+                return;
+            }
+            const payload = parseJwt(token);
+            // CORREÇÃO: Usar a claim 'sid' que o ASP.NET Identity usa por padrão
+            currentUser = { id: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid'], name: payload.sub };
+
+            await loadInitialData();
+            await startSignalRConnection();
+
+            sendButtonEl.onclick = sendMessage;
+            messageInputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        };
+
+        initializeApp();
+    });
+    </script>
+</body>
+</html>

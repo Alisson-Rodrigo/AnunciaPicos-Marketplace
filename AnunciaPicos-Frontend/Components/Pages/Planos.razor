@@ -58,7 +58,7 @@
         });
 
         try {
-            const resposta = await fetch(`https://api.anunciapicos.shop/api/PlanPayments/checkout/${idPlano}`, {
+            const resposta = await fetch(`https://api.anunciapicos.shop/plan/checkout/${idPlano}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
