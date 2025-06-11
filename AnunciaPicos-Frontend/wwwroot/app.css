@@ -1522,3 +1522,20 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #6a59d4, #8b7aff);
 }
+
+
+ @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
