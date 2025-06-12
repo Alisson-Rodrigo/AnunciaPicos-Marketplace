@@ -496,8 +496,8 @@ let mensagensCarregadas = new Set(); // Para evitar duplicatas
 let currentUserId = null; // ID do usuário logado
 
 // Configuração de tempo real
-const POLLING_INTERVAL = 3000; // 5 segundos
-const CONVERSATIONS_REFRESH_INTERVAL = 1000; // 15 segundos
+const POLLING_INTERVAL = 1000; // 5 segundos
+const CONVERSATIONS_REFRESH_INTERVAL = 100; // 15 segundos
 
 // Função para obter receiverId da URL
 function getReceiverIdFromUrl() {
@@ -627,17 +627,18 @@ async function enviarMensagem(receiverId, mensagem, isNovaConversa = false) {
         console.log('Mensagem enviada:', resultado);
 
         if (!isNovaConversa) {
-            // Só adicionar mensagem local se não estiver duplicada
-            const timestamp = new Date();
-            const msgId = `msg_sent_${timestamp.getTime()}_${Math.random().toString(36).substr(2, 9)}`;
-            
-            // Verificar se a mensagem já foi adicionada
-            if (!mensagensCarregadas.has(msgId)) {
-                mensagensCarregadas.add(msgId);
-                adicionarMensagemAoChat(mensagem, true, timestamp, msgId);
-                lastMessageTimestamp = timestamp.toISOString();
-            }
-        }
+    // Só adicionar mensagem local se não estiver duplicada
+    const timestamp = new Date();
+    const msgId = `msg_sent_${timestamp.getTime()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Verificar se a mensagem já foi adicionada
+    if (!mensagensCarregadas.has(msgId)) {
+        mensagensCarregadas.add(msgId);
+        // ✅ CORRIGIDO: Não marca como lida automaticamente
+        adicionarMensagemAoChat(mensagem, true, timestamp, msgId, false); // false = não lida
+        lastMessageTimestamp = timestamp.toISOString();
+    }
+}
 
         return resultado;
 
@@ -672,8 +673,8 @@ function isMensagemDoUsuarioLogado(mensagem) {
 }
 
 // Função para adicionar mensagem ao chat visualmente (MELHORADA CONTRA DUPLICATAS)
-function adicionarMensagemAoChat(mensagem, isFromMe, timestamp = new Date(), msgId = null) {
-    const messagesContainer = document.getElementById('messagesContainer');
+function adicionarMensagemAoChat(mensagem, isFromMe, timestamp = new Date(), msgId = null, isRead = null) {
+        const messagesContainer = document.getElementById('messagesContainer');
     if (!messagesContainer) return;
     
     // Gerar ID se não fornecido
@@ -734,9 +735,9 @@ divMsg.style.cssText = `
 // Adicionar atributo para identificar mensagens do usuário
 if (isFromMe) {
     divMsg.setAttribute('data-is-from-me', 'true');
-    // Adicionar indicador de leitura (inicialmente como não lida)
+    // ✅ CORRIGIDO: Usar status real da mensagem
     const timestampContainer = divMsg.querySelector('.timestamp-container');
-    const indicador = adicionarIndicadorLeitura(divMsg, true, false);
+    const indicador = adicionarIndicadorLeitura(divMsg, true, isRead);
     if (indicador && timestampContainer) {
         timestampContainer.appendChild(indicador);
     }
@@ -796,9 +797,12 @@ async function verificarNovasMensagens() {
             }
 
             // Só adicionar se realmente não existir
-            if (!mensagensCarregadas.has(msgId) && !document.querySelector(`[data-msg-id="${msgId}"]`)) {
-                adicionarMensagemAoChat(textoMsg, isFromMe, dataMsg, msgId);
-            }
+           // Só adicionar se realmente não existir
+if (!mensagensCarregadas.has(msgId) && !document.querySelector(`[data-msg-id="${msgId}"]`)) {
+    // ✅ CORRIGIDO: Usar status real de leitura
+    const isRead = msg.isRead || msg.IsRead || false;
+    adicionarMensagemAoChat(textoMsg, isFromMe, dataMsg, msgId, isRead);
+}
         });
 
         // Atualizar timestamp da última mensagem se houver mensagens
@@ -987,7 +991,9 @@ function exibirMensagens(mensagens) {
             msgId = `msg_${dataMsg.getTime()}_${isFromMe ? 'me' : 'other'}_${textoMsg.slice(0, 20).replace(/\s/g, '_')}`;
         }
 
-        adicionarMensagemAoChat(textoMsg, isFromMe, dataMsg, msgId);
+       // ✅ CORRIGIDO: Usar status real de leitura da API
+const isRead = msg.isRead || msg.IsRead || false;
+adicionarMensagemAoChat(textoMsg, isFromMe, dataMsg, msgId, isRead);
     });
 
     // Atualizar timestamp da última mensagem
@@ -995,12 +1001,7 @@ function exibirMensagens(mensagens) {
         const ultimaMensagem = mensagens[mensagens.length - 1];
         lastMessageTimestamp = ultimaMensagem.date || ultimaMensagem.Date || ultimaMensagem.sentAt || ultimaMensagem.SentAt || ultimaMensagem.timestamp || ultimaMensagem.Timestamp;
     }
-    // Marcar todas as mensagens como lidas se a conversa já está ativa
-if (conversaAtual && conversaAtual.conversationId) {
-    setTimeout(() => {
-        atualizarStatusLeituraTodasMensagens(true);
-    }, 500);
-}
+
 }
 
 // Função para selecionar conversa (CORRIGIDA PARA TRATAR ERROS DE JSON)
@@ -1076,7 +1077,7 @@ async function selecionarConversa(conversationId, otherUserName, otherUserProfil
         // Iniciar polling para esta conversa
         iniciarPollingMensagens();
         // Marcar mensagens como lidas quando selecionar a conversa
-await marcarMensagensComoLidas(conversationId);
+
 
     } catch (error) {
         console.error('Erro ao carregar mensagens:', error);
@@ -1180,10 +1181,11 @@ document.addEventListener('visibilitychange', function() {
             pollingInterval = setInterval(verificarNovasMensagens, POLLING_INTERVAL * 2);
         }
     } else {
-        // Página ganhou foco - restaurar frequência normal e marcar como lida
+        // Página ganhou foco - restaurar frequência normal
         if (isPollingActive) {
             iniciarPollingMensagens();
         }
+        // ✅ CORRIGIDO: Só marcar como lida se há mensagens NÃO MINHAS não lidas
         marcarComoLidaQuandoVisivel();
     }
 });
@@ -1270,12 +1272,16 @@ async function marcarMensagensComoLidas(conversationId) {
 }
 
 // Função para marcar como lida quando a conversa ganha foco
+// Função para marcar como lida quando a conversa ganha foco
 function marcarComoLidaQuandoVisivel() {
     if (conversaAtual && conversaAtual.conversationId && !document.hidden) {
-        marcarMensagensComoLidas(conversaAtual.conversationId);
+        // ✅ CORRIGIDO: Só marcar se há mensagens de OUTROS usuários
+        const mensagensDeOutros = document.querySelectorAll('[data-is-from-me="false"]');
+        if (mensagensDeOutros.length > 0) {
+            marcarMensagensComoLidas(conversaAtual.conversationId);
+        }
     }
 }
-
 // Função para adicionar indicador de leitura nas mensagens
 function adicionarIndicadorLeitura(divMsg, isFromMe, isRead = false) {
     if (!isFromMe) return; // Só mostrar indicador nas mensagens enviadas por mim
