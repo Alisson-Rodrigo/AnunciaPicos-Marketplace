@@ -70,6 +70,15 @@ namespace AnunciaPicos.Shared.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Chat not found, retry request..
+        /// </summary>
+        public static string CHAT_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("CHAT_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Conversation not exists..
         /// </summary>
         public static string CONVERSATION_NOT_EXISTS {
