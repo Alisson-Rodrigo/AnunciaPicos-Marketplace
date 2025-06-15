@@ -199,6 +199,16 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
+//Proteção de CSP 
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("Content-Security-Policy",
+        "default-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self';");
+
+    await next();
+});
+
+
 // Configura��o do Swagger no ambiente de desenvolvimento
 if (app.Environment.IsDevelopment())
 {
