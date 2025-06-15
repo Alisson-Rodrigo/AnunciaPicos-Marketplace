@@ -14,7 +14,6 @@
             <div class="sidebar-menu">
                 <div class="profile-image-container">
                     <div class="edit-image-overlay" id="edit-image-overlay">
-                        <button class="edit-image-btn" onclick="selecionarImagem()">Editar</button>
                         <input type="file" id="input-imagem" style="display: none;" accept="image/*" />
                     </div>
                 </div>
@@ -78,7 +77,14 @@
 
                         <div class="form-group">
                             <label for="input-imagem-edicao">Nova imagem de perfil</label>
-                            <input type="file" id="input-imagem-edicao" accept="image/*" />
+                            <div class="image-upload-container">
+                                <input type="file" id="input-imagem-edicao" accept="image/*" onchange="mostrarPreviewImagem(this)" />
+                                <div id="preview-text">Prévia da imagem:</div>
+                                <div id="image-preview-container" class="image-preview">
+                                    <img id="image-preview" src="" alt="Prévia da imagem" style="display: none;" />
+                                    <div id="preview-placeholder">Selecione uma imagem para ver a prévia</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-actions">
@@ -98,11 +104,169 @@
 </body>
 <Footer />
 
+<style>
+    /* Estilo para o container de prévia de imagem */
+    .image-upload-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    #preview-text {
+        font-weight: bold;
+        margin-top: 15px;
+        color: #333;
+    }
+    
+    .image-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 2px dashed #ccc;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background-color: #f9f9f9;
+        margin: 5px 0;
+    }
+    
+    #image-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    #preview-placeholder {
+        font-size: 14px;
+        color: #888;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    /* Estilos para a tabela de produtos */
+    .produtos-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+    }
+    
+    .produtos-table th {
+        background-color: #f9f9f9;
+        color: #555;
+        font-weight: 600;
+        text-align: left;
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .produtos-table td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+    
+    .produto-info-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .produto-thumb {
+        width: 60px;
+        height: 60px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .produto-thumb img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .produto-sem-imagem {
+        width: 60px;
+        height: 60px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .produto-detalhes h4 {
+        margin: 0 0 5px 0;
+        font-size: 14px;
+    }
+    
+    .produto-desc {
+        margin: 0;
+        font-size: 12px;
+        color: #777;
+    }
+    
+    .preco-col {
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .botoes-acao {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-editar {
+        background-color: #f59f42;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+    
+    .btn-deletar {
+        background-color: white;
+        color: #888;
+        border: 1px solid #ddd;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-editar:hover {
+        background-color: #e67e22;
+    }
+    
+    .btn-deletar:hover {
+        background-color: #f5f5f5;
+    }
+</style>
+
 <script>
 let dadosUsuario = {};
 let produtosDoUsuario = [];
+let userId = null;
 
-document.addEventListener("DOMContentLoaded", carregarPerfil);
+document.addEventListener("DOMContentLoaded", function() {
+    carregarPerfil();
+    
+    // Adicionar listener para o input de imagem na edição de perfil
+    const inputImagem = document.getElementById("input-imagem-edicao");
+    if (inputImagem) {
+        inputImagem.addEventListener("change", function() {
+            mostrarPreviewImagem(this);
+        });
+    }
+});
 
 async function carregarPerfil() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -121,10 +285,13 @@ async function carregarPerfil() {
         const data = await response.json();
         dadosUsuario = data;
         produtosDoUsuario = data.products || [];
+        userId = data.id;
+
+        // Salva token no localStorage para próxima navegação
+        localStorage.setItem("authToken", token);
 
         atualizarDadosInterface(data);
         carregarProdutos();
-
     } catch (error) {
         console.error("Erro ao carregar perfil:", error);
     }
@@ -151,42 +318,87 @@ function atualizarDadosInterface(data) {
         img.src = data.imageProfile;
         img.alt = "Imagem de perfil";
         Object.assign(img.style, {
-            width: "100%", height: "100%",
-            borderRadius: "50%", objectFit: "cover",
-            position: "absolute", top: "0", left: "0"
+            width: "100%",
+            height: "100%",
+            borderRadius: "50%",
+            objectFit: "cover",
+            position: "absolute",
+            top: "0",
+            left: "0"
         });
-        container.appendChild(img);  // Adiciona a imagem
+        container.appendChild(img);
 
         const overlay = document.getElementById("edit-image-overlay");
-        if (overlay) { // Verifica se o overlay existe
-            // Remove o overlay anterior, se houver
-            if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
-            }
-            container.appendChild(overlay);  // Adiciona o overlay novamente
+        if (overlay) {
+            // Remove o overlay anterior, se houver, e adiciona novamente
+            overlay.remove();
+            container.appendChild(overlay);
         }
+    }
+    
+    // Resetar a prévia da imagem ao carregar o perfil
+    resetarPreviewImagem();
+}
+
+// Função para mostrar prévia da imagem selecionada
+function mostrarPreviewImagem(input) {
+    const previewImg = document.getElementById("image-preview");
+    const placeholder = document.getElementById("preview-placeholder");
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = "block";
+            if (placeholder) placeholder.style.display = "none";
+            
+            // Garantir que o container de preview fique visível
+            const previewContainer = document.getElementById("image-preview-container");
+            if (previewContainer) {
+                previewContainer.style.display = "flex";
+            }
+            
+            console.log("Prévia da imagem atualizada:", e.target.result.substring(0, 50) + "...");
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        resetarPreviewImagem();
     }
 }
 
+// Função para resetar a prévia da imagem
+function resetarPreviewImagem() {
+    const previewImg = document.getElementById("image-preview");
+    const placeholder = document.getElementById("preview-placeholder");
+    
+    if (previewImg) {
+        previewImg.src = "";
+        previewImg.style.display = "none";
+    }
+    
+    if (placeholder) {
+        placeholder.style.display = "block";
+    }
+    
+    console.log("Preview da imagem resetado");
+}
 
 async function carregarProdutos() {
     const lista = document.getElementById("lista-produtos");
     lista.innerHTML = "";
 
-    // Recuperando o token JWT do localStorage ou da URL
-    const token = localStorage.getItem("token") || new URLSearchParams(window.location.search).get("token");
-
+    // Recuperando o token JWT do localStorage
+    const token = localStorage.getItem("authToken");
     if (!token) {
         console.error("Token não encontrado.");
         return;
     }
 
-    // ID do usuário fixo
-    const userId = 12;
-
     try {
-        // Realizando a requisição para obter os produtos
-        const response = await fetch(`https://api.anunciapicos.shop/product/busca/produtos?userId=${userId}`, {
+        // Requisição para obter os produtos do usuário
+        const response = await fetch(`https://api.anunciapicos.shop/product/search/products?userId=${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -194,7 +406,6 @@ async function carregarProdutos() {
             }
         });
 
-        // Verificar o status da resposta da API
         if (!response.ok) {
             console.error("Erro na resposta da API:", response.status);
             lista.innerHTML = "<p class='error'>Erro ao carregar produtos. Tente novamente mais tarde.</p>";
@@ -202,15 +413,10 @@ async function carregarProdutos() {
         }
 
         const data = await response.json();
-        
-        // Log para verificar a estrutura de dados recebida
         console.log("Resposta da API:", data);
 
-        // Verifique se a resposta contém itens de produtos ou dados
         const produtos = data.items || [];
-
         if (produtos.length === 0) {
-            console.log("Nenhum produto encontrado para o usuário com ID:", userId);
             lista.innerHTML = "<p class='no-products'>Você ainda não tem produtos cadastrados.</p>";
             return;
         }
@@ -263,135 +469,18 @@ async function carregarProdutos() {
                 </div>
             `;
             
-            // Adiciona as colunas à linha
             tr.appendChild(tdProduto);
             tr.appendChild(tdPreco);
             tr.appendChild(tdAcoes);
-            
-            // Adiciona a linha ao corpo da tabela
             tbody.appendChild(tr);
         });
         
         table.appendChild(tbody);
         lista.appendChild(table);
-
-        // Adiciona CSS para a nova tabela
-        adicionarCSS();
-
     } catch (error) {
         console.error("Erro ao carregar produtos:", error);
         lista.innerHTML = "<p class='error'>Erro ao carregar produtos. Tente novamente mais tarde.</p>";
     }
-}
-
-// Função para adicionar o CSS necessário
-function adicionarCSS() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .produtos-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-        }
-        
-        .produtos-table th {
-            background-color: #f9f9f9;
-            color: #555;
-            font-weight: 600;
-            text-align: left;
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .produtos-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-        
-        .produto-info-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .produto-thumb {
-            width: 60px;
-            height: 60px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .produto-thumb img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        
-        .produto-sem-imagem {
-            width: 60px;
-            height: 60px;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .produto-detalhes h4 {
-            margin: 0 0 5px 0;
-            font-size: 14px;
-        }
-        
-        .produto-desc {
-            margin: 0;
-            font-size: 12px;
-            color: #777;
-        }
-        
-        .preco-col {
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .botoes-acao {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .btn-editar {
-            background-color: #f59f42;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-            border-radius: 4px;
-        }
-        
-        .btn-deletar {
-            background-color: white;
-            color: #888;
-            border: 1px solid #ddd;
-            padding: 8px;
-            cursor: pointer;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-editar:hover {
-            background-color: #e67e22;
-        }
-        
-        .btn-deletar:hover {
-            background-color: #f5f5f5;
-        }
-    `;
-    document.head.appendChild(style);
 }
 
 function trocarSecao(secaoId) {
@@ -399,10 +488,6 @@ function trocarSecao(secaoId) {
     document.querySelector(`.menu-item[data-section="${secaoId}"]`).classList.add('active');
     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
     document.getElementById(`${secaoId}-section`).classList.add('active');
-}
-
-function selecionarImagem() {
-    document.getElementById("input-imagem-edicao").click();
 }
 
 function cancelarEdicao() {
@@ -415,9 +500,7 @@ async function salvarAlteracoes() {
     const telefone = document.getElementById("phone").value;
     const email = document.getElementById("email-text").value;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-
+    const token = localStorage.getItem("authToken");
     const formData = new FormData();
     formData.append("name", nome);
     formData.append("email", email);
@@ -443,7 +526,6 @@ async function salvarAlteracoes() {
         alert("Alterações salvas com sucesso!");
         await carregarPerfil();
         trocarSecao('perfil');
-
     } catch (error) {
         console.error("Erro detalhado:", error);
         alert("Falha ao salvar alterações: " + error.message);
@@ -456,5 +538,27 @@ function decodeJwt(token) {
     return JSON.parse(decoded);
 }
 
+// Redireciona para a página de edição de produto, passando o ID por query string
+function editarProduto(produtoId) {
+    window.location.href = `/editarproduto?id=${produtoId}`;
+}
 
+// Função de exclusão usando /product/delete-product/{id}
+async function deletarProduto(produtoId) {
+    if (!confirm("Tem certeza que deseja deletar este produto?")) return;
+
+    const token = localStorage.getItem("authToken");
+    try {
+        const response = await fetch(`https://api.anunciapicos.shop/product/delete-product/${produtoId}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        alert("Produto deletado com sucesso!");
+        carregarProdutos();
+    } catch (error) {
+        console.error("Erro ao deletar produto:", error);
+        alert("Falha ao deletar produto: " + error.message);
+    }
+}
 </script>

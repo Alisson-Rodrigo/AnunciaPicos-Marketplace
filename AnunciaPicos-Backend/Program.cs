@@ -46,6 +46,7 @@ using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Delete;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register;
 using AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Get;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
+using AnunciaPicos.Backend.Aplicattion.UseCases.Auth.AuthFacebook;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,13 +60,15 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3001")  // Coloque a URL do seu frontend aqui
               .WithOrigins("http://localhost:3000")
+              .WithOrigins("http://localhost:5173")
+              .WithOrigins("http://localhost:5174")
               .WithOrigins("http://localhost:63789")
               .WithOrigins("http://localhost:5222")
               .WithOrigins("https://anunciapicos.shop")
               .WithOrigins("http://anunciapicos.shop")
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials();  // Permitir cookies/autenticação com credenciais
+              .AllowCredentials();  // Permitir cookies/autenticaï¿½ï¿½o com credenciais
     });
 });
 
@@ -79,7 +82,7 @@ builder.Services.AddOpenApiDocument(config =>
     config.Title = "AnunciaPicos API";
     config.Version = "v1";
 
-    // Configuração do token JWT no Swagger
+    // Configuraï¿½ï¿½o do token JWT no Swagger
     config.AddSecurity("Bearer", new OpenApiSecurityScheme
     {
         Type = OpenApiSecuritySchemeType.Http,
@@ -141,33 +144,53 @@ builder.Services.AddScoped<IRegisterFavoriteUseCase, RegisterFavoriteUseCase>();
 builder.Services.AddScoped<IDeleteFavoriteUseCase, DeleteFavoriteUseCase>();
 builder.Services.AddScoped<IGetFavoriteUseCase, GetFavoriteUseCase>();
 builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+builder.Services.AddScoped<IFacebookLoginUseCase, FacebookLoginUseCase>();
 builder.Services.AddScoped<GetTokenRequest>();
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings.GetValue<string>("SecretKey");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// Adiciona os serviÃ§os de autenticaÃ§Ã£o ao contÃªiner.
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
-            ValidAudience = jwtSettings.GetValue<string>("Audience"),
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
+        ValidAudience = jwtSettings.GetValue<string>("Audience"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+    };
+})
+.AddFacebook(options =>
+{
+    // CORREÃ‡ÃƒO 3: Corrigido o erro de digitaÃ§Ã£o de 'vconfiguration' para 'configuration'
+    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+    options.SaveTokens = true;
+
+    options.Scope.Add("email");
+    options.Scope.Add("public_profile");
+
+    options.Fields.Add("name");
+    options.Fields.Add("email");
+    options.Fields.Add("picture");
+});
 
 // Banco de Dados - MySQL
 string mySqlConnection = builder.Configuration.GetConnectionString("Database")!;
 builder.Services.AddDbContextPool<AnunciaPicosDbContext>(options =>
     options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
 
-// Adicionando filtro global de exceções
+// Adicionando filtro global de exceï¿½ï¿½es
 builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionsFilter)));
 
 builder.Services.AddHostedService<PlanExpiredVerification>();
@@ -176,7 +199,7 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configuração do Swagger no ambiente de desenvolvimento
+// Configuraï¿½ï¿½o do Swagger no ambiente de desenvolvimento
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
@@ -186,29 +209,47 @@ if (app.Environment.IsDevelopment())
         settings.DocumentPath = "/swagger/v1/swagger.json";
     });
 
-    // Redirecionamento para a documentação Swagger
+    // Redirecionamento para a documentaï¿½ï¿½o Swagger
     app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
-// Configuração do diretório de imagens
 
-app.UseStaticFiles(new StaticFileOptions
+
+if (app.Environment.IsDevelopment())
 {
-    FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
-    RequestPath = "/uploads"
-});
+    // Se for Desenvolvimento, usa uma pasta "uploads" dentro do projeto
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
+        RequestPath = "/uploads"
+    });
+}
+else
+{
+    // Para qualquer outro ambiente (ProduÃ§Ã£o, Staging, etc.)
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider("/var/www/anunciapicos/uploads"),
+        RequestPath = "/uploads"
+    });
+}
 
-// Outras configurações
+// Outras configuraï¿½ï¿½es
 app.MapHub<ChatHub>("/chathub");
 app.UseRouting();
 app.UseHttpsRedirection();
+
+// --- CORREÃ‡ÃƒO AQUI ---
+// A polÃ­tica CORS deve ser aplicada aqui
+app.UseCors("AllowSpecificOrigin");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Este UseStaticFiles agora lida apenas com arquivos padrão
-app.UseStaticFiles();  // Serve arquivos estáticos para outros caminhos
+// Este UseStaticFiles agora lida apenas com arquivos padrÃ£o
+app.UseStaticFiles();
 
 app.MapControllers();
-app.UseCors("AllowSpecificOrigin");  // Aplica a política CORS definida
-app.Run();
 
+app.Run();

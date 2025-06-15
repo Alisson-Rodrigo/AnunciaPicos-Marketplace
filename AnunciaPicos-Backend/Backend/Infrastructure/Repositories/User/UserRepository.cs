@@ -65,5 +65,17 @@ namespace AnunciaPicos.Backend.Infrastructure.Repositories.User
             _context.Users.Remove(user);
         }
 
+        public async Task<UserModel?> GetByProviderIdAsync(string provider, string providerId)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Provider == provider && u.ProviderId == providerId);
+        }
+
+        public async Task<UserModel?> GetByEmailAsync(string email)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
     }
 }

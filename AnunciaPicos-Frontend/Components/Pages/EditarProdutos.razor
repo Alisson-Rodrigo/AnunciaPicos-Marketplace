@@ -1,0 +1,285 @@
+@page "/editarproduto"
+<NavBar />
+<div class="container">
+    <h2>Informações do Produto</h2>
+
+    <form id="productForm">
+        <div class="form-group">
+            <label for="productPrice">Preço do produto:</label>
+            <input type="number" step="0.01" id="productPrice" placeholder="R$200..." required />
+        </div>
+
+        <div class="form-group">
+            <label for="productName">Nome do produto:</label>
+            <input type="text" id="productName" placeholder="Digite o nome do produto" required />
+        </div>
+
+        <div class="form-group">
+            <label for="productCategory">Categoria:</label>
+            <select id="productCategory" required>
+                <option value="" disabled selected>Selecione...</option>
+                <!--
+                  As opções abaixo devem corresponder aos valores do enum CategoriesProduct
+                  Exemplo: se CategoriesProduct.Eletronicos == 1, coloque value="1"
+                -->
+                <option value="0">Outros</option>
+                <option value="1">Eletrônicos</option>
+                <option value="2">Móveis</option>
+                <option value="3">Roupas</option>
+                <option value="4">Eletrodomésticos</option>
+                <option value="5">Livros</option>
+                <option value="6">Produtos esportivos</option>
+                <option value="7">Beleza e saúde</option>
+                <option value="8">Brinquedos</option>
+                <option value="9">Automotivo</option>
+                <option value="10">Jardim e exteriores</option>
+                <option value="11">Alimentos e bebidas</option>
+            </select>
+        </div>
+
+        <div class="form-group full-width">
+            <div class="image-upload-container">
+                <p>Imagens cadastradas (apenas para exibição). Para adicionar novas imagens, utilize o endpoint específico de upload.</p>
+                <div id="imagePreview" class="preview-container"></div>
+            </div>
+        </div>
+
+        <div class="form-group full-width additional-info">
+            <h3>Informações adicionais:</h3>
+            <textarea id="productDescription" placeholder="Digite informações específicas sobre seu produto."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Salvar Alterações</button>
+    </form>
+</div>
+<Footer />
+
+<style>
+    .image-upload-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .image-upload-container p {
+        margin: 0;
+        font-size: 14px;
+        color: #333;
+    }
+    .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .preview-container img {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .full-width {
+        width: 100%;
+    }
+    .additional-info textarea {
+        width: 100%;
+        min-height: 100px;
+        resize: vertical;
+        padding: 8px;
+        font-size: 14px;
+    }
+    .submit-btn {
+        background-color: #2d8cf0;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    if (!verificarAutenticacao()) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get("id");
+    if (!productId) {
+        alert("Produto não encontrado.");
+        window.location.href = "/Home";
+        return;
+    }
+
+    const imagePreview = document.getElementById("imagePreview");
+
+    // 1) Carregar dados do produto existente (sem imagens de upload)
+    async function carregarProduto(id) {
+        const token = localStorage.getItem("authToken");
+        try {
+            const response = await fetch(`https://api.anunciapicos.shop/product/view-product/${id}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!response.ok) {
+                alert("Erro ao carregar produto.");
+                return;
+            }
+            const produto = await response.json();
+            console.log("Produto recebido:", produto);
+
+            document.getElementById("productName").value = produto.name || "";
+            document.getElementById("productPrice").value = produto.price || "";
+            document.getElementById("productCategory").value = produto.categories || "";
+            document.getElementById("productDescription").value = produto.description || "";
+
+            // Exibe imagens já cadastradas (array produto.images)
+            const imgs = produto.images || produto.imageUrl || [];
+            imagePreview.innerHTML = "";
+            imgs.forEach(url => {
+                const img = document.createElement("img");
+                img.src = url;
+                img.style.maxWidth = "180px";
+                img.style.maxHeight = "180px";
+                img.style.width = "180px";
+                img.style.height = "180px";
+                img.style.objectFit = "cover";
+                img.onclick = e => { e.preventDefault(); return false; };
+                imagePreview.appendChild(img);
+            });
+        } catch (err) {
+            console.error("Erro ao carregar produto:", err);
+            alert("Ocorreu um erro ao buscar dados do produto.");
+        }
+    }
+    carregarProduto(productId);
+
+    // 2) Submissão do formulário enviando JSON conforme RequestUpdateProductCommunication
+    const productForm = document.getElementById("productForm");
+    productForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        if (!verificarAutenticacao()) return;
+
+        const submitBtn = productForm.querySelector(".submit-btn");
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Enviando...";
+
+        const categoria = document.getElementById("productCategory").value;
+        if (categoria === "") {
+            alert("Por favor, selecione uma categoria");
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Salvar Alterações";
+            return;
+        }
+
+        const token = localStorage.getItem("authToken");
+        const payload = {
+            Name: document.getElementById("productName").value,
+            Description: document.getElementById("productDescription").value,
+            Price: parseFloat(document.getElementById("productPrice").value),
+            Categories: parseInt(categoria, 10)
+        };
+
+        console.log("Enviando payload:", payload);
+
+        try {
+            const response = await fetch(`https://api.anunciapicos.shop/product/update-product/${productId}`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert("Produto atualizado com sucesso!");
+                window.location.href = "/Home";
+            } else {
+                await tratarErro(response);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Salvar Alterações";
+            }
+        } catch (error) {
+            console.error("Erro ao enviar requisição:", error);
+            alert("Erro de conexão: " + error.message);
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Salvar Alterações";
+        }
+    });
+
+    // Extrai e exibe detalhes de erro
+    async function tratarErro(response) {
+        let errorData;
+        try {
+            errorData = await response.json();
+        } catch {
+            const texto = await response.text();
+            try { errorData = JSON.parse(texto); }
+            catch { errorData = { message: texto || "Erro desconhecido" }; }
+        }
+        let msg = `Erro ${response.status} ao atualizar produto:`;
+        if (errorData.errors && errorData.errors.length) {
+            msg += "\n- " + errorData.errors.join("\n- ");
+        } else {
+            msg += "\n" + (errorData.message || "Verifique os dados e tente novamente.");
+        }
+        console.error("Detalhes do erro de API:", { status: response.status, data: errorData });
+        alert(msg);
+    }
+
+    // Verifica token e expiração
+    function verificarAutenticacao() {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("Você precisa estar logado para editar um produto.");
+            window.location.href = "/Login";
+            return false;
+        }
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const agora = Math.floor(Date.now() / 1000);
+            if (payload.exp && payload.exp < agora) {
+                alert("Sua sessão expirou. Faça login novamente.");
+                localStorage.removeItem("authToken");
+                window.location.href = "/Login";
+                return false;
+            }
+            return true;
+        } catch (e) {
+            alert("Erro na autenticação. Faça login novamente.");
+            localStorage.removeItem("authToken");
+            window.location.href = "/Login";
+            return false;
+        }
+    }
+
+    // Ajusta estilo de imagens existentes
+    function limiteDeRedimensionamento() {
+        document.addEventListener("DOMContentLoaded", () => {
+            const imagePreview = document.getElementById("imagePreview");
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    if (mutation.type === 'childList') {
+                        imagePreview.querySelectorAll('img').forEach(img => {
+                            img.style.maxWidth = '180px';
+                            img.style.maxHeight = '180px';
+                            img.style.width = '180px';
+                            img.style.height = '180px';
+                            img.style.objectFit = 'cover';
+                            img.onclick = e => { e.preventDefault(); return false; };
+                        });
+                    }
+                });
+            });
+            observer.observe(imagePreview, { childList: true });
+        });
+    }
+    limiteDeRedimensionamento();
+});
+</script>

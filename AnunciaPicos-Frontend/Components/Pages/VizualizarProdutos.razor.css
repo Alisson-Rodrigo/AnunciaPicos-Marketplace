@@ -485,7 +485,7 @@ body {
 
 
 /* Estado de carregamento */
-.loading {
+    .loading {
     opacity: 0.6;
 }
 

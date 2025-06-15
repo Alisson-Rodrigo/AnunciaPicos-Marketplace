@@ -12,6 +12,7 @@
     justify-content: space-between;
     max-width: 1200px;
     margin: auto;
+    gap: 20px;
 }
 
 .footer-col {
@@ -23,10 +24,12 @@
 .footer h2, .footer h4 {
     color: #a991ff;
     margin-bottom: 15px;
+    font-size: 18px;
 }
 
 .footer p, .footer li {
     margin: 4px 0;
+    line-height: 1.5;
 }
 
 .footer .phone {
@@ -51,4 +54,83 @@
     margin: 4px;
     border-radius: 5px;
     font-size: 13px;
+}
+
+/* Responsividade para Mobile */
+@media screen and (max-width: 768px) {
+    .footer {
+        padding: 30px 15px;
+        text-align: center;
+    }
+    
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    
+    .footer-col {
+        flex: none;
+        width: 100%;
+        max-width: 400px;
+        margin: 0;
+        text-align: center;
+    }
+    
+    .footer h2, .footer h4 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .footer p, .footer li {
+        font-size: 15px;
+        margin: 8px 0;
+    }
+    
+    .footer .tags {
+        text-align: center;
+    }
+    
+    .footer .tags span {
+        margin: 6px 4px;
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .footer {
+        padding: 25px 10px;
+        font-size: 13px;
+    }
+    
+    .footer-col {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+    
+    .footer h2, .footer h4 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    
+    .footer p, .footer li {
+        font-size: 14px;
+        margin: 6px 0;
+    }
+    
+    .footer .tags span {
+        margin: 4px 2px;
+        padding: 6px 10px;
+        font-size: 12px;
+        display: inline-block;
+        width: auto;
+    }
+    
+    /* Melhor espaçamento para links e informações de contato */
+    .footer .phone, .footer .email {
+        display: block;
+        margin: 10px 0;
+        font-size: 15px;
+    }
 }

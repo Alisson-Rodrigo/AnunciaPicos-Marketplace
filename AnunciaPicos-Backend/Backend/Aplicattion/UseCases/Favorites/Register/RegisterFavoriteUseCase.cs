@@ -2,6 +2,8 @@
 using AnunciaPicos.Backend.Infrastructure.Models;
 using AnunciaPicos.Backend.Infrastructure.Repositories.Favorite;
 using AnunciaPicos.Backend.Infrastructure.Repositories.SaveChanges;
+using AnunciaPicos.Exceptions.ExceptionBase;
+using AnunciaPicos.Shared.Exceptions;
 
 namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register
 {
@@ -18,7 +20,20 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Favorites.Register
         }
         public async Task Execute(int productId)
         {
-            var user = _logged.UserLogged();
+            var user = await _logged.UserLogged();
+
+            if (user == null)
+            {
+                throw new AnunciaPicosExceptions(ResourceMessagesException.USER_WITHOUT_PERMISSION_ACCESS_RESOURCE);
+            }
+
+            var favoriteExists = await _favoriteRepository.GetFavoriteByUserIdAndProductId(user.Id, productId);
+
+            if (favoriteExists != null)
+            {
+                throw new AnunciaPicosExceptions("Produto já favoritado.");
+            }
+
             var favorite = new FavoriteModel
             {
                 UserId = user.Id,

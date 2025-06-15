@@ -81,9 +81,10 @@
 
         <div class="grid-produtos" id="produtosContainer"></div>
 
-        <div id="paginacaoBusca"></div>
-        <div id="paginacao"></div>
+     
     </main>
+     <div id="paginacaoBusca"></div>
+    <div id="paginacao"></div>
 </div>
 
 <Footer /> 
@@ -160,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Função para carregar os produtos
     let todosProdutos = [], produtosBusca = [];
     let paginaAtual = 1;
-    const produtosPorPagina = 6;
+    const produtosPorPagina = 12;
     let buscandoProdutos = false;
 
     function exibirPagina(pagina, lista) {
@@ -356,4 +357,3 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
-

@@ -4,6 +4,7 @@ using AnunciaPicos.Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnunciaPicos.Migrations
 {
     [DbContext(typeof(AnunciaPicosDbContext))]
-    partial class AnunciaPicosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250519184848_CreateFavoritesTable")]
+    partial class CreateFavoritesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,9 +147,6 @@ namespace AnunciaPicos.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("ReadAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<int>("SenderId")
                         .HasColumnType("int");
 
@@ -263,10 +263,6 @@ namespace AnunciaPicos.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("Apelido")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("CPF")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -281,9 +277,6 @@ namespace AnunciaPicos.Migrations
                     b.Property<string>("ImageProfile")
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("IsSocialLogin")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -294,12 +287,6 @@ namespace AnunciaPicos.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Provider")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ProviderId")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("UpdatedAt")
