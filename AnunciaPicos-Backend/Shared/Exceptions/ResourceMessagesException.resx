@@ -231,4 +231,7 @@
   <data name="EVALUATION_NOT_EMPTY" xml:space="preserve">
     <value>Evaluation not founds.</value>
   </data>
+  <data name="CHAT_NOT_FOUND" xml:space="preserve">
+    <value>Chat not found, retry request.</value>
+  </data>
 </root>
