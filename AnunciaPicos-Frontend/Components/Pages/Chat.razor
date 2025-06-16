@@ -106,42 +106,225 @@ const CONVERSATIONS_REFRESH_INTERVAL = 15000;
 
 async function obterUsuarioLogado() {
     try {
-        const response = await fetch('https://api.anunciapicos.shop/profile/myprofile', { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetch('https://api.anunciapicos.shop/profile/myprofile', { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
         if (response.ok) {
             const userData = await response.json();
             currentUserId = userData.id || userData.Id;
         }
-    } catch (error) { console.error('Erro ao obter dados do usuário:', error); }
+    } catch (error) { 
+        console.error('Erro ao obter dados do usuário:', error); 
+    }
 }
 
 async function carregarConversas() {
     try {
-        const response = await fetch('https://api.anunciapicos.shop/message/conversations', { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetch('https://api.anunciapicos.shop/message/conversations', { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
         if (!response.ok) return;
         const conversas = await response.json();
         preencherListaConversas(conversas);
-    } catch (error) { console.error('Erro ao carregar conversas:', error); }
-}
-
-// **FUNÇÃO CORRIGIDA**
-async function enviarMensagem(receiverId, mensagem) {
-    try {
-        // 1. Apenas envia a mensagem para o servidor.
-        const response = await fetch('https://api.anunciapicos.shop/message/send', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ receiverId: parseInt(receiverId), message: mensagem })
-        });
-        if (!response.ok) throw new Error(`Erro ao enviar mensagem: ${response.status}`);
-        
-        // 2. Após o sucesso, força uma atualização da tela para buscar a mensagem do servidor.
-        // Isso garante que não haverá duplicatas.
-        await verificarNovasMensagens();
     } catch (error) { 
-        console.error(error); 
+        console.error('Erro ao carregar conversas:', error); 
     }
 }
 
+// **NOVA FUNÇÃO PARA CRIAR CHAT ENVIANDO MENSAGEM AUTOMÁTICA**
+async function criarChatComMensagem(receiverId, mensagemInicial = "Olá! 👋") {
+    try {
+        console.log(`Criando conversa com usuário ${receiverId} enviando mensagem automática...`);
+        
+        // Envia uma mensagem automática para criar a conversa
+        const response = await fetch('https://api.anunciapicos.shop/message/send', {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`, 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ 
+                receiverId: parseInt(receiverId), 
+                message: mensagemInicial 
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro ao criar chat enviando mensagem: ${response.status}`);
+        }
+        
+        console.log('Conversa criada com sucesso através de mensagem automática');
+        
+        // Aguarda um pouco para o servidor processar
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Recarrega as conversas para incluir a nova conversa
+        await carregarConversas();
+        
+        // Tenta encontrar a conversa recém-criada
+        const response2 = await fetch('https://api.anunciapicos.shop/message/conversations', { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        
+        if (response2.ok) {
+            const conversas = await response2.json();
+            const novaConversa = conversas.find(c => 
+                parseInt(c.otherUserId) === parseInt(receiverId)
+            );
+            return novaConversa;
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Erro ao criar chat com mensagem:', error);
+        throw error;
+    }
+}
+
+// **FUNÇÃO PARA VERIFICAR SE CONVERSA EXISTE OU CRIAR COM MENSAGEM**
+async function verificarOuCriarConversa(receiverId, criarSeNaoExistir = true) {
+    try {
+        // Primeiro, tenta encontrar a conversa existente
+        const response = await fetch('https://api.anunciapicos.shop/message/conversations', { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        
+        if (response.ok) {
+            const conversas = await response.json();
+            const conversaExistente = conversas.find(c => 
+                parseInt(c.otherUserId) === parseInt(receiverId)
+            );
+            
+            if (conversaExistente) {
+                console.log('Conversa existente encontrada:', conversaExistente);
+                return conversaExistente;
+            }
+        }
+        
+        // Se não encontrou a conversa e deve criar
+        if (criarSeNaoExistir) {
+            console.log(`Conversa não encontrada para receiverId ${receiverId}. Criando com mensagem automática...`);
+            const novaConversa = await criarChatComMensagem(receiverId);
+            
+            if (novaConversa) {
+                return novaConversa;
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Erro ao verificar ou criar conversa:', error);
+        throw error;
+    }
+}
+
+// **FUNÇÃO PARA INICIAR CONVERSA COM USUÁRIO ESPECÍFICO (VINDO DE OUTRA PÁGINA)**
+async function iniciarConversaComUsuario(receiverId, userName = null, mensagemInicial = "Olá! 👋") {
+    try {
+        console.log(`Iniciando conversa com usuário ID: ${receiverId}`);
+        
+        // Primeiro verifica se já existe conversa
+        let conversa = await verificarOuCriarConversa(receiverId, false);
+        
+        // Se não existe, cria enviando mensagem automática
+        if (!conversa) {
+            console.log('Conversa não existe, criando com mensagem automática...');
+            
+            // Mostra loading na interface
+            document.getElementById('emptyChat').style.display = 'none';
+            document.getElementById('activeChat').style.display = 'flex';
+            document.getElementById('chatUserName').textContent = userName || `Usuário ${receiverId}`;
+            document.getElementById('messagesContainer').innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Iniciando conversa...</div>';
+            
+            // Cria a conversa enviando mensagem automática
+            conversa = await criarChatComMensagem(receiverId, mensagemInicial);
+        }
+        
+        if (conversa) {
+            // Seleciona a conversa encontrada ou criada
+            await selecionarConversa(conversa);
+            return conversa;
+        } else {
+            throw new Error('Não foi possível criar a conversa');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao iniciar conversa:', error);
+        
+        // Se falhou, mostra erro na interface
+        document.getElementById('emptyChat').style.display = 'none';
+        document.getElementById('activeChat').style.display = 'flex';
+        document.getElementById('chatUserName').textContent = userName || `Usuário ${receiverId}`;
+        document.getElementById('messagesContainer').innerHTML = `
+            <div style="text-align: center; color: #f44336; padding: 20px; background: #ffebee; border-radius: 8px; margin: 20px;">
+                <div style="font-weight: bold; margin-bottom: 8px;">Erro ao iniciar conversa</div>
+                <div style="font-size: 0.9em;">Não foi possível criar a conversa. Tente novamente.</div>
+                <button onclick="window.location.reload()" style="margin-top: 12px; padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Tentar Novamente
+                </button>
+            </div>
+        `;
+        
+        return null;
+    }
+}
+
+// **FUNÇÃO CORRIGIDA PARA ENVIAR MENSAGEM**
+async function enviarMensagem(receiverId, mensagem) {
+    try {
+        // Se não há conversa atual ou não tem conversationId, tenta criar/verificar
+        if (!conversaAtual || !conversaAtual.conversationId) {
+            console.log('Conversa não existe, tentando criar...');
+            await verificarOuCriarConversa(receiverId);
+        }
+        
+        // Envia a mensagem para o servidor
+        const response = await fetch('https://api.anunciapicos.shop/message/send', {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`, 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ 
+                receiverId: parseInt(receiverId), 
+                message: mensagem 
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro ao enviar mensagem: ${response.status}`);
+        }
+        
+        // Recarrega as conversas e mensagens
+        await carregarConversas();
+        
+        // Se a conversa atual não tinha ID, tenta encontrá-la agora
+        if (!conversaAtual.conversationId) {
+            const conversaAtualizada = await verificarOuCriarConversa(receiverId);
+            conversaAtual = conversaAtualizada;
+        }
+        
+        // Atualiza as mensagens
+        await verificarNovasMensagens();
+        
+    } catch (error) { 
+        console.error('Erro ao enviar mensagem:', error);
+        
+        // Mostra mensagem de erro para o usuário
+        const messagesContainer = document.getElementById('messagesContainer');
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'background: #ffebee; color: #c62828; padding: 12px; margin: 8px 0; border-radius: 8px; text-align: center; border: 1px solid #ef9a9a;';
+        errorDiv.textContent = 'Erro ao enviar mensagem. Tente novamente.';
+        messagesContainer.appendChild(errorDiv);
+        
+        // Remove a mensagem de erro após 5 segundos
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.parentNode.removeChild(errorDiv);
+            }
+        }, 5000);
+    }
+}
 
 function isMensagemDoUsuarioLogado(mensagem) {
     if (currentUserId) {
@@ -160,11 +343,13 @@ function adicionarOuAtualizarMensagem(msg) {
 
     const msgElement = document.querySelector(`[data-msg-id="${msgId}"]`);
 
-    if (msgElement) { // Se a mensagem já existe, apenas atualiza o status de leitura
+    if (msgElement) {
+        // Se a mensagem já existe, apenas atualiza o status de leitura
         if (isFromMe && isRead) {
             atualizarStatusDeUmaMensagem(msgElement, true);
         }
-    } else { // Se não existe, cria o elemento da mensagem
+    } else {
+        // Se não existe, cria o elemento da mensagem
         adicionarMensagemAoChat(textoMsg, isFromMe, dataMsg, msgId, isRead);
     }
 }
@@ -205,7 +390,9 @@ async function verificarNovasMensagens() {
     if (!conversaAtual || !conversaAtual.conversationId) return;
     try {
         const url = `https://api.anunciapicos.shop/message/history/${conversaAtual.conversationId}`;
-        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetch(url, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
         if (!response.ok) return;
 
         const todasMensagens = await response.json();
@@ -225,13 +412,16 @@ async function verificarNovasMensagens() {
         if (hasNewUnreadMessage && !document.hidden) {
             marcarMensagensComoLidas(conversaAtual.conversationId);
         }
-    } catch (error) { console.error('Erro no polling de mensagens:', error); }
+    } catch (error) { 
+        console.error('Erro no polling de mensagens:', error); 
+    }
 }
 
 function iniciarPollingMensagens() {
     pararPollingMensagens();
     pollingInterval = setInterval(verificarNovasMensagens, POLLING_INTERVAL);
 }
+
 function pararPollingMensagens() {
     if (pollingInterval) clearInterval(pollingInterval);
 }
@@ -253,7 +443,9 @@ function preencherListaConversas(conversas) {
             item.className = 'conversation-item';
             item.setAttribute('data-conversation-id', conversa.conversationId);
             
-            const avatarHTML = conversa.otherUserProfilePicture ? `<img src="${conversa.otherUserProfilePicture}" alt="Avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" />` : `<div style="width:40px; height:40px; border-radius:50%; background:#007bff; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">${(conversa.otherUserName || 'U').charAt(0).toUpperCase()}</div>`;
+            const avatarHTML = conversa.otherUserProfilePicture ? 
+                `<img src="${conversa.otherUserProfilePicture}" alt="Avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" />` : 
+                `<div style="width:40px; height:40px; border-radius:50%; background:#007bff; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">${(conversa.otherUserName || 'U').charAt(0).toUpperCase()}</div>`;
             
             item.innerHTML = `
                 <div>${avatarHTML}</div>
@@ -270,7 +462,6 @@ function preencherListaConversas(conversas) {
     }
 }
 
-
 function formatarData(dataISO) {
     if (!dataISO) return '';
     const data = new Date(dataISO);
@@ -278,8 +469,10 @@ function formatarData(dataISO) {
     const agora = new Date();
     const ontem = new Date(agora);
     ontem.setDate(ontem.getDate() - 1);
-    if (data.toDateString() === agora.toDateString()) return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    if (data.toDateString() === ontem.toDateString()) return 'Ontem';
+    if (data.toDateString() === agora.toDateString()) 
+        return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    if (data.toDateString() === ontem.toDateString()) 
+        return 'Ontem';
     return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 }
 
@@ -288,30 +481,43 @@ async function selecionarConversa(conversa) {
     pararPollingMensagens();
 
     document.querySelectorAll('.conversation-item').forEach(el => el.classList.remove('active'));
-    document.querySelector(`[data-conversation-id="${conversa.conversationId}"]`).classList.add('active');
+    const conversaElement = document.querySelector(`[data-conversation-id="${conversa.conversationId}"]`);
+    if (conversaElement) {
+        conversaElement.classList.add('active');
+    }
 
     document.getElementById('emptyChat').style.display = 'none';
     document.getElementById('activeChat').style.display = 'flex';
     document.getElementById('chatUserName').textContent = conversa.otherUserName;
     const chatAvatar = document.getElementById('chatAvatar');
-    chatAvatar.innerHTML = conversa.otherUserProfilePicture ? `<img src="${conversa.otherUserProfilePicture}" alt="Avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />` : `<div style="width:32px; height:32px; border-radius:50%; background:#007bff; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">${(conversa.otherUserName || 'U').charAt(0).toUpperCase()}</div>`;
+    chatAvatar.innerHTML = conversa.otherUserProfilePicture ? 
+        `<img src="${conversa.otherUserProfilePicture}" alt="Avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />` : 
+        `<div style="width:32px; height:32px; border-radius:50%; background:#007bff; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">${(conversa.otherUserName || 'U').charAt(0).toUpperCase()}</div>`;
     
     document.getElementById('messagesContainer').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
     await verificarNovasMensagens();
     iniciarPollingMensagens();
-    marcarMensagensComoLidas(conversa.conversationId);
+    
+    if (conversa.conversationId) {
+        marcarMensagensComoLidas(conversa.conversationId);
+    }
 }
 
 async function marcarMensagensComoLidas(conversationId) {
     if (!conversationId) return;
     try {
-        const response = await fetch(`https://api.anunciapicos.shop/message/mark-as-read/${conversationId}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetch(`https://api.anunciapicos.shop/message/mark-as-read/${conversationId}`, { 
+            method: 'PUT', 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
         if (response.ok) {
             const badge = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"] .unread-count-badge`);
             if (badge) badge.remove();
         }
-    } catch (error) { console.error('Erro ao marcar mensagens como lidas:', error); }
+    } catch (error) { 
+        console.error('Erro ao marcar mensagens como lidas:', error); 
+    }
 }
 
 function adicionarIndicadorLeitura(isRead = false) {
@@ -331,9 +537,36 @@ function atualizarStatusDeUmaMensagem(msgElement, isRead) {
     }
 }
 
+// **FUNÇÃO PARA DETECTAR PARÂMETROS DA URL E INICIAR CONVERSA AUTOMATICAMENTE**
+function verificarParametrosURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const receiverId = urlParams.get('receiverId');
+    const userName = urlParams.get('userName');
+    
+    if (receiverId) {
+        console.log(`Parâmetro receiverId detectado: ${receiverId}`);
+        
+        // Aguarda um pouco para garantir que o usuário foi carregado
+        setTimeout(async () => {
+            await iniciarConversaComUsuario(receiverId, userName);
+        }, 1000);
+        
+        // Remove os parâmetros da URL para limpar
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+}
+
+// **FUNÇÃO GLOBAL PARA USO EXTERNO**
+window.iniciarChatComUsuario = iniciarConversaComUsuario;
+
 document.addEventListener('DOMContentLoaded', async () => {
     await obterUsuarioLogado();
     await carregarConversas();
+    
+    // Verifica se veio com parâmetros na URL para iniciar conversa específica
+    verificarParametrosURL();
+    
     setInterval(carregarConversas, CONVERSATIONS_REFRESH_INTERVAL);
     
     const messageForm = document.getElementById('messageForm');
@@ -342,6 +575,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const messageInput = document.getElementById('messageInput');
         const mensagem = messageInput.value.trim();
         if (!mensagem || !conversaAtual) return;
+        
         messageInput.disabled = true;
         await enviarMensagem(conversaAtual.otherUserId, mensagem);
         messageInput.value = '';
@@ -357,7 +591,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && conversaAtual) {
+        if (!document.hidden && conversaAtual && conversaAtual.conversationId) {
             marcarMensagensComoLidas(conversaAtual.conversationId);
         }
     });
