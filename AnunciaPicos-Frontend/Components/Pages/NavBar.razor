@@ -11,9 +11,19 @@
             box-sizing: border-box;
         }
 
+        /* FORÇA O SCROLL A FUNCIONAR */
+        html, body {
+            height: auto !important;
+            overflow: visible !important;
+            overflow-x: auto !important;
+            overflow-y: auto !important;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
+            min-height: 100vh; /* Garante altura mínima */
         }
 
         /* Navbar base */
@@ -26,8 +36,9 @@
             padding: 20px 30px;
             height: 80px;
             flex-wrap: wrap;
-            position: relative;
+            position: relative; /* Mudança: era fixed ou sticky? */
             box-shadow: 0 4px 15px rgba(126, 110, 234, 0.3);
+            z-index: 1000;
         }
 
         .logo-area {
@@ -174,7 +185,6 @@
             animation: pulse 2s infinite;
         }
 
-       
         /* Botão de logout melhorado */
         #areaLogout {
             display: none; /* Inicialmente oculto */
@@ -400,6 +410,70 @@
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
+
+        /* ANIMAÇÕES */
+        @* @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        } *@
+
+        /* CONTEÚDO DE TESTE PARA VERIFICAR O SCROLL */
+        .content {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .test-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* RESPONSIVIDADE */
+        @* @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .icons {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: rgba(126, 110, 234, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 0 0 15px 15px;
+                width: 200px;
+                padding: 20px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .icons.show-menu {
+                display: flex;
+            }
+
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 20px;
+            }
+
+            .sub-navbar-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+        } *@
     </style>
 </head>
 <body>
@@ -442,8 +516,14 @@
         </div>
     </div>
 
+    
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // FORÇA O SCROLL A FUNCIONAR
+            document.body.style.overflow = 'visible';
+            document.documentElement.style.overflow = 'visible';
+            
             const logoHomeLink = document.querySelector('.logo a[href="/Home"]');
             
             if (logoHomeLink) {
@@ -529,22 +609,18 @@
                         const payload = JSON.parse(atob(token.split('.')[1]));
                         const agora = Math.floor(Date.now() / 1000);
 
-                        // Verifica se o token é válido (não expirado)
                         if (payload.exp && payload.exp < agora) {
-                            // Token expirado - remove e oculta o botão
                             localStorage.removeItem("authToken");
-                            if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
-                            if (areaLogout) areaLogout.style.display = "none";
+                          
                             return;
                         }
 
-                        // Token válido - exibe mensagem de boas-vindas e botão de logout
                         if (payload.nome && welcomeEl) {
                             welcomeEl.textContent = `Olá, ${payload.nome}`;
                         }
 
                         if (areaLogout) {
-                            areaLogout.style.display = "flex"; // Mostra o botão de logout
+                            areaLogout.style.display = "flex";
                         }
 
                         if (logoutBtn) {
@@ -556,19 +632,28 @@
                         }
                     } catch (e) {
                         console.error("Erro ao processar token:", e);
-                        // Token inválido - oculta o botão e exibe mensagem de visitante
                         if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
                         if (areaLogout) areaLogout.style.display = "none";
-                        localStorage.removeItem("authToken"); // Remove token inválido
+                        localStorage.removeItem("authToken");
                     }
                 } else {
-                    // Sem token - oculta o botão e exibe mensagem de visitante
                     if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
                     if (areaLogout) areaLogout.style.display = "none";
                 }
             }
 
             exibirMensagemUsuario();
+            
+            // VERIFICA E CORRIGE PROBLEMAS DE SCROLL
+            function verificarScroll() {
+                console.log('Verificando scroll...');
+                console.log('Body overflow:', getComputedStyle(document.body).overflow);
+                console.log('HTML overflow:', getComputedStyle(document.documentElement).overflow);
+                console.log('Body height:', document.body.scrollHeight);
+                console.log('Window height:', window.innerHeight);
+            }
+            
+            verificarScroll();
         });
     </script>
 </body>
