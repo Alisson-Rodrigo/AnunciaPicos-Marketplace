@@ -174,15 +174,10 @@
             animation: pulse 2s infinite;
         }
 
-        @* @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        } *@
-
+       
         /* Botão de logout melhorado */
         #areaLogout {
-            display: flex;
+            display: none; /* Inicialmente oculto */
             align-items: center;
         }
 
@@ -369,8 +364,6 @@
             transform: rotate(180deg);
         }
 
-        /
-
         .navbar {
             animation: fadeInDown 0.8s ease-out;
         }
@@ -534,12 +527,27 @@
                 if (token) {
                     try {
                         const payload = JSON.parse(atob(token.split('.')[1]));
+                        const agora = Math.floor(Date.now() / 1000);
+
+                        // Verifica se o token é válido (não expirado)
+                        if (payload.exp && payload.exp < agora) {
+                            // Token expirado - remove e oculta o botão
+                            localStorage.removeItem("authToken");
+                            if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
+                            if (areaLogout) areaLogout.style.display = "none";
+                            return;
+                        }
+
+                        // Token válido - exibe mensagem de boas-vindas e botão de logout
                         if (payload.nome && welcomeEl) {
                             welcomeEl.textContent = `Olá, ${payload.nome}`;
                         }
 
+                        if (areaLogout) {
+                            areaLogout.style.display = "flex"; // Mostra o botão de logout
+                        }
+
                         if (logoutBtn) {
-                            areaLogout.style.display = "inline-block";
                             logoutBtn.onclick = () => {
                                 localStorage.removeItem("authToken");
                                 alert("Você foi desconectado com sucesso!");
@@ -548,10 +556,13 @@
                         }
                     } catch (e) {
                         console.error("Erro ao processar token:", e);
-                        if (welcomeEl) welcomeEl.textContent = "Visitante";
+                        // Token inválido - oculta o botão e exibe mensagem de visitante
+                        if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
                         if (areaLogout) areaLogout.style.display = "none";
+                        localStorage.removeItem("authToken"); // Remove token inválido
                     }
                 } else {
+                    // Sem token - oculta o botão e exibe mensagem de visitante
                     if (welcomeEl) welcomeEl.textContent = "Você está navegando como visitante.";
                     if (areaLogout) areaLogout.style.display = "none";
                 }
