@@ -1,7 +1,16 @@
 @page "/Home"
 <NavBar />
 
-
+ <div class="sub-navbar">
+        <div class="sub-navbar-container">
+            <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">
+                <i class="fas fa-cogs"></i> Escolha um Plano
+            </button>
+            <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')" class="plan-button">
+                <i class="fas fa-plus"></i> Anunciar Produto
+            </button>
+        </div>
+    </div>
 <div class="banner-carousel">
     <div class="carousel-inner-slide" id="carouselSlide">
         <div class="banner-slide-container">

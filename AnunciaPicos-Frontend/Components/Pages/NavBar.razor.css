@@ -1,5 +1,161 @@
- @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+
+
+        /* Animações */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* RESPONSIVIDADE CORRIGIDA */
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+            
+            .search-container {
+                max-width: 400px;
+                margin: 0 15px;
+            }
+            
+            .welcome-message {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            
+            .logo a {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px 20px;
+                min-height: auto;
+            }
+
+            .navbar-content {
+                width: 100%;
+                position: relative;
+                margin-bottom: 15px;
+            }
+
+            .logo {
+                position: static;
+                transform: none;
+                order: 1;
+                margin-right: auto;
+            }
+
+            .hamburger {
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .welcome-message {
+                display: none;
+            }
+
+            .search-container {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                order: 3;
+            }
+
+            .icons {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(126, 110, 234, 0.98);
+                backdrop-filter: blur(10px);
+                padding: 20px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                border-radius: 0 0 15px 15px;
+                gap: 15px;
+                z-index: 999;
+            }
+
+            .icons.show-menu {
+                display: flex;
+                animation: slideDown 0.3s ease-out;
+            }
+
+            .icon {
+                justify-content: center;
+                text-align: center;
+                padding: 15px;
+                border-radius: 10px;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .sub-navbar-container {
+                flex-direction: column;
+                gap: 15px;
+                padding: 0 20px;
+            }
+
+            .plan-button, .categories-dropdown {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+
+            .logo a {
+                font-size: 20px;
+            }
+
+            .search-box {
+                font-size: 14px;
+                padding: 10px 15px;
+                padding-right: 45px;
+            }
+
+            .search-button {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .test-content {
+                padding: 20px;
+            }
+
+            .plan-button, .categories-dropdown {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }

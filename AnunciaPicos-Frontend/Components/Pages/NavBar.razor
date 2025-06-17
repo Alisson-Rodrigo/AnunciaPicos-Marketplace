@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
+ * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* FORÇA O SCROLL A FUNCIONAR */
         html, body {
             height: auto !important;
             overflow: visible !important;
@@ -23,7 +22,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
-            min-height: 100vh; /* Garante altura mínima */
+            min-height: 100vh;
         }
 
         /* Navbar base */
@@ -34,29 +33,47 @@
             background: linear-gradient(135deg, #7e6eea 0%, #6b5ed9 100%);
             color: white;
             padding: 20px 30px;
-            height: 80px;
-            flex-wrap: wrap;
-            position: relative; /* Mudança: era fixed ou sticky? */
+            min-height: 80px;
+            position: relative;
             box-shadow: 0 4px 15px rgba(126, 110, 234, 0.3);
             z-index: 1000;
+            flex-wrap: wrap;
+        }
+
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
         }
 
         .logo-area {
             display: flex;
-            width: 100%;
             align-items: center;
-            position: relative;
+            flex: 1;
+        }
+
+        .welcome-message {
+            font-size: 16px;
+            font-weight: 500;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
         }
 
         .logo {
-            font-weight: bold;
-            font-size: 26px;
-            margin: 0;
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            text-align: center;
-            width: auto;
+            font-weight: bold;
+            font-size: 26px;
+            margin: 0;
         }
 
         .logo a {
@@ -73,28 +90,13 @@
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
         }
 
-        .welcome-message {
-            font-size: 16px;
-            font-weight: 500;
-            color: #ffffff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            white-space: nowrap;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 10px 15px;
-            border-radius: 25px;
-            position: absolute;
-            left: 0;
-            margin: 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
         .search-container {
             flex: 1;
             max-width: 600px;
             margin: 0 20px;
             position: relative;
             width: 100%;
+            order: 3;
         }
 
         .search-box {
@@ -136,10 +138,8 @@
 
         .icons {
             display: flex;
-            justify-content: flex-end;
             gap: 20px;
-            position: absolute;
-            right: 20px;
+            align-items: center;
             transition: all 0.3s ease-in-out;
         }
 
@@ -160,14 +160,6 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .icon i {
-            transition: all 0.3s ease;
-        }
-
-        .icon:hover i {
-            transform: scale(1.1);
-        }
-
         .cart-count, .chat-count {
             position: absolute;
             top: 5px;
@@ -185,9 +177,27 @@
             animation: pulse 2s infinite;
         }
 
-        /* Botão de logout melhorado */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            z-index: 1001;
+            padding: 10px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+
+
+        .hamburger.active i {
+            transform: rotate(45deg);
+        }
+
+        /* Botão de logout */
         #areaLogout {
-            display: none; /* Inicialmente oculto */
+            display: flex;
             align-items: center;
         }
 
@@ -227,6 +237,7 @@
             margin: 0 auto;
             gap: 30px;
             flex-wrap: wrap;
+            padding: 0 20px;
         }
 
         .plan-button {
@@ -252,14 +263,6 @@
             box-shadow: 0 6px 20px rgba(126, 110, 234, 0.4);
         }
 
-        .plan-button i {
-            transition: transform 0.3s ease;
-        }
-
-        .plan-button:hover i {
-            transform: scale(1.1);
-        }
-
         .categories-dropdown {
             background: linear-gradient(135deg, #6b6bff 0%, #5a5aff 100%);
             color: white;
@@ -283,16 +286,6 @@
             box-shadow: 0 6px 20px rgba(107, 107, 255, 0.4);
         }
 
-        .categories-dropdown::after {
-            content: '\25BC';
-            font-size: 0.8rem;
-            transition: transform 0.3s ease;
-        }
-
-        .categories-dropdown:hover::after {
-            transform: rotate(180deg);
-        }
-
         .dropdown {
             position: relative;
             display: inline-block;
@@ -311,13 +304,11 @@
             transform: translateX(-50%);
             opacity: 0;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
         }
 
         .dropdown-content.show {
             display: block;
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
         }
 
         .dropdown-content a {
@@ -332,98 +323,9 @@
         .dropdown-content a:hover {
             background: linear-gradient(135deg, #f3f3ff 0%, #e6e6ff 100%);
             color: #7e6eea;
-            transform: translateX(5px);
         }
 
-        .dropdown-content a:first-child {
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-        }
-
-        .dropdown-content a:last-child {
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
-            border-bottom: none;
-        }
-
-        /* Hamburger icon animation */
-        .hamburger {
-            display: none;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            transition: all 0.3s ease-in-out;
-            z-index: 100;
-            padding: 10px;
-            border-radius: 50%;
-        }
-
-        .hamburger:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(1.1);
-        }
-
-        .hamburger i {
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .hamburger i.fa-times {
-            transform: rotate(180deg);
-        }
-
-        .navbar {
-            animation: fadeInDown 0.8s ease-out;
-        }
-
-        /* Efeito de hover para ícones específicos */
-        .icon[data-tooltip]:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-        }
-
-        /* Estilos para o ícone de chat */
-        .chat-icon {
-            position: relative;
-        }
-
-        .chat-icon::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background: #00ff88;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        /* ANIMAÇÕES */
-        @* @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes fadeInDown {
-            0% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        } *@
-
-        /* CONTEÚDO DE TESTE PARA VERIFICAR O SCROLL */
+        /* Conteúdo de teste */
         .content {
             padding: 40px 20px;
             max-width: 1200px;
@@ -438,42 +340,6 @@
             margin-bottom: 30px;
             line-height: 1.6;
         }
-
-        /* RESPONSIVIDADE */
-        @* @media (max-width: 768px) {
-            .hamburger {
-                display: block;
-            }
-
-            .icons {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                right: 0;
-                background: rgba(126, 110, 234, 0.95);
-                backdrop-filter: blur(10px);
-                border-radius: 0 0 15px 15px;
-                width: 200px;
-                padding: 20px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            }
-
-            .icons.show-menu {
-                display: flex;
-            }
-
-            .navbar {
-                flex-direction: column;
-                height: auto;
-                padding: 15px 20px;
-            }
-
-            .sub-navbar-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-        } *@
     </style>
 </head>
 <body>
@@ -505,16 +371,7 @@
         </div>
     </div>
 
-    <div class="sub-navbar">
-        <div class="sub-navbar-container">
-            <button class="plan-button" onclick="verificarAuthENavegar('/Planos')">
-                <i class="fas fa-cogs"></i> Escolha um Plano
-            </button>
-            <button id="btnAdicionarAnuncio" onclick="verificarAuthENavegar('/cadastrarProduto')" class="plan-button">
-                <i class="fas fa-plus"></i> Anunciar Produto
-            </button>
-        </div>
-    </div>
+   
 
     
 
