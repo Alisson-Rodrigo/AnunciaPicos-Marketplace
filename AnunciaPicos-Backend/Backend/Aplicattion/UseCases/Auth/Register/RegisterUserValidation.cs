@@ -15,7 +15,7 @@ namespace AnunciaPicos.Backend.Aplicattion.UseCases.Auth.Register
             _cpf = cpf ?? throw new ArgumentNullException(nameof(cpf));
 
             // Validação para Username:
-            RuleFor(x => x.Name)
+            RuleFor(x => x.Apelido)
                 .NotEmpty().WithMessage(ResourceMessagesException.NAME_EMPTY)
                 // Verifica se o valor não possui espaços no início ou no fim:
                 .Must(username => username == username.Trim())
